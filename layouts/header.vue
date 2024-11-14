@@ -1,53 +1,35 @@
 <template>
-    <header class="bg-white shadow-md">
+    <header class="bg-white shadow-sm">
         <!-- top-header -->
-        <div class="border-b border-gray-100 py-2"> 
-            <div class="container mx-auto max-w-xl flex justify-between">
-                <div class="topbar-left">
-                    <a class="text-gray-110 text-font-13" href="https://beta.vinashoptv.com/">Welcome to Vinashop</a>
-                </div>
-                <div class="topbar-right">
-                    <a class="text-green-334 text-font-13" href="https://beta.vinashoptv.com/"><i class="ec ec-map-pointer text-font-18 mr-1"></i> Store Locator</a>
-                    <span class="text-gray-5 mx-4">|</span>
-                    <a class="text-green-334 text-font-13" href="https://beta.vinashoptv.com/"><i class="ec ec-user text-font-18 mr-1"></i> Register <span class="text-gray-50">or</span> Sign in</a>
-                </div>
-            </div>
-        </div>
+        <Topbar />
         <!-- main-header -->
         <div class="container mx-auto">
             <div class="flex items-center py-2 xl:py-8">
-                <!-- Logo -->
-                <nav class="max-width-270">           
-                    <a class="logo" href="/">
-                        <img src="/images/logo-01.png" alt="">
-                    </a>
-                </nav>
-
-                <!-- search -->
-                <div class="w-3/6">
-                    <form action="">
-                        <div class="input-group flex">
-                            <input type="search" class="w-2/3 border-2 border-primary rounded-bl-full rounded-tl-full text-font-15 h-10 py-2 pl-5 w-full" placeholder="Search for Products">
-                            <button class="btn btn-primary bg-primary px-3 py-2 h-10 rounded-br-full rounded-tr-full"><span class="ec ec-search text-font-24 text-green-022" aria-hidden="true"></span></button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- cart -->
-                <div class="w-1/6 justify-end">
-                    <a class="relative" href="/">
-                        <span class="text-font-24 text-green-334 ec ec-shopping-bag"></span>
-                        <span class="text-green-334 bg-primary w-5 h-5 absolute flex justify-center items-center rounded-full text-font-13 font-bold top-2.5 left-3.5">0</span>
-                    </a>
-                </div>   
+                <Logo />
+                <Searchbar />
+                <CartIcon />
             </div>
             <!-- menu -->
-            <div class="flex items-center">
-                <div class="max-width-270">
-                    <button type="button" class="flex max-width-270 btn btn-primary bg-primary py-4 px-6 rounded-t-lg items-center leading-none font-bold">
+            <MenuDropdown />
+            <!-- <div class="flex items-center">
+                <div class="max-w-[270]">
+                    <button type="button" class="flex max-w-[270] btn btn-primary bg-primary py-4 px-6 rounded-t-lg items-center leading-none font-bold">
                         <span class="fa fa-list-ul mr-2"></span>
                         <span class="pl-1">All Departments</span>
                     </button>
+                    <div class="list-menu absolute max-w-[270] hidden">
+                        <ul class="px-3 py-2 w-full">
+                            <li class="border-b relative py-2 px-1 hover:bg-neutral-100"><a href="#" class="font-black hover:text-black">Sale Off</a></li>
+                            <li class="border-b relative py-2 px-1 hover:bg-neutral-100"><a href="#" class="font-black hover:text-black">SPECIAL</a></li>
+                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Ginseng-LINGZHI</a><i class="fa fa-angle-right text-neutral-400"></i></li>       
+                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Supplements</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
+                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Food & Drink</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
+                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Skin Care</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
+                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Hair Care</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
+                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Electronics +</a><i class="fa fa-angle-right text-neutral-400"></i></li>
+                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Masks & Sanitizer</a><i class="fa fa-angle-right text-neutral-400"></i></li>                                                 
+                        </ul>
+                    </div>
                 </div>
                 <div class="pl-7">
                     <ul class="hidden md:flex space-x-8">
@@ -57,16 +39,16 @@
                         <li><a href="#" class="font-black hover:text-black">Toll free: 1-855-855-5888</a></li>
                     </ul>
                 </div>
-            </div>
+            </div> -->
         </div>
             
   
-            <!-- Nút Menu cho thiết bị di động -->
-            <!-- <button @click="toggleMenu" class="md:hidden text-gray-600 focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button> -->       
+        <!-- Nút Menu cho thiết bị di động -->
+        <!-- <button @click="toggleMenu" class="md:hidden text-gray-600 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button> -->       
   
       <!-- Menu di động -->
       <!-- <div v-if="isOpen" class="md:hidden bg-gray-100 px-6 py-4">
@@ -78,17 +60,12 @@
         </ul>
       </div> -->
     </header>
-  </template>
+</template>
   
-  <script setup lang="ts">
-  import { ref } from 'vue';
-  
-  const isOpen = ref(false);
-  const toggleMenu = () => {
-    isOpen.value = !isOpen.value;
-  };
-  </script>
-  
-  <style scoped>
-  /* Bạn có thể tùy chỉnh thêm nếu cần */
-  </style>
+<script setup lang="ts">
+    import { ref } from 'vue';
+    const isOpen = ref(false);
+    const toggleMenu = () => {
+        isOpen.value = !isOpen.value;
+    };
+</script>

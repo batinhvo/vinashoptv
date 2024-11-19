@@ -5,14 +5,15 @@
                 <div class="w-1/2 mt-16 ml-80 text-left">
                     <h1 class="text-6xl mb-6 font-thin">CORDYCEPS<br>SPECIAL</h1>           
                     <h6 class="font-black text-xl">BUY 2 GET 1 FREE</h6>        
-                    <div>
+                    <div class="mb-4">
                         <span class="">FROM</span>
                         <div class="text-5xl font-black leading-[3rem]">
                             <sup>$</sup>
-                            199
+                            <span>199</span>
                             <sup>00</sup>
                         </div>
                     </div> 
+                    <button class="btn btn-primary bg-primary py-2 px-7 rounded-lg text-base">Start Buying</button>
                 </div>
                 <div class="w-1/2">
                         <img src="/images/banner-01.png" alt="">

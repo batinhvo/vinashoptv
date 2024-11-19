@@ -1,6 +1,6 @@
 <template>
     <form class="max-w-[620px] w-full">
-        <div class="input-group flex">
+        <div class="input-group flex px-5">
             <input 
             type="search"
             placeholder="Search for Products"

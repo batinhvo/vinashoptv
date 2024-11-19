@@ -10,37 +10,13 @@
                 <CartIcon />
             </div>
             <!-- menu -->
-            <MenuDropdown />
-            <!-- <div class="flex items-center">
-                <div class="max-w-[270]">
-                    <button type="button" class="flex max-w-[270] btn btn-primary bg-primary py-4 px-6 rounded-t-lg items-center leading-none font-bold">
-                        <span class="fa fa-list-ul mr-2"></span>
-                        <span class="pl-1">All Departments</span>
-                    </button>
-                    <div class="list-menu absolute max-w-[270] hidden">
-                        <ul class="px-3 py-2 w-full">
-                            <li class="border-b relative py-2 px-1 hover:bg-neutral-100"><a href="#" class="font-black hover:text-black">Sale Off</a></li>
-                            <li class="border-b relative py-2 px-1 hover:bg-neutral-100"><a href="#" class="font-black hover:text-black">SPECIAL</a></li>
-                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Ginseng-LINGZHI</a><i class="fa fa-angle-right text-neutral-400"></i></li>       
-                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Supplements</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
-                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Food & Drink</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
-                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Skin Care</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
-                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Hair Care</a><i class="fa fa-angle-right text-neutral-400"></i></li>                            
-                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Electronics +</a><i class="fa fa-angle-right text-neutral-400"></i></li>
-                            <li class="border-b relative flex justify-between items-center py-2 px-1 hover:bg-neutral-100"><a href="#" class="hover:text-black hover:font-black">Masks & Sanitizer</a><i class="fa fa-angle-right text-neutral-400"></i></li>                                                 
-                        </ul>
-                    </div>
-                </div>
-                <div class="pl-7">
-                    <ul class="hidden md:flex space-x-8">
-                        <li><a href="#" class="font-black hover:text-black">Home</a></li>
-                        <li><a href="#" class="font-black hover:text-black">About Us</a></li>
-                        <li><a href="#" class="font-black hover:text-black">Contact</a></li>
-                        <li><a href="#" class="font-black hover:text-black">Toll free: 1-855-855-5888</a></li>
-                    </ul>
-                </div>
-            </div> -->
+            <div class="flex items-center">
+                <MenuDropdown />
+                <Menubar />
+            </div>
         </div>
+        <!-- slider -->
+        
             
   
         <!-- Nút Menu cho thiết bị di động -->

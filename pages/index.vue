@@ -2,7 +2,8 @@
   <div>
     <!-- Header -->
     <Header />
-
+    <!-- Slider -->
+     <Slider />
     <!-- Nội dung trang -->
     <main class="min-h-screen flex flex-col items-center justify-center py-10">
       <h1 class="text-4xl font-bold text-blue-600 mb-6">Chào mừng bạn đến với VinaShopTV!</h1>

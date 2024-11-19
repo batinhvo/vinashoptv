@@ -15,7 +15,8 @@
     "elegant-icons": "^0.0.1",
     "nuxt": "^3.14.159",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "vue3-carousel": "^0.7.1"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.2"

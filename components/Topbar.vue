@@ -1,6 +1,6 @@
 <template>
     <div class="border-b border-gray-100 py-2">
-        <div class="2xl:container max-w-5xl mx-auto flex justify-between items-center">
+        <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-gray-110 font-normal">Welcome to Vinashop</a>
             <div class="flex items-center space-x-4">
                 <a href="/" class="text-green-334 font-medium hover:italic flex items-center">

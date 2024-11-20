@@ -3,7 +3,7 @@
         <!-- top-header -->
         <Topbar />
         <!-- main-header -->
-        <div class="2xl:container mx-auto">
+        <div class="container mx-auto">
             <div class="flex items-center py-2 xl:py-8">
                 <Logo />
                 <Searchbar />

@@ -12,7 +12,7 @@
                         </a>
                         <!-- Submenu 1 -->
                         <transition name="fade">
-                        <ul v-if="item.hasSubmenu" class="submenu bg-white shadow-md absolute top-0 rounded-b-lg left-full mt-0 w-[270px] z-50 top-0">
+                        <ul v-if="item.hasSubmenu" class="submenu bg-white shadow-md absolute rounded-lg left-full mt-0 w-[270px] z-50 top-0 p-2">
                             <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
                                 <a href="#" class="flex justify-between items-center hover:text-black hover:font-black">
                                     {{ subItem.label }}
@@ -20,7 +20,7 @@
                                 </a>
                                 <!-- Submenu 2 -->
                                 <transition name="fade">
-                                <ul v-if="subItem.hasSubmenu" class="submenu1 bg-white shadow-md absolute top-0 rounded-b-lg left-full mt-0 w-[270px] z-50 top-0">
+                                <ul v-if="subItem.hasSubmenu" class="submenu1 bg-white shadow-md absolute top-0 rounded-lg left-full mt-0 w-[270px] z-50 p-2">
                                     <li v-for="(subItem1, subIndex1) in subItem.subItem1" :key="subIndex1" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
                                         <a href="#" class="flex justify-between items-center hover:text-black hover:font-black">
                                             {{ subItem1.label }}
@@ -42,7 +42,6 @@
 <script setup lang="ts">
  
     const isMenuOpen = ref(false);
-    const isSubMenuOpen = ref(false);
     const menu = ref<HTMLElement | null>(null);
     const menuItems = [
         { label: 'Sale Off', hasSubmenu: false },

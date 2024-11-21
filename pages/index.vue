@@ -3,8 +3,11 @@
     <!-- Header -->
     <Header />
 
-    <!-- Slider -->
+    <!-- Main Home -->
     <Slider />
+    <BestSeller />
+    <MainSeller />
+    <BigDiscount />
 
     <!-- footer -->
      <Footer />

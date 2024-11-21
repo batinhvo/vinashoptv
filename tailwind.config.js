@@ -15,7 +15,8 @@ module.exports = {
                 'font-13' : '0.81288rem',
                 'font-15' : '0.938rem',
                 'font-18' : '1.12525rem !important',
-                'font-24' : '1.49975rem !important',
+                'font-22' : '1.37462rem',
+                'font-55' : '3.43788rem',
             },
             colors: {
                 'body' : '#333e48',

@@ -1,22 +1,14 @@
 <template>
   <div>
-    <!-- Header -->
-    <Header />
-
-    <!-- Main Home -->
-    <Slider />
-    <BestSeller />
-    <MainSeller />
-    <BigDiscount />
-
-    <!-- footer -->
-     <Footer />
+    <BodyHomeSlider />
+    <BodyHomeBestSeller />
+    <BodyHomeMainSeller />
+    <BodyHomeBigDiscount />
   </div>
 </template>
 
 <script setup>
-  import Header from '~/layouts/header.vue';
-  import Footer from '~/layouts/footer.vue';
+
 </script>
 
 <style scoped>

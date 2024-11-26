@@ -117,11 +117,11 @@
                         <h6 class="mb-4 font-bold text-base underline">Important</h6>            
                         <div class="my-4">
                             <ul class="flex flex-col">
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA">Privacy</a></li>                                
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA">Billing & Orders</a></li>       
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA">Return Policy</a></li>       
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA">Term & Condition</a></li>       
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA">Contacts</a></li>       
+                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Privacy</a></li>                                
+                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Billing & Orders</a></li>       
+                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Return Policy</a></li>       
+                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Term & Condition</a></li>       
+                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Contacts</a></li>       
                             </ul>
                         </div>                           
                     </div>

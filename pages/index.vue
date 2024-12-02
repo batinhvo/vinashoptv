@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BodyHomeSlider />
+    <BodyHomeMainSlider />
     <BodyHomeBestSeller />
     <BodyHomeMainSeller />
     <BodyHomeBigDiscount />

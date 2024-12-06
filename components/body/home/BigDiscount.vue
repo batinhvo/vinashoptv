@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto mb-8">
-        <a href="/" class="block">
+        <a href="/" class="block" @click.prevent="showAlert">
             <div class="bg-[url('/images/bg-discount.jpg')] bg-cover bg-top-center mx-4">
                 <div class="px-12 py-6 lg:py-0">
                     <div class="flex flex-wrap items-center lg:p-14">
@@ -24,6 +24,20 @@
                     </div>
                 </div>
             </div>
-        </a>
+        </a>           
     </div>
 </template>
+
+<script setup lang="ts">
+
+    const Alert = useNotify();
+
+
+    const showAlert = () => {
+        Alert({
+            message: "đây là thông báo từ VinaShop",
+            type: "info",
+            time: 0,
+        });
+    }
+</script>

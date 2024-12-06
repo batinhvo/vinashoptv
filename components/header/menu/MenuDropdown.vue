@@ -3,35 +3,33 @@
         <button @click="toggleMenu" class="btn btn-primary bg-primary px-6 py-3 flex items-center font-bold w-[270px] rounded-t-lg">
             <i class="fa fa-list-ul mr-2"></i> All Departments
         </button>
-        <!-- <transition name="fade"> -->
-            <div v-show="isMenuOpen" ref="menu" class="list-menu absolute bg-white shadow-lg rounded-b-lg w-[270px] z-50" :class="[isMenuOpen ? 'fade' : '']">
-                <ul class="p-2">
-                    <li v-for="(item, index) in menuItems" :key="index" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative group">
-                        <a href="#" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
-                            <i v-if="item.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
-                        </a>
-                        <!-- Submenu 1 -->                       
-                        <ul v-if="item.hasSubmenu" class="submenu bg-white shadow-md absolute rounded-lg left-full mt-0 w-[270px] z-50 top-0 p-2">
-                            <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
-                                <a href="#" class="flex justify-between items-center hover:text-black hover:font-bold">
-                                    {{ subItem.label }}
-                                    <i v-if="subItem.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
-                                </a>
-                                <!-- Submenu 2 -->                                
-                                <ul v-if="subItem.hasSubmenu" class="submenu1 bg-white shadow-md absolute top-0 rounded-lg left-full mt-0 w-[270px] z-50 p-2">
-                                    <li v-for="(subItem1, subIndex1) in subItem.subItem1" :key="subIndex1" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
-                                        <a href="#" class="flex justify-between items-center hover:text-black hover:font-bold">
-                                            {{ subItem1.label }}
-                                            <i v-if="subItem1.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
-                                        </a>
-                                    </li>
-                                </ul>                                
-                            </li>
-                        </ul>                        
-                    </li>
-                </ul>
-            </div>
-        <!-- </transition> -->
+        <div v-show="isMenuOpen" ref="menu" class="list-menu absolute bg-white shadow-lg rounded-b-lg w-[270px] z-50" :class="[isMenuOpen ? 'fade' : '']">
+            <ul class="p-2">
+                <li v-for="(item, index) in menuItems" :key="index" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative group">
+                    <a href="#" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
+                        <i v-if="item.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
+                    </a>
+                    <!-- Submenu 1 -->                       
+                    <ul v-if="item.hasSubmenu" class="submenu bg-white shadow-md absolute rounded-lg left-full mt-0 w-[270px] z-50 top-0 p-2">
+                        <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
+                            <a href="#" class="flex justify-between items-center hover:text-black hover:font-bold">
+                                {{ subItem.label }}
+                                <i v-if="subItem.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
+                            </a>
+                            <!-- Submenu 2 -->                                
+                            <ul v-if="subItem.hasSubmenu" class="submenu1 bg-white shadow-md absolute top-0 rounded-lg left-full mt-0 w-[270px] z-50 p-2">
+                                <li v-for="(subItem1, subIndex1) in subItem.subItem1" :key="subIndex1" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
+                                    <a href="#" class="flex justify-between items-center hover:text-black hover:font-bold">
+                                        {{ subItem1.label }}
+                                        <i v-if="subItem1.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
+                                    </a>
+                                </li>
+                            </ul>                                
+                        </li>
+                    </ul>                        
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
   
@@ -336,20 +334,20 @@
   display: none;
 }
 
-/* .fade-enter-active, .fade-leave-active {
-    transition: max-height 5s ease;
-}
-
-.fade-enter-from, .fade-leave-to {
+.list-menu {
     max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    
 }
 
-.fade-enter-to, .fade-leave-from {
+.list-menu.fade {
     max-height: 340px;
-} */
+    opacity: 1;
+}
 
 .fade {
-    animation: fadeShow 1s ease-out forwards; 
+    animation: fadeShow 8s ease-out forwards; 
 }
 
 @keyframes fadeShow {

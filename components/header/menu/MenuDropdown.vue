@@ -1,9 +1,9 @@
 <template>
-    <div class="relative">
+    <div class="relative inline-block">
         <button @click="toggleMenu" class="btn btn-primary bg-primary px-6 py-3 flex items-center font-bold w-[270px] rounded-t-lg">
             <i class="fa fa-list-ul mr-2"></i> All Departments
         </button>
-        <div v-show="isMenuOpen" ref="menu" class="list-menu absolute bg-white shadow-lg rounded-b-lg w-[270px] z-50" :class="[isMenuOpen ? 'fade' : '']">
+        <div ref="menu"  :class="['list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-50', isMenuOpen ? 'show' : '']">
             <ul class="p-2">
                 <li v-for="(item, index) in menuItems" :key="index" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative group">
                     <a href="#" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
@@ -310,10 +310,41 @@
     
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value;
+
+        // Thêm logic animation
+        if (isMenuOpen.value && menu.value) {
+        menu.value.classList.add("show");
+        } else if (menu.value) {
+        menu.value.classList.remove("show");
+        }
     }
 </script>
 
 <style lang="css" scoped>
+button {
+  outline: none;
+}
+
+.list-menu {
+    position: absolute;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height .6s ease-in-out, opacity 1.2s ease-in-out;
+}
+
+.list-menu.show {
+    max-height: 340px;
+    overflow: visible;
+    opacity: 1;
+    transition: max-height .3s ease-in-out, opacity .5s ease-in-out;
+}
+
+.list-menu:not(.show) {
+  max-height: 0;
+  opacity: 0;
+}
+
 .submenu,
 .submenu1 {
   display: none;
@@ -333,33 +364,6 @@
 .submenu li:hover:not(:has(.submenu1)) .submenu1 {
   display: none;
 }
-
-.list-menu {
-    max-height: 0;
-    opacity: 0;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    
-}
-
-.list-menu.fade {
-    max-height: 340px;
-    opacity: 1;
-}
-
-.fade {
-    animation: fadeShow 8s ease-out forwards; 
-}
-
-@keyframes fadeShow {
-    from {
-        max-height: 0;
-    }
-    to {
-        max-height: 340px;
-    }
-}
-
-
 </style>
 
 

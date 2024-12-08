@@ -3,8 +3,9 @@
         <button @click="toggleMenu" class="btn btn-primary bg-primary px-6 py-3 flex items-center font-bold w-[270px] rounded-t-lg">
             <i class="fa fa-list-ul mr-2"></i> All Departments
         </button>
+
         <div ref="menu"  :class="['list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-50', isMenuOpen ? 'show' : '']">
-            <ul class="p-2">
+            <ul class="p-2 relative">
                 <li v-for="(item, index) in menuItems" :key="index" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative group">
                     <a href="#" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
                         <i v-if="item.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
@@ -311,11 +312,15 @@
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value;
 
-        // Thêm logic animation
+        //logic animation
         if (isMenuOpen.value && menu.value) {
-        menu.value.classList.add("show");
+            menu.value.classList.add("show");
+            setTimeout(() => {
+                menu.value?.classList.add("overflow-visible");
+            }, 500);
         } else if (menu.value) {
-        menu.value.classList.remove("show");
+            menu.value.classList.remove("show");
+            menu.value.classList.remove("overflow-hidden");
         }
     }
 </script>
@@ -327,7 +332,7 @@ button {
 
 .list-menu {
     position: absolute;
-    overflow: hidden;
+    overflow: hidden; 
     max-height: 0;
     opacity: 0;
     transition: max-height .6s ease-in-out, opacity 1.2s ease-in-out;
@@ -335,9 +340,12 @@ button {
 
 .list-menu.show {
     max-height: 340px;
-    overflow: visible;
     opacity: 1;
-    transition: max-height .3s ease-in-out, opacity .5s ease-in-out;
+    transition: max-height .5s ease-in-out, opacity .5s ease-in-out;
+}
+
+.list-menu.overflow-visible {
+    overflow: visible;
 }
 
 .list-menu:not(.show) {

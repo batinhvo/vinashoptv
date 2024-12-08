@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, computed, watch } from "vue";
+    import { defineComponent, ref, computed } from "vue";
 
     export default defineComponent({
         name: "NotifyAlert",

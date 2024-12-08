@@ -7,10 +7,22 @@
                     <i class="ec ec-map-pointer text-lg mr-1"></i> Store Locator
                 </a>
                 <span class="text-gray-5">|</span>
-                <a href="/" class="text-green-334 text-font-13 hover:text-black flex items-center">
-                    <i class="ec ec-user text-lg mr-1"></i> Register or Sign in
-                </a>
+                <div class="text-green-334 text-font-13 hover:text-black flex items-center">
+                    <i class="ec ec-user text-lg mr-1"></i>
+                    <div>
+                        <a href="" class="hover:text-black">Register</a>
+                        <span class="mx-1 text-gray-50">or</span>
+                        <a href="" class="hover:text-black">Sign in</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.text-lg {
+    font-size: 1.125rem !important;
+}
+
+</style>

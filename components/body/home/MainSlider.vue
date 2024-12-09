@@ -12,7 +12,7 @@
                             <h6 v-if="slide.subtitle" class="text-2xl font-light mb-3 in-top-2">{{ slide.subtitle }}</h6>
                             <h6 class="font-bold text-font-15 mb-3 in-top-2">{{ slide.description }}</h6>
                             <div class="mb-4 in-top-3">
-                                <span class="font-normal in-top-3">FROM</span>
+                                <span class="font-normal in-top-3 leading-none md:leading-loose">FROM</span>
                                 <div class="text-3xl lg:text-5xl font-bold leading-[3.5rem]">
                                     <sup>$</sup><span>{{ slide.price }}</span><sup>00</sup>
                                 </div>

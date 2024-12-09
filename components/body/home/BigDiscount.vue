@@ -32,7 +32,6 @@
 
     const Alert = useNotify();
 
-
     const showAlert = () => {
         Alert({
             message: "đây là thông báo từ VinaShop",

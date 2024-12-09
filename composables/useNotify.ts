@@ -10,7 +10,7 @@ interface NotifyOptions {
 export const useNotify = () => {
     return ({ message, type = "info" , time = 3000}: NotifyOptions) => {
         const container = document.createElement("div");
-        document.getElementById("notify-alert")?.appendChild(container);
+        document.body?.appendChild(container);
 
         const app = createApp({
             data() {

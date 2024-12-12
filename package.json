@@ -16,9 +16,11 @@
     "nuxt": "^3.14.159",
     "vue": "^3.5.13",
     "vue-router": "latest",
-    "vue3-carousel": "^0.7.1"
+    "vue3-carousel": "^0.7.1",
+    "yup": "^1.5.0"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.12.2"
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "@types/yup": "^0.32.0"
   }
 }

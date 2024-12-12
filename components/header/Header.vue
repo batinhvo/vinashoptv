@@ -18,7 +18,7 @@
         </div>      
 
         <!-- main-header-mobile -->
-        <div class="container mx-auto lg:hidden block h-12 bg-gray-80 py-2 px-3">
+        <div class="container mx-auto xl:hidden block h-12 bg-gray-80 py-2 px-3">
             <div class="flex">
                 <HeaderMenuButtonMenu />
                 <Logo />

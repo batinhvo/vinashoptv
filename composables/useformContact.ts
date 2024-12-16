@@ -3,11 +3,15 @@ import { formSchema, type SignFormData } from './validationSchemas';
 
 const notify = useNotify();
 
-export const useSignIn = () => {
+export const useformContact = () => {
     // Dữ liệu form
     const formData = reactive<SignFormData>({
+        firstName: '',
+        lastName: '',
+        phone: '',
         email: '',
-        password: '',      
+        address: '',
+        message: '',
     });
   
     // Lưu trạng thái lỗi

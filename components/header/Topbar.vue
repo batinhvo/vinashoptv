@@ -1,9 +1,9 @@
 <template>
     <div class="border-b border-gray-100 py-2 hidden xl:block">
-        <div class="container mx-auto flex justify-between items-center">
+        <div class="container flex justify-between items-center">
             <a href="/" class="text-gray-110 text-font-13 hover:text-black">Welcome to Vinashop</a>
             <div class="flex items-center space-x-4">
-                <a href="/" class="text-green-334 text-font-13 hover:text-black flex items-center">
+                <a href="contact" class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-map-pointer text-lg mr-1"></i> Store Locator
                 </a>
                 <span class="text-gray-5">|</span>
@@ -51,6 +51,10 @@
 </script>
 
 <style lang="css" scoped>
+    .text-lg {
+        font-size: 1.125rem !important;
+    }
+
     .Signin {
         overflow: hidden;
         opacity: 0;

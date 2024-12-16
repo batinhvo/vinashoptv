@@ -34,8 +34,20 @@ module.exports = {
                 'green-334' : '#334141',
                 'green-022' : '#1e2022',
             }
-        }
-        
+        },     
+        container: {
+            center: true,
+            padding: {
+                DEFAULT: '0 15px',
+            },
+            screens: {
+                sm: '540px',
+                md: '720px',
+                lg: '960px',
+                xl: '1280px',
+                '2xl': '1536px',
+            }
+        }   
     },
     plugins: [
         function ({ addBase }) {

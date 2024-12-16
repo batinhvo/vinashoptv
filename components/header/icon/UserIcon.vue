@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="ml-auto">
         <button type="button" @click="toggleOpenSignIn" class="py-2 px-2 text-black flex items-center justify-center text-font-22">
             <i class="ec ec-user"></i>
         </button>

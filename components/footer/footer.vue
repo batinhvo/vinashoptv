@@ -130,13 +130,11 @@
             </div>
         </div>
         <div class="py-2 bg-gray-14">
-            <div class="container mx-auto">
-                <div class="flex">
-                    <div>
-                        <span>@ </span>
-                        <a href="/" class="font-bold">Vinashop</a>
-                        <span> - All rights Reserved</span>
-                    </div>
+            <div class="flex mx-auto">
+                <div class="container px-4 md:px-0">
+                    <span>@ </span>
+                    <a href="/" class="font-bold">Vinashop</a>
+                    <span> - All rights Reserved</span>
                 </div>
             </div>
         </div>

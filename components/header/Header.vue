@@ -4,7 +4,7 @@
         <HeaderTopbar />
 
         <!-- main-header-desktop -->
-        <div class="container mx-auto hidden xl:block">
+        <div class="container hidden xl:block">
             <div class="flex items-center py-2 xl:py-8">
                 <Logo />
                 <HeaderSearchSearchbar />
@@ -18,15 +18,20 @@
         </div>      
 
         <!-- main-header-mobile -->
-        <div class="container mx-auto xl:hidden block h-12 bg-gray-80 py-2 px-3">
-            <div class="flex">
+        <div class="xl:hidden h-12 bg-gray-80 py-2 px-3 bg-neutral-100">
+            <div class="container flex justify-between">
+                <div class="flex">
                 <HeaderMenuButtonMenu />
-                <Logo />
+                <div class="max-w-[250px]">
+                    <Logo />
+                </div>
+            </div>
+            <div class="flex">
                 <HeaderSearchIcon />
                 <HeaderIconUserIcon />
                 <HeaderIconCartIcon />
+            </div> 
             </div>
-            
         </div>      
     </header>
 </template>

@@ -36,8 +36,18 @@
   
 <script setup lang="ts">
  
+    const route = useRoute(); //lay thong tin route hien tai
     const isMenuOpen = ref(false);
     const menu = ref<HTMLElement | null>(null);
+
+    watch(
+        () => route.path,
+        (newPath) => {
+            isMenuOpen.value = newPath === "/";
+        },
+        {immediate: true}
+    );
+
     const menuItems = [
         { label: 'Sale Off', hasSubmenu: false },
         { label: 'SPECIAL', hasSubmenu: false },

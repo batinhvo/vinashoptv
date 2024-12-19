@@ -6,7 +6,7 @@
                     <div class="w-full lg:w-1/3">
                         <div class="mb-10">
                             <a href="/" class="logo">
-                                <img src="public/images/logo-01.png" alt="Vinashop Logo" class="w-[200px] h-auto">
+                                <img src="/assets/images/logo-01.png" alt="Vinashop Logo" class="w-[200px] h-auto">
                             </a>
                         </div>
                         <div class="mb-1">

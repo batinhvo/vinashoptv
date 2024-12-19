@@ -1,7 +1,7 @@
 <template>
     <div class="container mx-auto mb-8">
         <a href="/" class="block" @click.prevent="showAlert">
-            <div class="bg-[url('/images/bg-discount.jpg')] bg-cover bg-top-center mx-4">
+            <div class="bg-[url('assets/images/bg-discount.jpg')] bg-cover bg-top-center mx-4">
                 <div class="px-12 py-6 lg:py-0">
                     <div class="flex flex-wrap items-center lg:p-14">
                         <div class="w-full lg:w-1/2 mb-2">

@@ -10,7 +10,7 @@
                 <div class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-user text-lg mr-1"></i>
                     <div>
-                        <button class="hover:text-black">Register</button>
+                        <a href="register" class="hover:text-black">Register</a>
                         <span class="mx-1 text-gray-50">or</span>
                         <button @click="toggleOpenSignIn" class="hover:text-black">Sign in</button>
                     </div>

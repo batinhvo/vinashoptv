@@ -11,6 +11,11 @@ export const formSchema = Yup.object({
         .min(8, 'Password must be at least 8 characters long')
         .required('This field cannot be left empty')
         .optional(),
+    confirmPassword: Yup
+        .string()
+        .oneOf([Yup.ref('password')], 'Passwords must match')
+        .required('This field cannot be left empty')
+        .optional(),
     firstName: Yup
         .string()
         .matches(/^[A-Za-z\s]+$/, 'First name must not contain numbers')
@@ -30,6 +35,25 @@ export const formSchema = Yup.object({
         .string()
         .required('This field cannot be left empty')
         .optional(),
+    state: Yup
+        .string()
+        .required('This field cannot be left empty')
+        .optional(),  
+    city: Yup
+        .string()
+        .required('This field cannot be left empty')
+        .optional(),  
+    postCode: Yup
+        .string()
+        .required('This field cannot be left empty')
+        .optional(),  
+    agree: Yup
+        .boolean()
+        .oneOf([true], "You must accept the terms and conditions")
+        .optional(),  
+    receiveEmail: Yup
+        .boolean()
+        .optional(),  
     message: Yup
         .string()
         .optional(),

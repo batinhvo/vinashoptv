@@ -37,16 +37,8 @@
 <script setup lang="ts">
  
     const route = useRoute(); //lay thong tin route hien tai
-    const isMenuOpen = ref(false);
+    const isMenuOpen = ref(route.path === "/");
     const menu = ref<HTMLElement | null>(null);
-
-    watch(
-        () => route.path,
-        (newPath) => {
-            isMenuOpen.value = newPath === "/";
-        },
-        {immediate: true}
-    );
 
     const menuItems = [
         { label: 'Sale Off', hasSubmenu: false },
@@ -319,9 +311,14 @@
         }     
     ];
     
+    if (isMenuOpen.value) {
+        setTimeout(() => {
+            menu.value?.classList.add("overflow-visible");
+        }, 100);
+    }
+
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value;
-
         //logic animation
         if (isMenuOpen.value && menu.value) {
             menu.value.classList.add("show");
@@ -330,7 +327,7 @@
             }, 500);
         } else if (menu.value) {
             menu.value.classList.remove("show");
-            menu.value.classList.remove("overflow-hidden");
+            
         }
     }
 </script>

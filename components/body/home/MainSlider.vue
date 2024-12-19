@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-[url('/images/bg-slide.jpg')] bg-cover bg-top-center">
+    <div class="bg-[url('assets/images/bg-slide.jpg')] bg-cover bg-top-center">
         <carousel :height="450" v-bind="config" class="container mx-auto" @slide-end="handleSlideEnd">
             <Slide v-for="(slide, index) in slides" :key="index">
                 <div class="mx-auto">
@@ -61,7 +61,7 @@
             subtitle: '',
             description: 'BUY 2 GET 1 FREE',
             price: 199,
-            image: '/images/banner-01.png',
+            image: '/images/banner/banner-01.png',
             alt: 'Cordyceps-promotion-image',
         },
         {
@@ -69,7 +69,7 @@
             subtitle: 'Made in USA - 90 Capsules - 1100 mg',
             description: '100% PURE, POTENT, NATURAL & ORGANIC',
             price: 30,
-            image: '/images/banner-02.png',
+            image: '/images/banner/banner-02.png',
             alt: 'Moringa-promotion-image',
         },
     ]);     

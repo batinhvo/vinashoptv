@@ -1,24 +1,38 @@
 <template>
-    <div class="w-full bg-white shadow-lg border border-gray-100 rounded-lg">
-        <div class="px-7 py-4 border-b border-gray-100">Black Ginseng</div>
-        <ul class="px-3">           
+    <div class="w-full bg-white shadow-lg border border-gray-100 rounded-lg pb-3">
+        <div class="px-8 py-4 border-b border-gray-100 text-base">Browse Categories</div>
+        <ul class="px-2">           
             <li v-for="(item, index) in menuItems" :key="index">
-                <div class="px-3 py-2 border-b border-gray-100">
-                    <div class="cursor-pointer flex justify-between items-center" @click="toggleColumnMenu(index)">
-                        <NuxtLink to="bestseller" class="hover:text-black"> {{item.label}} </NuxtLink>
-                        <button @click="toggleColumnMenu(index)">
+                <div class="border-b border-gray-100 px-2">
+                    <div class="cursor-pointer flex justify-between items-center hover:bg-neutral-100 px-4 py-2" @click="toggleColumnMenu(index)">
+                        <NuxtLink to="bestseller" class="hover:text-black" :class="[openSubMenuIndex === index ? 'font-bold' : '']"> {{item.label}} </NuxtLink>
+                        <button>
                             <i v-if="item.hasSubmenu" class="fa text-xs" :class="[openSubMenuIndex === index ? 'fa-angle-up' : 'fa-angle-down']"></i>
                         </button>                           
-                    </div>               
-                    <div v-if="item.hasSubmenu" class="">
+                    </div>  
+                    <!-- menu 1 -->
+                    <div v-if="item.hasSubmenu" :class="[openSubMenuIndex === index ? 'block' : 'hidden']"> 
                         <ul class="px-2">
                             <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
-                                <div class="cursor-pointer flex justify-between items-center p-2" :class="[subItem.hasSubmenu ? '' : 'hover:bg-gray-200']">
+                                <div class="cursor-pointer flex justify-between items-center py-2 px-3 hover:bg-neutral-100 border-t border-gray-100" @click="toggleColumnMenu1(index)">
                                     <NuxtLink to="bestseller" class="hover:text-black"> {{subItem.label}} </NuxtLink>
                                     <button>
-                                        <i v-if="subItem.hasSubmenu" class="fa text-xs" :class="[openSubMenuIndex === index ? 'fa-angle-up' : 'fa-angle-down']"></i>
+                                        <i v-if="subItem.hasSubmenu" class="fa text-xs" :class="[openSubMenuIndex1 === index ? 'fa-angle-up font-bold' : 'fa-angle-down']"></i>
                                     </button>                           
                                 </div>  
+                                <!-- menu 2 -->
+                                <div v-if="subItem.hasSubmenu" :class="[openSubMenuIndex1 === subIndex ? 'block' : 'hidden']">
+                                    <ul class="px-2">
+                                        <li v-for="(subItem1, subIndex1) in subItem.subItem1" :key="subIndex1">
+                                            <div class="cursor-pointer flex justify-between items-center py-2 px-3 hover:bg-neutral-100 border-t border-gray-100">
+                                                <NuxtLink to="bestseller" class="hover:text-black"> {{subItem1.label}} </NuxtLink>
+                                                <button>
+                                                    <i v-if="subItem1.hasSubmenu" class="fa text-xs"></i>
+                                                </button>                           
+                                            </div>  
+                                        </li>
+                                    </ul>
+                                </div>        
                             </li>
                         </ul>
                     </div>          
@@ -300,13 +314,15 @@
         }     
     ];
 
-    //show-off-submenu
     const openSubMenuIndex = ref<number | null>(null); // null nghĩa là không có submenu nào mở
-
     function toggleColumnMenu(index: number) {
         openSubMenuIndex.value = openSubMenuIndex.value === index ? null : index;
     }
 
+    const openSubMenuIndex1 = ref<number | null>(null); // null nghĩa là không có submenu nào mở
+    function toggleColumnMenu1(index: number) {
+        openSubMenuIndex1.value = openSubMenuIndex1.value === index ? null : index;
+    }
 
 </script>
 
@@ -314,5 +330,4 @@
     .text-xs {
         font-size: 8px !important;
     }
-
 </style>

@@ -2,10 +2,10 @@
     <div class="container mx-auto my-8">
         <div class="flex flex-wrap">
             <div v-for="(item, index) in product" :key="index" class="w-full md:w-1/2 lg:w-1/4 px-4">
-                <a :href="item.link">
+                <NuxtLink :to="item.link">
                     <div class="flex flex-wrap py-1 bg-neutral-100 items-center border border-inherit min-h-36">
                         <div class="w-1/2 p-2">
-                            <img :src="item.img" class="w-full h-auto" alt="">
+                            <NuxtImg :src="item.img" class="w-full h-auto" :alt="item.title" />
                         </div>
                         <div class="w-1/2 px-4">
                             <div class="mb-2 text-lg font-light tracking-tighter">
@@ -19,7 +19,7 @@
                             </div>
                         </div>
                     </div>
-                </a>
+                </NuxtLink>
             </div>
         </div>
     </div>

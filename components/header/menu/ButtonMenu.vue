@@ -21,7 +21,7 @@
             <ul>
                 <li v-for="(item, index) in menuItems" :key="index">
                     <div class="flex justify-between items-center py-2">
-                        <a :class="[(item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']" href=""> {{item.label}} </a>
+                        <NuxtLink :class="[(item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']" to="bestseller"> {{item.label}} </NuxtLink>
                         <button @click="toggleColumnMenu(index)">
                             <i v-if="item.hasSubmenu" class="fa text-[8px] text-black" :class="[openSubMenuIndex === index ? 'fa-angle-up' : 'fa-angle-down']"></i>
                         </button>                        
@@ -30,10 +30,10 @@
                         <div v-if="openSubMenuIndex === index" class="max-h-[340px] overflow-x-auto">
                             <ul v-if="item.hasSubmenu">
                                 <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex" class="py-2 border-l-2 border-primary pl-4">
-                                    <a class="font-bold" href=""> {{subItem.label}} </a>
+                                    <NuxtLink class="font-bold" to="bestseller"> {{subItem.label}} </NuxtLink>
                                     <ul v-if="subItem.hasSubmenu">
                                         <li v-for="(subItem1, subIndex1) in subItem.subItem1" :key="subIndex1" class="pt-4">
-                                            <a class="text-gray-500" href=""> {{subItem1.label}} </a>
+                                            <NuxtLink class="text-gray-500" to="bestseller"> {{subItem1.label}} </NuxtLink>
                                         </li>
                                     </ul>
                                 </li>                           

@@ -1,16 +1,16 @@
 <template>
     <div class="border-b border-gray-100 py-2 hidden xl:block">
         <div class="container flex justify-between items-center">
-            <a href="/" class="text-gray-110 text-font-13 hover:text-black">Welcome to Vinashop</a>
+            <NuxtLink to="/" class="text-gray-110 text-font-13 hover:text-black">Welcome to Vinashop</NuxtLink>
             <div class="flex items-center space-x-4">
-                <a href="contact" class="text-green-334 text-font-13 hover:text-black flex items-center">
+                <NuxtLink to="contact" class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-map-pointer text-lg mr-1"></i> Store Locator
-                </a>
+                </NuxtLink>
                 <span class="text-gray-5">|</span>
                 <div class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-user text-lg mr-1"></i>
                     <div>
-                        <a href="register" class="hover:text-black">Register</a>
+                        <NuxtLink to="register" class="hover:text-black">Register</NuxtLink>
                         <span class="mx-1 text-gray-50">or</span>
                         <button @click="toggleOpenSignIn" class="hover:text-black">Sign in</button>
                     </div>

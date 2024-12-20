@@ -23,7 +23,7 @@
                         </div>
                         <!-- Hình ảnh -->
                         <div class="lg:w-1/3 w-1/2 p-4 lg:p-0">
-                            <img 
+                            <NuxtImg 
                                 :src="slide.image" 
                                 class="zoom-in-image" 
                                 :class="{'active-image': currentSlideIndex === index, 'inactive-image': currentSlideIndex !== index}"

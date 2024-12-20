@@ -1,16 +1,24 @@
 <template>
     <div class="container mx-auto mb-8">
         <div class="flex flex-wrap">
-            <div class="w-full lg:w-1/2 p-4">
-                <a href="bestseller" class="block border border-[#00890c] shadow-[3px_2px_5px_1px_#898989]">
-                    <img src="/assets/images/best-seller.jpg" alt="">
-                </a>
-            </div>
-            <div class="w-full lg:w-1/2 p-4">
-                <a href="" class="block border border-[#00890c] shadow-[3px_2px_5px_1px_#898989]">
-                    <img src="/assets/images/on-sale.jpg" alt="">
-                </a>
-            </div>
+            <div v-for="(item, index) in images" :key="index" class="w-full lg:w-1/2 p-4">
+                <NuxtLink to="bestseller" class="block border border-[#00890c] shadow-[3px_2px_5px_1px_#898989]">
+                    <NuxtImg :src="item.img" :alt="item.desc" />
+                </NuxtLink>
+            </div>           
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+    const images = [
+        {
+            img : '/images/banner/best-seller.jpg',
+            desc : 'Best Seller'
+        },
+        {
+            img : '/images/banner/on-sale.jpg',
+            desc : 'On Sale'
+        }
+    ]
+</script>

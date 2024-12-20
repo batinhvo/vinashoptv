@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <img :src="imgBanner" class="w-full" alt="">
+            <NuxtImg :src="imgBanner" class="w-full" alt="" />
         </div>
         <div class="container mx-auto">
             <div class="my-0 md:my-10">

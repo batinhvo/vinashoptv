@@ -2,14 +2,26 @@
     <div class="w-full bg-white shadow-lg border border-gray-100 rounded-lg">
         <div class="px-7 py-4 border-b border-gray-100">Black Ginseng</div>
         <ul class="px-3">           
-            <li v-for="(item, index) in menuItems" :key="index" >
+            <li v-for="(item, index) in menuItems" :key="index">
                 <div class="px-3 py-2 border-b border-gray-100">
                     <div class="cursor-pointer flex justify-between items-center" @click="toggleColumnMenu(index)">
-                        <a href="" class="hover:text-black"> {{item.label}} </a>
+                        <NuxtLink to="bestseller" class="hover:text-black"> {{item.label}} </NuxtLink>
                         <button @click="toggleColumnMenu(index)">
                             <i v-if="item.hasSubmenu" class="fa text-xs" :class="[openSubMenuIndex === index ? 'fa-angle-up' : 'fa-angle-down']"></i>
-                        </button>           
-                    </div>                   
+                        </button>                           
+                    </div>               
+                    <div v-if="item.hasSubmenu" class="">
+                        <ul class="px-2">
+                            <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex">
+                                <div class="cursor-pointer flex justify-between items-center p-2" :class="[subItem.hasSubmenu ? '' : 'hover:bg-gray-200']">
+                                    <NuxtLink to="bestseller" class="hover:text-black"> {{subItem.label}} </NuxtLink>
+                                    <button>
+                                        <i v-if="subItem.hasSubmenu" class="fa text-xs" :class="[openSubMenuIndex === index ? 'fa-angle-up' : 'fa-angle-down']"></i>
+                                    </button>                           
+                                </div>  
+                            </li>
+                        </ul>
+                    </div>          
                 </div>
             </li>           
         </ul>

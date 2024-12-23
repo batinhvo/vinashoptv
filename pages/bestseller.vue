@@ -29,7 +29,7 @@
                             <div class="text-neutral-500 overflow-hidden whitespace-nowrap w-11/12 text-left"> {{ selectedSort }} </div>       
                             <i class="fa fa-angle-down text-[9px] text-neutral-500 pl-1.5"></i>                    
                         </button>
-                        <div v-if="isOpenSort" class="absolute top-15 mt-2 bg-white shadow-lg border border-gray-100 rounded-lg">
+                        <div v-if="isOpenSort" class="absolute z-40 top-15 mt-2 bg-white shadow-lg border border-gray-100 rounded-lg">
                             <ul class="py-2 px-1">
                                 <li class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" @click="setSort('Default Sorting')">Default Sorting</li>
                                 <li class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" @click="setSort('Sort by Price: Low to Hight')">Sort by Price: Low to Hight</li>

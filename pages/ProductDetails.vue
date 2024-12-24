@@ -16,7 +16,18 @@
             
             <div class="flex flex-wrap mb-6">
                 <div class="w-full md:w-1/2 lg:w-5/12 px-4">
-                    <NuxtImg class="w-full" src="/images/products/vinashoptv-product.jpg" />
+                    <swiper                        
+                        :slidesPerView="1"
+                        :spaceBetween="10"
+                        :navigation="true"
+                        :autoplay="{ delay: 500, disableOnInteraction: false }"
+                        :pagination="{ clickable: true }"
+                        :loop="true"
+                    >
+                        <swiper-slide v-for="(image, index) in images" :key="index">
+                            <img :src="image" alt="Slide image" class="slide-image" />
+                        </swiper-slide>
+                    </swiper>
                 </div>
                 <div class="w-full md:w-1/2 lg:w-4/12 px-4">
                     <div class="text-xs mb-2">Hair Color</div>
@@ -93,6 +104,8 @@
 </template>
 
 <script setup lang="ts">
+    import { Swiper, SwiperSlide } from 'swiper/vue'
+    import 'swiper/swiper-bundle.css'
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -123,6 +136,16 @@
     const selectOption = (key: string, val: string) => {
     selectedOptions.value[key] = val;
     };
+
+
+
+
+    const images = [
+        '/images/products/vinashoptv-product.jpg',
+        '/images/products/gold-oil.jpg',
+        '/images/products/fucoidan-AHCC.jpg',
+    ]
+
 
 </script>
 

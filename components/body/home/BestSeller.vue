@@ -1,7 +1,7 @@
 <template>
     <div class="container mx-auto my-8">
         <div class="flex flex-wrap">
-            <div v-for="(item, index) in product" :key="index" class="w-full md:w-1/2 lg:w-1/4 px-4">
+            <div v-for="(item, index) in product" :key="index" class="w-full lg:w-1/2 xl:w-1/4 py-4 px-4 xl:py-0">
                 <NuxtLink :to="item.link">
                     <div class="flex flex-wrap py-1 bg-neutral-100 items-center border border-inherit min-h-36">
                         <div class="w-1/2 p-2">

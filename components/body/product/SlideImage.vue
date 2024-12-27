@@ -37,7 +37,7 @@
         :modules="[FreeMode, Thumbs]"
         class="mt-4"
         >
-            <swiper-slide v-for="(image, index) in images" :key="index" class="p-2 border border-gray-300" :class="{ 'active': activeIndex === index }">
+            <swiper-slide v-for="(image, index) in images" :key="index" class="p-2 border border-gray-300 cursor-pointer" :class="{ 'active': activeIndex === index }">
                 <img :src="image" class="w-full swiper-lazy" alt="Thumbnail image" />
             </swiper-slide>
         </swiper>

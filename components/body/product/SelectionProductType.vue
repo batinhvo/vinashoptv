@@ -32,13 +32,13 @@
         <div class="mt-6 flex justify-between">
             <div class="font-bold">Quantity</div>
             <div class="flex">
-                <button  @click="decrement" class="w-10 h-7 text-center hover:bg-gray-300 bg-gray-100 border border-zinc-300 rounded-l-full">
+                <button  @click.prevent="decrement" class="w-10 h-7 text-center hover:bg-gray-300 bg-gray-100 border border-zinc-300 rounded-l-full">
                     <span class="text-xs">
                         <i class="fa fa-minus pb-1 text-gray-500" aria-hidden="true"></i>
                     </span>
                 </button>
                 <input v-model="quantity" class="max-w-16 border-y border-zinc-300 text-center focus:outline-none" type="number">
-                <button @click="increment" class="w-10 h-7 text-center bg-gray-100 hover:bg-gray-300 border border-zinc-300 rounded-r-full">                                    
+                <button @click.prevent="increment" class="w-10 h-7 text-center bg-gray-100 hover:bg-gray-300 border border-zinc-300 rounded-r-full">                                    
                     <span class="text-xs">
                         <i class="fa fa-plus pb-1 text-gray-500" aria-hidden="true"></i>
                     </span>

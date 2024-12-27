@@ -14,28 +14,33 @@
                         :title="product.title"
                         :desc="product.desc"
                         :price="product.price"
-                        :link="product.link"
                         :sold="product.sold"
                         :disc="product.disc" 
-                        :Discprice="product.Discprice"
+                        :discPrice="product.discPrice"
                     />
                 </div>
                 <div class="text-center border-t border-gray-300">
-                    <button class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300 mt-6">
-                        See Details
-                    </button>
+                    <div class="mt-6 hover:-translate-y-1 duration-300">
+                        <NuxtLink class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]"
+                        :to="`/product/${generateSlug(product.title)}`">
+                            See Details
+                        </NuxtLink>
+                    </div>
                 </div>
             </div>
 
             <div v-if="!isPopupPhone">
                 <div class="flex flex-wrap">
                     <div class="w-1/2 pr-3 text-center">
-                        <div class="border border-gray-200">
+                        <div class="border border-gray-200 mb-6">
                             <NuxtImg class="w-full" :src="product.image" alt="Product Image"/>
                         </div>
-                        <button class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300 mt-6">
-                            See Details
-                        </button>
+                        <div class="hover:-translate-y-1 duration-300">
+                            <NuxtLink class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]"
+                            :to="`/product/${generateSlug(product.title)}`">
+                                See Details
+                            </NuxtLink>
+                        </div>
                     </div>
                     <div class="w-1/2 px-3">
                         <ModalPopupContentQuickView 
@@ -43,10 +48,9 @@
                             :title="product.title"
                             :desc="product.desc"
                             :price="product.price"
-                            :link="product.link"
                             :sold="product.sold"
                             :disc="product.disc" 
-                            :Discprice="product.Discprice"
+                            :discPrice="product.discPrice"
                         />
                     </div>
                 </div>
@@ -63,10 +67,9 @@
             title: string;
             desc: string;
             price: string;
-            link: string;
             sold: string;
             disc: boolean;
-            Discprice?: string;
+            discPrice?: string;
         }
     }>();
 
@@ -91,6 +94,10 @@
     onBeforeUnmount(() => {
         window.removeEventListener('resize', updateColumns); // remove
     });
+
+    //link
+    const generateSlug = (name: string): string =>
+    name.toLowerCase().replace(/\s+/g, '-');
 </script>
 
 

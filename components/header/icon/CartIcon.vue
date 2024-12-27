@@ -1,6 +1,6 @@
 <template>
     <div class="relative ml-auto">
-        <NuxtLink to="/" class="p-2">
+        <NuxtLink to="/checkout" class="p-2">
             <span class="xl:text-2xl text-font-22">
                 <i class="ec ec-shopping-bag text-green-334"></i>
             </span>

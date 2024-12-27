@@ -27,7 +27,7 @@
                      class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                      :class="[errors.firstName? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-center" v-if="errors.firstName">{{ errors.firstName }}</p>
+                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.firstName">{{ errors.firstName }}</p>
                   </div>              
   
                   <!-- last name -->
@@ -37,7 +37,7 @@
                       class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
                       disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                       :class="[errors.lastName? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-center" v-if="errors.lastName">{{ errors.lastName }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.lastName">{{ errors.lastName }}</p>
                   </div>                               
   
                   <!-- email -->
@@ -47,7 +47,7 @@
                       class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
                       disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                       :class="[errors.email? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-center" v-if="errors.email">{{ errors.email }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.email">{{ errors.email }}</p>
                   </div>        
 
                   <!-- phone -->
@@ -56,7 +56,7 @@
                     <input v-model="formData.phone" id="phone" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
                       focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                       :class="[errors.phone? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-center" v-if="errors.phone">{{ errors.phone }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.phone">{{ errors.phone }}</p>
                   </div>                         
                   
                   <!-- password -->
@@ -66,7 +66,7 @@
                       class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
                       disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                       :class="[errors.password? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-center" v-if="errors.password">{{ errors.password }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.password">{{ errors.password }}</p>
                   </div>        
 
                   <!-- confirm-password -->
@@ -76,7 +76,7 @@
                       class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
                       disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                       :class="[errors.confirmPassword? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-center" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</p>
                   </div>                 
   
                   <!-- State -->
@@ -89,7 +89,7 @@
                       <option>123</option>
                       <option>123</option>
                     </select>                   
-                      <p class="text-red-600 text-xs text-center" v-if="errors.state">{{ errors.state }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.state">{{ errors.state }}</p>
                   </div>     
                   
                    <!-- City -->
@@ -99,7 +99,7 @@
                      class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                      :class="[errors.city? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-center" v-if="errors.city">{{ errors.city }}</p>
+                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.city">{{ errors.city }}</p>
                   </div>              
   
                   <!-- PostCode/Zip -->
@@ -109,7 +109,7 @@
                       class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
                       disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                       :class="[errors.postCode? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-center" v-if="errors.postCode">{{ errors.postCode }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.postCode">{{ errors.postCode }}</p>
                   </div>         
 
                   <!-- Street Address -->
@@ -119,23 +119,23 @@
                     class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
                       disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                       :class="[errors.address? 'border-red-500' : 'border-gray-300']">                   
-                      <p class="text-red-600 text-xs text-center" v-if="errors.address">{{ errors.address }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.address">{{ errors.address }}</p>
                   </div>     
 
                   <!-- check agree -->
                   <div class="w-full px-4 pb-5 flex flex-wrap items-center">                   
                     <div class="w-full">
-                      <input v-model="formData.agree" id="agree" type="checkbox" class="accent-green-500 focus:ring-green-400">                    
+                      <input v-model="formData.agree" id="agree" type="checkbox" class="accent-[#169100]">                    
                       <label for="agree" class="font-bold ml-2">I agree to the Terms & Conditions.</label>
                     </div>       
-                    <div class="text-red-600 text-xs text-center pl-5" v-if="errors.agree">{{ errors.agree }}</div>            
+                    <div class="text-red-600 text-xs text-left pl-6 pl-5" v-if="errors.agree">{{ errors.agree }}</div>            
                   </div>                      
                   
                   <!-- check receive email -->
                   <div class="w-full px-4 pb-5 flex items-center">                   
-                    <input v-model="formData.receiveEmail" id="receiveEmail" type="checkbox" class="accent-green-500 focus:ring-green-400 text-white">                    
+                    <input v-model="formData.receiveEmail" id="receiveEmail" type="checkbox" class="accent-[#169100]">                    
                     <label for="receiveEmail" class="font-bold ml-2">Yes, I would like to receive emails about special promotions, events and exclusive offers.</label>
-                      <p class="text-red-600 text-xs text-center" v-if="errors.receiveEmail">{{ errors.receiveEmail }}</p>
+                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.receiveEmail">{{ errors.receiveEmail }}</p>
                   </div>  
 
 

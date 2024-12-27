@@ -1,34 +1,37 @@
 <template>
     <div class="flex flex-wrap relative my-5">
-        <div v-for="(item, index) in products" :key="index" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
+        <div v-for="(product, index) in products" :key="product.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
             <div class="mb-2 px-6">
-                <NuxtLink class="text-xs">{{ item.cate }}</NuxtLink>
+                <NuxtLink class="text-xs">{{ product.cate }}</NuxtLink>
             </div>
             <div :class="['px-6', { 'border-l border-gray-200': index % columns !== 0 }]">
                 <div class="relative group">
-                    <button @click="openQuickView(item)">
-                        <NuxtImg class="w-full" :src="item.image" :alt="item.title"/>
+                    <button @click="openQuickView(product)">
+                        <NuxtImg class="w-full" :src="product.image" :alt="product.title"/>
                     </button>
                     <div class="pop-up">
                         <button class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300"
-                            @click="openQuickView(item)">
+                            @click="openQuickView(product)">
                             Quick View
-                        </button>                       
-                        <button class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300 mt-6">
+                        </button>                                              
+                        <NuxtLink
+                        :to="`/product/${generateSlug(product.title)}`"
+                        class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300 mt-6"
+                        >
                             See Details
-                        </button>
+                        </NuxtLink>
                     </div>
                 </div>
                 <div class="mt-2">
-                    <NuxtLink :to="item.link">
-                        <div class="text-xs lg:text-sm text-[#167000] hover:text-[#104f00] font-bold line-clamp-2">{{ item.title }}</div>
+                    <NuxtLink :to="`/product/${generateSlug(product.title)}`">
+                        <div class="text-xs lg:text-sm text-[#167000] hover:text-[#104f00] font-bold line-clamp-2">{{ product.title }}</div>
                     </NuxtLink>
-                    <div class="text-xs line-clamp-2 my-5">{{ item.desc }}</div>         
+                    <div class="text-xs line-clamp-2 my-5">{{ product.desc }}</div>         
                 </div>
             </div>
-            <div class="flex justify-between items-end mt-3 px-6">
-                <div class="text-base lg:text-xl" :class="[item.disc ? 'text-red-500': '']">${{ item.disc ? item.Discprice : item.price }}.00</div>                
-                <div v-if="item.disc && item.Discprice" class="text-xs lg:text-base line-through">${{ item.price }}.00</div>
+            <div class="flex justify-between products-end mt-3 px-6">
+                <div class="text-base lg:text-xl" :class="[product.disc ? 'text-red-500': '']">${{ product.disc ? product.discPrice : product.price }}.00</div>                
+                <div v-if="product.disc && product.discPrice" class="text-xs lg:text-base line-through">${{ product.price }}.00</div>
             </div>
         </div>   
         <ModalPopupQuickView v-if="selectedProduct" :product="selectedProduct" @close="closeQuickView" />
@@ -36,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-
     // -----------------border product----------------------- //
 
     const columns = ref(2);
@@ -59,15 +61,17 @@
 
     //----------------Call-Quick-View-------------------//
     type Product = {
+        id: string,
         cate: string;
         image: string;
         title: string;
         desc: string;
         price: string;
-        link: string;
         sold: string;
         disc: boolean;
-        Discprice?: string;
+        discPrice?: string;
+        subImages: boolean;
+        thumImages?: string[];
     };
     const selectedProduct = ref<Product | null>(null);
         const openQuickView = (product: Product) => {
@@ -82,50 +86,28 @@
     //data
     const products: Product[] = [
         {
+            id: '001',
             cate : 'Hair Color',
             image: '/images/products/vinashoptv-product.jpg',
             title: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g',           
             desc : 'Enriched with keratin, ceramide, natural ingredients (Green Tea Extract, Jojoba, Olive Oil, Aloe Vera Gel, Acorus Calamus Root Extract) and with no ammonia, it nourishes hair fibers deep within and keeps hair healthy.',           
             price : '139',           
-            link : '/', 
             sold : '1000',
             disc : true,
-            Discprice : '99',
-        },
-        {
-            cate : 'Hair Color',
-            image: '/images/products/vinashoptv-product.jpg',
-            title: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g',           
-            desc : 'Enriched with keratin, ceramide, natural ingredients (Green Tea Extract, Jojoba, Olive Oil, Aloe Vera Gel, Acorus Calamus Root Extract) and with no ammonia, it nourishes hair fibers deep within and keeps hair healthy.',           
-            price : '199',           
-            link : '/', 
-            sold : '100',
-            disc : false,
-            Discprice : '99',
-        },
-        {
-            cate : 'Hair Color',
-            image: '/images/products/vinashoptv-product.jpg',
-            title: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g',           
-            desc : 'Enriched with keratin, ceramide, natural ingredients (Green Tea Extract, Jojoba, Olive Oil, Aloe Vera Gel, Acorus Calamus Root Extract) and with no ammonia, it nourishes hair fibers deep within and keeps hair healthy.',           
-            price : '139',           
-            link : '/', 
-            sold : '1000',
-            disc : true,
-            Discprice : '99',
-        },
-        {
-            cate : 'Hair Color',
-            image: '/images/products/vinashoptv-product.jpg',
-            title: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g',           
-            desc : 'Enriched with keratin, ceramide, natural ingredients (Green Tea Extract, Jojoba, Olive Oil, Aloe Vera Gel, Acorus Calamus Root Extract) and with no ammonia, it nourishes hair fibers deep within and keeps hair healthy.',           
-            price : '199',           
-            link : '/', 
-            sold : '100',
-            disc : false,
-            Discprice : '99',
-        },
+            discPrice : '99',
+            subImages : true,
+            thumImages : [
+                '/images/products/vinashoptv-product.jpg',
+                '/images/products/vinashoptv-product.jpg',
+                '/images/products/vinashoptv-product.jpg',
+            ]
+        },       
     ];
+
+    //link
+    const generateSlug = (name: string): string =>
+    name.toLowerCase().replace(/\s+/g, '-');
+
 </script>
 
 <style lang="css" scoped>

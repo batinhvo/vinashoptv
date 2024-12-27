@@ -28,7 +28,7 @@
                   <input v-model="formData.firstName" id="firstName" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm
                     focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                     :class="[errors.firstName? 'border-red-500' : 'border-gray-300']">
-                  <p class="text-red-600 text-xs text-center" v-if="errors.firstName">{{ errors.firstName }}</p>
+                  <p class="text-red-600 text-xs text-left pl-6" v-if="errors.firstName">{{ errors.firstName }}</p>
                 </div>              
 
                 <!-- last name -->
@@ -37,7 +37,7 @@
                   <input v-model="formData.lastName" id="lastName" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
                     focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                     :class="[errors.lastName? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-center" v-if="errors.lastName">{{ errors.lastName }}</p>
+                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.lastName">{{ errors.lastName }}</p>
                 </div>                               
 
                 <!-- phone -->
@@ -46,7 +46,7 @@
                   <input v-model="formData.phone" id="phone" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
                     focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                     :class="[errors.phone? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-center" v-if="errors.phone">{{ errors.phone }}</p>
+                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.phone">{{ errors.phone }}</p>
                 </div>                
 
                 <!-- email -->
@@ -55,7 +55,7 @@
                   <input v-model="formData.email" id="email" type="email" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
                     focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                     :class="[errors.email? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-center" v-if="errors.email">{{ errors.email }}</p>
+                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.email">{{ errors.email }}</p>
                 </div>              
 
                 <!-- address -->
@@ -64,7 +64,7 @@
                   <input v-model="formData.address" id="address" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
                     focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                     :class="[errors.address? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-center" v-if="errors.address">{{ errors.address }}</p>
+                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.address">{{ errors.address }}</p>
                 </div>               
 
                 <!-- message -->

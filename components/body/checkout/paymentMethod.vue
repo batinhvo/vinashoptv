@@ -29,9 +29,12 @@
                 <div class="mb-10">
                     <label class="font-bold">Select your credit card<span class="text-red-500"> *</span></label>
                     <BodyCheckoutInputSelect
+                    id="creditCard"
                     :options="creditcardOpt"
+                    :activeDropdownId="activeDropdownId"
                     :defaultOption="creditCardSelected"
-                    @update:selectedOption="setCard"/>
+                    @update:selectedOption="setCard"
+                    @update:activeDropdownId="setActiveDropdownId"/>
                 </div>
                 <!-- name card -->
                 <div class="mb-1">
@@ -59,17 +62,23 @@
                 <div class="mb-10">
                     <label class="font-bold">Month Expired<span class="text-red-500"> *</span></label>
                     <BodyCheckoutInputSelect
+                    id="month"
                     :options="monthOpt"
+                    :activeDropdownId="activeDropdownId"
                     :defaultOption="monthSelected"
-                    @update:selectedOption="setMonth"/>
+                    @update:selectedOption="setMonth"
+                    @update:activeDropdownId="setActiveDropdownId"/>
                 </div>
                 <!-- select year -->
                 <div class="mb-10">
                     <label class="font-bold">Year Expired<span class="text-red-500"> *</span></label>
                     <BodyCheckoutInputSelect
+                    id="year"
                     :options="yearOpt"
+                    :activeDropdownId="activeDropdownId"
                     :defaultOption="yearSelected"
-                    @update:selectedOption="setYear"/>
+                    @update:selectedOption="setYear"
+                    @update:activeDropdownId="setActiveDropdownId"/>
                 </div>
                 <!-- card number -->
                 <div class="mb-1">
@@ -89,6 +98,7 @@
 
 <script setup lang="ts">
     // Toggle PayPal visibility when selected
+    const activeDropdownId = ref('');
     const selectedPayment = ref<string | null>(null);
 
     const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];
@@ -98,6 +108,10 @@
     const creditCardSelected = ref('Nothing Selected');
     const monthSelected = ref('Nothing Selected');
     const yearSelected = ref('Nothing Selected');
+
+    function setActiveDropdownId(id: string) {
+        activeDropdownId.value = id;
+    }
 
     function setCard(cardOption: string) {
         creditCardSelected.value = cardOption;

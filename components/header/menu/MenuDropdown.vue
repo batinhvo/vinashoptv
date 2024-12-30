@@ -46,7 +46,6 @@
     });
 
     const menu = ref<HTMLElement | null>(null);
-
     const menuItems = [
         { label: 'Sale Off', hasSubmenu: false },
         { label: 'SPECIAL', hasSubmenu: false },
@@ -317,10 +316,6 @@
             ]
         }     
     ];
-    
-    if (isMenuOpen.value) {
-        menu.value?.classList.add("overflow-visible");
-    }
 
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value;
@@ -354,13 +349,8 @@
         transition: max-height .5s ease-in-out, opacity .5s ease-in-out;
     }
 
-    .list-menu.overflow-visible {
-        overflow: visible;
-    }
-
-    .list-menu:not(.show) {
-        max-height: 0;
-        opacity: 0;
+    .overflow-visible {
+        overflow: visible !important;
     }
 
     .submenu,

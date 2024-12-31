@@ -105,12 +105,12 @@
                         <!-- different address -->
                         <div class="px-4 pb-10 flex flex-wrap items-center">                   
                             <div class="w-full">
-                                <input v-model="showForm" id="difAddres" type="checkbox" class="accent-[#169100]">                    
+                                <input v-model="formData.isDifferentAddress" id="difAddres" type="checkbox" class="accent-[#169100]">                    
                                 <label for="difAddres" class="font-bold ml-2">Ship to a different address?</label>
                             </div>                                           
                         </div>   
 
-                        <div v-if="showForm">
+                        <div v-if="formData.isDifferentAddress">
                             <div class="flex flex-wrap">
                                 <!-- first name -->
                                 <div class="w-full md:w-1/2 px-4 pb-10">
@@ -237,7 +237,7 @@
 
 <script setup lang="ts">
     const showForm = ref(false);
-    const { formData, errors, isSubmitting, onSubmit } = useformContact();
+    const { formData, errors, isSubmitting, onSubmit } = useformCheckout();
 </script>
 
 <style lang="css" scoped>

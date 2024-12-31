@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-export const formSchema = Yup.object({
+export const formSchema = Yup.object().shape({
     email: Yup
         .string()
         .email('Invalid email')
@@ -58,46 +58,46 @@ export const formSchema = Yup.object({
         .string()
         .optional(),
     isDifferentAddress : Yup.boolean(),
-    // emailDif: Yup.string().when('isDifferentAddress', {
-    //     is: true,
-    //     then: Yup.string().email('Invalid email').required('This field cannot be left empty'),
-    //     otherwise: Yup.string().notRequired(),
-    // }),
-    emailDif: Yup.string().when('receiveEmail', (a, schema) => {
-        console.log(a)
-        return a ? schema.notRequired() : schema.email('Invalid email').required('This field cannot be left empty');
+    emailDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.email('Invalid email').required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
     }),
-    firstNameDif: Yup
-        .string()
-        .matches(/^[A-Za-z\s]+$/, 'First name must not contain numbers')
-        .required('This field cannot be left empty')
-        .optional(),
-    lastNameDif: Yup
-        .string()
-        .matches(/^[A-Za-z\s]+$/, 'Last name must not contain numbers')
-        .required('This field cannot be left empty')
-        .optional(),
-    phoneDif: Yup
-        .string()
-        .matches(/^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}?\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/, 'Invalid phone number')
-        .required('This field cannot be left empty')
-        .optional(),
-    addressDif: Yup
-        .string()
-        .required('This field cannot be left empty')
-        .optional(),
-    stateDif: Yup
-        .string()
-        .required('This field cannot be left empty')
-        .optional(),  
-    cityDif: Yup
-        .string()
-        .required('This field cannot be left empty')
-        .optional(),  
-    postCodeDif: Yup
-        .string()
-        .required('This field cannot be left empty')
-        .optional(), 
+    firstNameDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.matches(/^[A-Za-z\s]+$/, 'First name must not contain numbers').required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    lastNameDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.matches(/^[A-Za-z\s]+$/, 'Last name must not contain numbers').required('This field cannot be left empty'),        
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    phoneDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.matches(/^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}?\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/, 'Invalid phone number').required('This field cannot be left empty'),      
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    addressDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    stateDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
+    }), 
+    cityDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    postCodeDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
 });
 
 export type SignFormData = Yup.InferType<typeof formSchema>;

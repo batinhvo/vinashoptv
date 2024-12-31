@@ -10,8 +10,6 @@ export const useformCheckout = () => {
         lastName: '',
         phone: '',
         email: '',
-        password: '',
-        confirmPassword: '',
         state: '',
         city: '',
         postCode: '',
@@ -24,9 +22,8 @@ export const useformCheckout = () => {
         cityDif: '',
         postCodeDif: '',
         addressDif: '',
-        agree: false,
         receiveEmail: false,
-        isDifferentAddress: true,
+        isDifferentAddress: false,
     });
   
     // Lưu trạng thái lỗi
@@ -42,8 +39,7 @@ export const useformCheckout = () => {
             }
             // Thực hiện xác thực
             await formSchema.validate(formData, { abortEarly: false });
-
-                return true;
+            return true;
         } catch (err: any) {
             if (err.inner) {
                 err.inner.forEach((validationError: any) => {

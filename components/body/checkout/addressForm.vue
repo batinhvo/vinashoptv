@@ -1,4 +1,5 @@
 <template>
+    <form @submit.prevent="onSubmit">
     <div class="flex flex-wrap">
         <!-- first name -->
         <div class="w-full md:w-1/2 px-4 pb-10">
@@ -80,9 +81,11 @@
             <p class="text-red-600 text-xs text-left pl-6" v-if="errors.phone">{{ errors.phone }}</p>
         </div>       
     </div>
+    </form>
 </template>
 
 <script setup lang="ts">
+    const emit = defineEmits(['submit']);
     //check form
     const { formData, errors, isSubmitting, onSubmit } = useformContact();
 </script>

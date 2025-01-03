@@ -151,5 +151,12 @@
             transform: translateY(0);
         }
     }
+
+    .swiper-pagination-bullet-active {
+        opacity: var(--swiper-pagination-bullet-opacity, 1);
+        width: 1.87512rem;
+        background-color: #20d600;
+        border-radius: 6.1875rem;
+    }
 </style>
   

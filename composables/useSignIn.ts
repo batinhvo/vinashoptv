@@ -1,9 +1,8 @@
 import { reactive, ref } from 'vue';
 import { formSchema, type SignFormData } from './validationSchemas';
 
-const notify = useNotify();
-
 export const useSignIn = () => {
+    const notify = useNotify();
     // Dữ liệu form
     const formData = reactive<SignFormData>({
         email: '',
@@ -17,13 +16,14 @@ export const useSignIn = () => {
     // Hàm xác thực form
     const validateForm = async (): Promise<boolean> => {
         try {
-                // Reset lỗi trước khi validate
-                for (const key in errors) {
+            // Reset lỗi trước khi validate
+            for (const key in errors) {
                 delete errors[key as keyof SignFormData];
             }
             // Thực hiện xác thực
             await formSchema.validate(formData, { abortEarly: false });
-                return true;
+
+            return true;
         } catch (err: any) {
             if (err.inner) {
                 err.inner.forEach((validationError: any) => {
@@ -38,16 +38,21 @@ export const useSignIn = () => {
     const onSubmit = async () => {
         isSubmitting.value = true;
         const isValid = await validateForm();
-        if (isValid) {          
+        if (isValid) {        
+            if (formData.email === 'tinh.vo@lldtek.com' && formData.password === 'tinhvo0123') {
+                localStorage.setItem('user', JSON.stringify(formData));
+                // Điều hướng đến trang người dùng
+                window.location.replace('/user');               
+            } else {
+                notify({
+                    message: 'Invalid email or password',
+                    type: 'error',
+                    time: 1000
+                });
+            }
+        } else {           
             notify({
-                message: 'Success',
-                type: 'success',
-                time: 1000
-            });
-        } else {
-            console.log('Form is invalid', errors);
-            notify({
-                message: 'Errord',
+                message: 'Invalid email or password',
                 type: 'error',
                 time: 1000
             });

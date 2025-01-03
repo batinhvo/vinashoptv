@@ -57,6 +57,7 @@ export const formSchema = Yup.object().shape({
     message: Yup
         .string()
         .optional(),
+    //Different Address
     isDifferentAddress : Yup.boolean(),
     emailDif: Yup.string().when('isDifferentAddress', {
         is: true, 
@@ -94,6 +95,39 @@ export const formSchema = Yup.object().shape({
         otherwise: (schema) => schema.notRequired(),
     }),
     postCodeDif: Yup.string().when('isDifferentAddress', {
+        is: true, 
+        then: (schema) => schema.required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    //Credit Card
+    isPaypal: Yup.boolean(),
+    isCreditCard : Yup.boolean(),
+    creditCard: Yup.string().when('isCreditCard', {
+        is: true, 
+        then: (schema) => schema.required('Please select an option').notOneOf(['Nothing Selected'], 'Please select an option'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    nameCard: Yup.string().when('isCreditCard', {
+        is: true,
+        then: (schema) => schema.required('This field cannot be left empty').matches(/^[A-Za-z\s]+$/, 'First name must not contain numbers'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    cardNumber: Yup.string().when('isCreditCard', {
+        is: true, 
+        then: (schema) => schema.required('This field cannot be left empty'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    monthCard: Yup.string().when('isCreditCard', {
+        is: true, 
+        then: (schema) => schema.required('Please select an option').notOneOf(['Nothing Selected'], 'Please select an option'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    yearCard: Yup.string().when('isCreditCard', {
+        is: true, 
+        then: (schema) => schema.required('Please select an option').notOneOf(['Nothing Selected'], 'Please select an option'),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    securityCode: Yup.string().when('isCreditCard', {
         is: true, 
         then: (schema) => schema.required('This field cannot be left empty'),
         otherwise: (schema) => schema.notRequired(),

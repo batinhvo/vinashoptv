@@ -14,6 +14,7 @@ export const useformCheckout = () => {
         city: '',
         postCode: '',
         address: '',
+        message: '',
         firstNameDif: '',
         lastNameDif: '',
         phoneDif: '',
@@ -22,8 +23,17 @@ export const useformCheckout = () => {
         cityDif: '',
         postCodeDif: '',
         addressDif: '',
+        agree: true,
         receiveEmail: false,
         isDifferentAddress: false,
+        isPaypal: false,
+        isCreditCard: false,
+        creditCard: '',
+        nameCard: '',
+        cardNumber: '',
+        monthCard: '',
+        yearCard: '',
+        securityCode: '',
     });
   
     // Lưu trạng thái lỗi
@@ -33,12 +43,22 @@ export const useformCheckout = () => {
     // Hàm xác thực form
     const validateForm = async (): Promise<boolean> => {
         try {
-                // Reset lỗi trước khi validate
-                for (const key in errors) {
+            // Reset lỗi trước khi validate
+            for (const key in errors) {
                 delete errors[key as keyof SignFormData];
             }
             // Thực hiện xác thực
             await formSchema.validate(formData, { abortEarly: false });
+            
+            if(!formData.isCreditCard && !formData.isPaypal) {
+                notify({
+                    message: 'Please select payment method!!!',
+                    type: "warning",
+                    time: 4000,
+                });
+                return false;
+            }
+
             return true;
         } catch (err: any) {
             if (err.inner) {
@@ -54,12 +74,13 @@ export const useformCheckout = () => {
     const onSubmit = async () => {
         isSubmitting.value = true;
         const isValid = await validateForm();
-        if (isValid) {          
+        if (isValid) {                     
             notify({
                 message: 'Success',
                 type: 'success',
                 time: 1000
             });
+            console.log('Form Data:', formData);
         } else {
             console.log('Form is invalid', errors);
             notify({

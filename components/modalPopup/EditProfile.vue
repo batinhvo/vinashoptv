@@ -81,23 +81,18 @@
         'states', () => $fetch("https://vinashoptv.com/api/v1/states")
     );
 
-    const {data:cityData, error:cityError, refresh: refreshCities} = await useAsyncData<City[]>(
-        'cities', () => selectedState.value ? $fetch(`https://vinashoptv.com/api/v1/cities?state=${selectedState.value}`),
-        {immediate: false}
-    );
-
     if(stateData.value) {
         stateOpt.value = stateData.value.map(state => state.name);
     } else {
         console.log(stateError);
     }
 
-    if(cityData.value) {
-        cityOpt.value = cityData.value.map(ci => ci.name);
-        console.log(cityData.value)
-    } else {
-        console.log(cityError);
-    }
+    // if(cityData.value) {
+    //     cityOpt.value = cityData.value.map(ci => ci.name);
+    //     console.log(cityData.value)
+    // } else {
+    //     console.log(cityError);
+    // }
 
     const stateSelected = ref('Houston');
     const citySelected = ref('Houston');

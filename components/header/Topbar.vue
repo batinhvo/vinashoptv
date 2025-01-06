@@ -31,13 +31,15 @@
             </div>
         </div>
         <!-- edit profile -->
-        <Modal v-if="showModalProfile" title="Special Offer!" @close="showModalProfile = false">
+        <Modal v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
             <template #body>
-                <div>
-
-                </div>
+                <ModalPopupEditProfile />
+            </template>
+            <template #actions>
+                <button class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
             </template>
         </Modal>
+
 
         <!-- edit password -->
         <Modal v-if="showchangePass" title="Change Password" @close="showchangePass = false">
@@ -82,8 +84,7 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
-
+    
     const isOpenSignIn = ref(false);
     const isSignInVisible = ref(false);
 
@@ -103,13 +104,13 @@
     const {user, logout} = useAuth();    
 
     //show modal
-    const showModalProfile = ref(false);
+    
     const showchangePass = ref(false);
-
     const openChangePass = () => {
         showchangePass.value = true;
     };
 
+    const showModalProfile = ref(false);
     const openEditProfile = () => {
         showModalProfile.value = true;
     };
@@ -152,4 +153,5 @@
             transform: translateX(100%);
         }
     }
+
 </style>

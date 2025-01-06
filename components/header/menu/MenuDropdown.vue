@@ -4,7 +4,7 @@
             <i class="fa fa-list-ul mr-2"></i> All Departments
         </button>
 
-        <div ref="menu"  :class="['list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-50', isMenuOpen ? 'show' : '']">
+        <div ref="menu"  :class="['list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-50', isMenuOpen ? 'show overflow-visible' : '']">
             <ul class="p-2 relative">
                 <li v-for="(item, index) in menuItems" :key="index" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative group">
                     <NuxtLink to="/" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
@@ -319,14 +319,6 @@
 
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value;
-        //logic animation
-        if (isMenuOpen.value && menu.value) {
-            menu.value.classList.add("show");           
-            menu.value?.classList.add("overflow-visible");
-        } else if (menu.value) {
-            menu.value.classList.remove("show");
-            
-        }
     }
 </script>
 

@@ -18,7 +18,7 @@
             <ul class="py-2 px-1">
                 <li 
                     v-for="(option, index) in options" 
-                    :key="index" 
+                    :key="option" 
                     class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" 
                     @click.prevent="setOption(option)"
                     role="option"

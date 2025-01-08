@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
+    <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg min-w-96">
             <button @click="closeModal" class="w-full flex justify-end text-base text-gray-400 hover:text-gray-600 pt-3 pr-4">
                 <i class="fa fa-times" aria-hidden="true"></i>

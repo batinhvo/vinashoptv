@@ -44,26 +44,7 @@
         <!-- edit password -->
         <Modal v-if="showchangePass" title="Change Password" @close="showchangePass = false">
             <template #body>
-                <div class="flex flex-wrap mt-6 w-96 bg-zinc-100 border border-zinc-200 p-3">
-                    <div class="w-full mb-6">
-                        <label for="password" class="font-bold ml-2 block">Current Password</label>
-                        <input type="password" placeholder="********"
-                        class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                        disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none">
-                    </div>
-                    <div class="w-full mb-6">
-                        <label for="password" class="font-bold ml-2 block">New Password</label>
-                        <input type="password" placeholder="********"
-                        class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                        disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none">
-                    </div>
-                    <div class="w-full">
-                        <label for="password" class="font-bold ml-2 block">Confirm Password</label>
-                        <input type="password" placeholder="********"
-                        class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                        disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none">
-                    </div>
-                </div>
+                <ModalPopupChangePass />
             </template>
             <template #actions>
                 <button class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>

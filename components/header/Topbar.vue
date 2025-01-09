@@ -44,16 +44,16 @@
         <!-- edit password -->
         <Modal v-if="showchangePass" title="Change Password" @close="showchangePass = false">
             <template #body>
-                <ModalPopupChangePass />
+                <ModalPopupChangePass @submit-form="handleSubmit"/>
             </template>
             <template #actions>
-                <button class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
+                <button @click.prevent="submitChangPass" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
             </template>
         </Modal>
 
         <div v-if="isSignInVisible" class="fixed inset-y-0 right-0 bg-white z-40 w-96 shadow-lg Signin" :class="[ isOpenSignIn ? 'show' : '' ]">
             <div class="flex pt-4 px-7">
-                <button class="ml-auto text-xl text-zinc-400" @click="toggleOpenSignIn" :aria-expanded="isOpenSignIn">
+                <button class="ml-auto text-xl text-zinc-400" @click.prevent="toggleOpenSignIn" :aria-expanded="isOpenSignIn">
                     <i class="ec ec-close-remove"></i>
                 </button>
             </div>
@@ -64,8 +64,17 @@
     
 </template>
 
-<script setup lang="ts">
-    
+<script setup lang="ts">    
+    const submitChangPass = () => {
+        const formElement = document.querySelector('form');
+        formElement?.dispatchEvent(new Event('submit'));
+    }
+
+    const handleSubmit = (formData: any) => {
+        console.log('Received data from child component:', formData);
+    };
+
+
     const isOpenSignIn = ref(false);
     const isSignInVisible = ref(false);
 
@@ -85,7 +94,6 @@
     const {user, logout} = useAuth();    
 
     //show modal
-    
     const showchangePass = ref(false);
     const openChangePass = () => {
         showchangePass.value = true;

@@ -1,38 +1,43 @@
 import * as Yup from 'yup';
 
-//tạo kiểu qui tắc valid
-type ValidationRuleMap = {
-    [key: string]: (schema: Yup.StringSchema, arg?: number) => Yup.StringSchema;
-};
+const validationRules = (rules: string): Yup.StringSchema => {
+    const parsedRules = rules.split('|').map(rule => { //Chuỗi quy tắc được tách ra thành một mảng các quy tắc đơn lẻ, mỗi quy tắc có định dạng ruleName:value
+        const [ruleName, value] = rule.split(':');
+        return { ruleName, value };
+    });
 
-const minLength = 8;
-const maxLength = 8;
+    let schema: Yup.StringSchema = Yup.string(); // Default schema as a string
 
-//qui tắc
-export function useValidation(validationString: string): Yup.StringSchema {
-    const rules = validationString.split('|');
-    let schema: Yup.StringSchema = Yup.string(); //định nghĩa schema là string  
-    const rule: ValidationRuleMap = {
-        required: (schema) => schema.required('This field cannot be left empty'),
-        email: (schema) => schema.email('Invalid email'),
-        min: (schema, minLength) => schema.min(minLength, `Must be at least ${minLength} characters`),
-        max: (schema, maxLength) => schema.max(maxLength, `Must be at least ${maxLength} characters`),
-        phone: (schema) => schema.matches(/^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}?\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/, 'Invalid phone number'),
-    }
-
-    // Áp dụng các quy tắc vào schema
-    schema = rules.reduce((acc: Yup.StringSchema, rule: string): Yup.StringSchema => {
-        const [ruleName, arg] = rule.split(':');
-        const numericArg = arg ? Number(arg) : undefined;
-
-        // Kiểm tra và áp dụng quy tắc vào schema
-        if (rules[ruleName]) {
-            return numericArg ? rules[ruleName](acc, numericArg) : rules[ruleName](acc);
+    parsedRules.forEach(({ ruleName, value }) => {
+        switch (ruleName) {
+            case 'required':
+                schema = schema.required('This field cannot be left empty');
+                break;
+            case 'min':
+                schema = schema.min(Number(value), `Must be at least ${value} characters`);
+                break;
+            case 'max':
+                schema = schema.max(Number(value), `Must not exceed ${value} characters`);
+                break;
+            case 'email':
+                schema = schema.email('Invalid email format');
+                break;
+            case 'matches':
+                schema = schema.matches(new RegExp(value), 'Invalid format');
+                break;
+            case 'phone':
+                schema = schema.matches(/^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}?\)?[-.\s]?)?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/, 'Invalid phone number');
+                break;
+            default:
+                break;
         }
-        return acc;
-    }, schema);
+    });
 
     return schema;
+    //Sau khi áp dụng tất cả các quy tắc, schema đã được chỉnh sửa sẽ được trả về. 
+    // Schema này có thể được dùng với các phương thức của Yup để kiểm tra xem giá trị chuỗi có đáp ứng tất cả các quy tắc kiểm tra hay không.
 }
+
+export default validationRules;
 
 

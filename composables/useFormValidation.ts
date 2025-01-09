@@ -1,41 +1,34 @@
-import { useValidation } from "./useValidation";
+import { useForm, useField} from 'vee-validate';
+import validationRules from './useValidation';
 
-export function useFormValidation() {
-    const formData = ref({
-        password: '',
-        newPass: '',
-        confPass: ''
+export const useFormValidation = (fields: any[]) => {
+    const validationSchema: Record<string, any> = {};
+
+    fields.forEach((field) => {
+        const rules = field.validation || ''; // Lấy quy tắc từ data-validation
+        validationSchema[field.name] = validationRules(rules);
     });
 
-    const errors = ref({
-        password: '',
-        newPass: '',
-        confPass: ''
+    const { handleSubmit, errors } = useForm({
+        validationSchema,
     });
 
-    //gọi hàm khi mất focus
-    const validate = (filed: string, validationString: string) => {
-        const validationSchema = useValidation(validationString);
+   // Dùng reduce để xây dựng formFields
+    const formFields = fields.reduce((acc, field) => {
+        const { value, errorMessage } = useField(field.name);
+        acc[field.name] = { value, errorMessage };  // Tích lũy giá trị vào đối tượng
+        return acc;
+    }, {} as Record<string, { value: any, errorMessage: string }>); // Khởi tạo kiểu đúng
 
-        //xóa lỗi cũ trước khi test lại
-        errors.value[filed] = '';
-
-        try {
-            validationSchema.validateSync(formData.value[filed]);
-        } catch (error: any) {
-            errors.value[filed] = error.message;
-        }
-    };
-
-    //xử lí submit form
-    const submitForm = () => {
-        alert("gửi rồi nghen");
+    const onSubmit = (values: { [key: string]: any }) => {
+        console.log('Form Submitted:', values);
     }
 
     return {
-        formData,
+        formFields,
+        handleSubmit: handleSubmit(onSubmit),
         errors,
-        validate,
-        submitForm
-    }
+    };
 }
+
+

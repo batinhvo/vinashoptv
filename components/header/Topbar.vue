@@ -44,10 +44,10 @@
         <!-- edit password -->
         <Modal v-if="showchangePass" title="Change Password" @close="showchangePass = false">
             <template #body>
-                <ModalPopupChangePass @submit-form="handleSubmit"/>
+                <ModalPopupChangePass @submit="onSubmit"/>
             </template>
             <template #actions>
-                <button @click.prevent="submitChangPass" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
+                <button @click.prevent="submitChangePass"  class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
             </template>
         </Modal>
 
@@ -65,15 +65,15 @@
 </template>
 
 <script setup lang="ts">    
-    const submitChangPass = () => {
-        const formElement = document.querySelector('form');
-        formElement?.dispatchEvent(new Event('submit'));
-    }
-
-    const handleSubmit = (formData: any) => {
-        console.log('Received data from child component:', formData);
+    const onSubmit = () => {
+        console.log("Sự kiện submit từ component con đã được gọi!");
     };
-
+    const submitChangePass = () => {
+        const form = document.querySelector('form');
+        if (form) {
+            form.requestSubmit();
+        }
+    }
 
     const isOpenSignIn = ref(false);
     const isSignInVisible = ref(false);

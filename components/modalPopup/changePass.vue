@@ -1,51 +1,26 @@
 <template>
-    <form @submit.prevent="submitForm">
+    <form @submit.prevent="onSubmit">
         <div class="flex flex-wrap mt-6 w-96 bg-zinc-100 border border-zinc-200 py-3"> 
-            <div v-for="(field, index) in fields" :key="index" class="w-full">
-                <InputFiled 
-                    v-bind="fieldProps(field)"
-                    v-slot="{ field, errorMessage }"
-                >
-                    <span>{{ errorMessage }}</span>
-                </InputFiled>       
-            </div>             
-        </div>
-        <button type="submit">Submit</button>
+            <InputFiled v-model="password" :rules="'required|min:8'" name="password" label="Current Password" type="password" placeholder="********"/>   
+            <InputFiled v-model="newPassword" :rules="'required|min:8'" name="newPassword" label="New Password" type="password" placeholder="********"/>   
+            <InputFiled v-model="ConfPassword" :rules="'required|confirmed:newPassword'" name="ConfPassword" label="Confirm Password" type="password" placeholder="********"/>  
+            <input type="checkbox" v-modal="show">
+            <div v-if="isshow">
+                <InputFiled v-model="email" :rules="'required|emailExist'" name="email" type="email" />
+            </div>
+        </div>    
     </form>
 </template>
 
 <script setup lang="ts">
-import { useForm, useField } from 'vee-validate';
-import * as rules from '@vee-validate/rules';
+    const show = ref(false);
 
-    // Khai báo kiểu cho các trường
-    interface Field {
-        name: string;
-        label: string;
-        validation: string;
-    }
-
-    const fields: Field[] = [
-        { name: 'password', label: 'Current Password', validation: 'required' },
-        { name: 'newPassword', label: 'New Password', validation: 'required|min:8' },
-        { name: 'confirmPassword', label: 'Confirm Password', validation: 'required|confirmed:newPassword' },
-    ];
+    
+    const emit = defineEmits();
 
     const { handleSubmit } = useForm();
 
-    const fieldProps = (field: Field) => {
-        const { value, errorMessage } = useField(field.name, field.validation);
-        return {
-            label: field.label,
-            placeholder: '********',
-            type: 'password',
-            errorMessage: errorMessage,
-            field: value,
-        };
-    };
-
-    const submitForm = handleSubmit((values) => {
-        console.log('Dữ liệu form đã được gửi:', values);
+    const onSubmit = handleSubmit(() => {
+        emit('submitEvent');
     });
-
 </script>

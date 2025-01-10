@@ -5,8 +5,13 @@ export default defineNuxtConfig({
     autoImport: true,
   },
   devtools: { enabled: true },
+  plugins: ['~/plugins/veeValidate.ts'],
   components: true,
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/image'],
+  modules: [
+    '@nuxtjs/tailwindcss', 
+    '@nuxt/image', 
+    '@vee-validate/nuxt', 
+  ],
   css: [
     '~/assets/css/tailwind.css',
     '~/assets/css/font-electro.css',

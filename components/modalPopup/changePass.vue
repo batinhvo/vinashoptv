@@ -14,12 +14,8 @@
 
 <script setup lang="ts">
     const show = ref(false);
-
-
     const emit = defineEmits();
-
     const { handleSubmit } = useForm();
-
     const onSubmit = handleSubmit(() => {
         emit('submitEvent');
         alert(123)

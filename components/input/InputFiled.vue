@@ -11,7 +11,6 @@
         disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
         :class="[!meta.valid && meta.touched ? 'bg-red-100' : '']"/>
         <ErrorMessage :name="name" class="text-red-500 mt-2 text-xs pl-4"/>
-        
     </div>
 </template>
 

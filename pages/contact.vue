@@ -22,60 +22,13 @@
             <!-- form -->
             <form @submit.prevent="onSubmit">
               <div class="flex flex-wrap mt-8">
-                <!-- first name -->
-                <div class="w-full md:w-1/2 px-4 pb-5">
-                  <label for="firstName" class="font-bold">First Name<span class="text-red-500"> *</span></label>
-                  <input v-model="formData.firstName" id="firstName" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm
-                    focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                    :class="[errors.firstName? 'border-red-500' : 'border-gray-300']">
-                  <p class="text-red-600 text-xs text-left pl-6" v-if="errors.firstName">{{ errors.firstName }}</p>
-                </div>              
-
-                <!-- last name -->
-                <div class="w-full md:w-1/2 px-4 pb-5">
-                  <label for="lastName" class="font-bold">Last Name<span class="text-red-500"> *</span></label>
-                  <input v-model="formData.lastName" id="lastName" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
-                    focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                    :class="[errors.lastName? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.lastName">{{ errors.lastName }}</p>
-                </div>                               
-
-                <!-- phone -->
-                <div class="w-full md:w-1/2 px-4 pb-5">
-                  <label for="phone" class="font-bold">Phone<span class="text-red-500"> *</span></label>
-                  <input v-model="formData.phone" id="phone" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
-                    focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                    :class="[errors.phone? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.phone">{{ errors.phone }}</p>
-                </div>                
-
-                <!-- email -->
-                <div class="w-full md:w-1/2 px-4 pb-5">
-                  <label for="email" class="font-bold">Email</label>
-                  <input v-model="formData.email" id="email" type="email" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
-                    focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                    :class="[errors.email? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.email">{{ errors.email }}</p>
-                </div>              
-
-                <!-- address -->
-                <div class="w-full px-4 pb-5">
-                  <label for="address" class="font-bold">Address</label>
-                  <input v-model="formData.address" id="address" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
-                    focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                    :class="[errors.address? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.address">{{ errors.address }}</p>
-                </div>               
-
-                <!-- message -->
-                <div class="w-full px-4 pb-5">
-                  <label for="message" class="font-bold">Your Message</label>
-                  <textarea v-model="formData.message" id="message" rows="4" class="mt-2.5 p-8 border rounded-2xl w-full shadow-sm border-gray-300
-                    focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                  ></textarea>
-                </div>                
-
-                <button type="submit" :disabled="isSubmitting" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
+                <InputField name="firstName" v-model="firstName" rules="required" label="First Name" :widthfull=false placeholder="enter your first name" />
+                <InputField name="lastName" v-model="lastName" rules="required" label="Last Name" :widthfull=false placeholder="enter your last name" />
+                <InputField name="phone" v-model="phone" rules="required|phone" label="Phone" :widthfull=false placeholder="enter your phone number" />
+                <InputField name="email" v-model="email" rules="required|email" label="Email" type="email" :widthfull=false placeholder="enter your email address" />
+                <InputField name="title" v-model="title" label="Title" rules="required" placeholder="title is...." />
+                <InputField name="message" v-model="message" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." />
+                <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                   Send Message
                 </button>
               </div>
@@ -108,20 +61,27 @@
 
           </div>
 
-
         </div>
       </div>
   </div>
 </template>
 
 <script setup lang="ts">
-    //check form
-    const { formData, errors, isSubmitting, onSubmit } = useformContact();
+  const firstName = ref('');
+  const lastName = ref('');
+  const phone = ref('');
+  const email = ref('');
+  const title = ref('');
+  const message = ref('');
+
+  const { handleSubmit } = useForm();
+  const onSubmit = handleSubmit(() => {
+      alert(123)
+  });
 </script>
 
 <style lang="css" scoped>
-
-.border-b::after {
+  .border-b::after {
     content: ' ';
     height: 2px;
     width: 114px;
@@ -130,6 +90,5 @@
     position: relative;
     bottom: -1px;
     left: 0;
-}
-
+  }
 </style>

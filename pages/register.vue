@@ -20,126 +20,34 @@
               <!-- form -->
               <form @submit.prevent="onSubmit">
                 <div class="flex flex-wrap mt-8">
-                  <!-- first name -->
-                  <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="firstName" class="font-bold">First Name </label>
-                    <input v-model="formData.firstName" id="firstName" type="text" placeholder="enter your first name"
-                     class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                     disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                     :class="[errors.firstName? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.firstName">{{ errors.firstName }}</p>
-                  </div>              
-  
-                  <!-- last name -->
-                  <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="lastName" class="font-bold">Last Name </label>
-                    <input v-model="formData.lastName" id="lastName" type="text" placeholder="enter your last name"
-                      class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.lastName? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.lastName">{{ errors.lastName }}</p>
-                  </div>                               
-  
-                  <!-- email -->
-                  <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="email" class="font-bold">Email Address</label>
-                    <input v-model="formData.email" id="email" type="email" placeholder="info@vinashoptv.com"
-                      class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.email? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.email">{{ errors.email }}</p>
-                  </div>        
+                  <InputField name="firstName" v-model="firstName" label="First Name" rules="required" placeholder="enter your first name" :widthfull=false />
+                  <InputField name="lastName" v-model="lastName" label="Last Name" rules="required" placeholder="enter your last name" :widthfull=false />
+                  <InputField name="email" v-model="email" label="Email Address" rules="required|email|emailExist" type="email" placeholder="info@vinashoptv.com" :widthfull=false />
+                  <InputField name="phone" v-model="phone" label="Phone Number" rules="required|phone" placeholder="(000) 000-0000" :widthfull=false />
+                  <InputField name="password" v-model="password" label="Password" rules="required" placeholder="********" type="password" :widthfull=false />
+                  <InputField name="confPassword" v-model="confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" :widthfull=false />
 
-                  <!-- phone -->
-                  <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="phone" class="font-bold">Phone Number</label>
-                    <input v-model="formData.phone" id="phone" type="text" class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm 
-                      focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.phone? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.phone">{{ errors.phone }}</p>
-                  </div>                         
-                  
-                  <!-- password -->
-                  <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="password" class="font-bold">Password</label>
-                    <input v-model="formData.password" id="password" type="password" placeholder="********"
-                      class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.password? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.password">{{ errors.password }}</p>
-                  </div>        
-
-                  <!-- confirm-password -->
-                  <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="confirmPassword" class="font-bold">Confirm Password</label>
-                    <input v-model="formData.confirmPassword" id="confirmPassword" type="password" placeholder="********"
-                      class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.confirmPassword? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</p>
-                  </div>                 
-  
-                  <!-- State -->
-                  <div class="w-full px-4 pb-5">
-                    <label for="state" class="font-bold">State</label>
-                    <select v-model="formData.state" id="state" type="text" placeholder="Select State"
-                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.state? 'border-red-500' : 'border-gray-300']">
-                      <option>123</option>
-                      <option>123</option>
-                    </select>                   
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.state">{{ errors.state }}</p>
-                  </div>     
-                  
-                   <!-- City -->
-                   <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="city" class="font-bold">City </label>
-                    <input v-model="formData.city" id="city" type="text" placeholder="Select City"
-                     class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                     disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                     :class="[errors.city? 'border-red-500' : 'border-gray-300']">
-                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.city">{{ errors.city }}</p>
-                  </div>              
-  
-                  <!-- PostCode/Zip -->
-                  <div class="w-full md:w-1/2 px-4 pb-5">
-                    <label for="postCode" class="font-bold">PostCode/Zip </label>
-                    <input v-model="formData.postCode" id="postCode" type="text" placeholder="9999"
-                      class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.postCode? 'border-red-500' : 'border-gray-300']">
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.postCode">{{ errors.postCode }}</p>
-                  </div>         
-
-                  <!-- Street Address -->
-                  <div class="w-full px-4 pb-5">
-                    <label for="address" class="font-bold">Address</label>
-                    <input v-model="formData.address" id="address" type="text" placeholder="123 Street"
-                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                      disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                      :class="[errors.address? 'border-red-500' : 'border-gray-300']">                   
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.address">{{ errors.address }}</p>
-                  </div>     
+                  <InputField name="postCode" v-model="postCode" label="PostCode/Zip" rules="required" placeholder="9999" :widthfull=false />
+                  <InputField name="address" v-model="address" label="Street Address" rules="required" placeholder="123 street" :widthfull=false />
 
                   <!-- check agree -->
                   <div class="w-full px-4 pb-5 flex flex-wrap items-center">                   
                     <div class="w-full">
-                      <input v-model="formData.agree" id="agree" type="checkbox" class="accent-[#169100]">                    
+                      <input id="agree" type="checkbox" class="accent-[#169100]">                    
                       <label for="agree" class="font-bold ml-2">I agree to the Terms & Conditions.</label>
                     </div>       
-                    <div class="text-red-600 text-xs text-left pl-6 pl-5" v-if="errors.agree">{{ errors.agree }}</div>            
+                    
                   </div>                      
                   
                   <!-- check receive email -->
                   <div class="w-full px-4 pb-5 flex items-center">                   
-                    <input v-model="formData.receiveEmail" id="receiveEmail" type="checkbox" class="accent-[#169100]">                    
+                    <input  id="receiveEmail" type="checkbox" class="accent-[#169100]">                    
                     <label for="receiveEmail" class="font-bold ml-2">Yes, I would like to receive emails about special promotions, events and exclusive offers.</label>
-                      <p class="text-red-600 text-xs text-left pl-6" v-if="errors.receiveEmail">{{ errors.receiveEmail }}</p>
+                      
                   </div>  
 
 
-                  <button type="submit" :disabled="isSubmitting" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
+                  <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                     Send Message
                   </button>
                 </div>
@@ -150,13 +58,64 @@
     </div>
   </template>
   
-  <script setup lang="ts">
-      //check form
-      const { formData, errors, isSubmitting, onSubmit } = useformRegister();
-  </script>
+<script setup lang="ts">
+  import { defineRule } from 'vee-validate';
+
+  interface State {
+    id: number;
+    name: string;
+  }
+
+  const apiStore = useApiStore();
+  const states = ref<State[]>([]);
+  const stateSelected = ref(null);
+
+  const loadStates = async () => {
+    try {
+      states.value = await apiStore.fetchStates() as State[];  // Ép kiểu dữ liệu
+    } catch (error) {
+      console.error('Error loading states:', error);
+    }
+  };
+
+  onMounted(() => {
+    loadStates();
+  });
+
+  //https://vinashoptv.com/api/v1/auth/check-email
+
+  const firstName = ref('');
+  const lastName = ref('');
+  const email = ref('');
+  const password = ref('');
+  const confPassword = ref('');
+  const phone = ref('');
+  const postCode = ref('');
+  const address = ref('');
+
+  const mockApiRequest = (value: string | undefined) => {
+      return new Promise((resolve) => {
+          setTimeout(() => {
+          resolve(value === 'test@example.com');
+          }, 1000);
+      });
+  };
+
+  defineRule('emailExist', async (value: string | undefined) : Promise<boolean|string> => {
+      const result = await mockApiRequest(value);
+      if(result) {
+          return 'Email address already exists';
+      }
+      return true;
+  });
+
+  const { handleSubmit } = useForm();
+  const onSubmit = handleSubmit(() => {
+      alert(123)
+  });
+</script>
   
-  <style lang="css" scoped>
-  
+<style lang="css" scoped>
   .border-b::after {
       content: ' ';
       height: 2px;
@@ -167,6 +126,5 @@
       bottom: -1px;
       left: 0;
   }
-  
-  </style>
+</style>
   

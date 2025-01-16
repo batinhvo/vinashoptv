@@ -10,7 +10,8 @@
             >
                 <input 
                 class="text-neutral-500 overflow-hidden whitespace-nowrap w-11/12 text-left focus:outline-none cursor-pointer" 
-                :value="selectedOption" 
+                v-model="selectedOption"
+                :rules
                 readonly
                 />
                 <i class="fa fa-angle-down text-[9px] text-neutral-500 pl-1.5"></i>
@@ -54,6 +55,10 @@
         label: {
             type: String,
             default: ''
+        },
+        rules: {
+            type: String,
+            default: 'stateSelect'
         }
     });
   

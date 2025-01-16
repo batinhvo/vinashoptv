@@ -82,6 +82,22 @@ export default defineNuxtPlugin(() => {
       return true;
     });
 
+    defineRule('stateSelect', (value: string | undefined) => {
+      if ( !value || value === 'Select State') {
+          return 'Please select a state';
+      }
+      return true;
+    });
+
+    defineRule('citySelect', (value: string | undefined) => {
+        if ( !value || value === 'Select City') {
+            return 'Please select a city';
+        }
+        return true;
+    });
+    
+
+
     // defineRule('checkString', (value: string | undefined, [checkValue]: [string]) => {
     //     console.log(checkValue)
     //     if (!value || !value.includes(checkValue)) {

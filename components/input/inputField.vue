@@ -16,6 +16,9 @@
 </template>
 
 <script setup lang="ts">
+    import { defineRule } from 'vee-validate';
+    import axios from 'axios';
+
     const props = defineProps({
         name: { type: String, required: true },
         label: { type: String, required: true },
@@ -33,6 +36,28 @@
         meta.valid = fieldValue.value ? true : false; // This is just an example logic. 
     })
     //dirty (người dùng có chỉnh sửa gì không - ứng dụng: có lưu lại khi thoát ?)
+
+    const checkEmailExist = async (email: string): Promise<boolean> => {
+        try {
+        const emailResponse = await axios.post('https://vinashoptv.com/api/v1/auth/check-email', {email});
+        if(emailResponse.data.error === 1) {
+            return true; // email da dang ky
+        } 
+        return false; //email chua dang ky
+        } catch (error) {
+        console.error('Error checking email:', error);
+        return false;
+        }
+    };
+
+    defineRule('emailExist', async (value: string | undefined): Promise<boolean | string> => {
+        if (!value) return 'Email is required';
+        const exists = await checkEmailExist(value);
+        if (exists) {
+        return 'Email address already exists';
+        }
+        return true;
+    });
 </script>
 
 <style lang="css" scoped>

@@ -23,7 +23,6 @@ export const useAuth = () => {
         loadUser();
     });
     
-
     return {
         user: computed(() => user.value),
         loadUser,

@@ -26,7 +26,20 @@
                   <InputField name="phone" v-model="phone" label="Phone Number" rules="required|phone" placeholder="(000) 000-0000" :widthfull=false />
                   <InputField name="password" v-model="password" label="Password" rules="required" placeholder="********" type="password" :widthfull=false />
                   <InputField name="confPassword" v-model="confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" :widthfull=false />
-
+                  <InputSelect id="state" label="State" rules="stateSelect"
+                    :options="stateOpt"
+                    :activeDropdownId="activeDropdownId"
+                    :defaultOption="stateSelected"
+                    @update:selectedOption="setState"
+                    @update:activeDropdownId="setActiveDropdownId"
+                  />      
+                  <InputSelect id="city" label="City"
+                    :options="cityOpt"
+                    :activeDropdownId="activeDropdownId"
+                    :defaultOption="citySelected"
+                    @update:selectedOption="setCity"
+                    @update:activeDropdownId="setActiveDropdownId"
+                  />   
                   <InputField name="postCode" v-model="postCode" label="PostCode/Zip" rules="required" placeholder="9999" :widthfull=false />
                   <InputField name="address" v-model="address" label="Street Address" rules="required" placeholder="123 street" :widthfull=false />
 
@@ -46,7 +59,6 @@
                       
                   </div>  
 
-
                   <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                     Send Message
                   </button>
@@ -59,30 +71,6 @@
   </template>
   
 <script setup lang="ts">
-  import { defineRule } from 'vee-validate';
-
-  interface State {
-    id: number;
-    name: string;
-  }
-
-  const apiStore = useApiStore();
-  const states = ref<State[]>([]);
-  const stateSelected = ref(null);
-
-  const loadStates = async () => {
-    try {
-      states.value = await apiStore.fetchStates() as State[];  // Ép kiểu dữ liệu
-    } catch (error) {
-      console.error('Error loading states:', error);
-    }
-  };
-
-  onMounted(() => {
-    loadStates();
-  });
-
-  //https://vinashoptv.com/api/v1/auth/check-email
 
   const firstName = ref('');
   const lastName = ref('');
@@ -93,26 +81,46 @@
   const postCode = ref('');
   const address = ref('');
 
-  const mockApiRequest = (value: string | undefined) => {
-      return new Promise((resolve) => {
-          setTimeout(() => {
-          resolve(value === 'test@example.com');
-          }, 1000);
-      });
-  };
-
-  defineRule('emailExist', async (value: string | undefined) : Promise<boolean|string> => {
-      const result = await mockApiRequest(value);
-      if(result) {
-          return 'Email address already exists';
-      }
-      return true;
-  });
-
   const { handleSubmit } = useForm();
   const onSubmit = handleSubmit(() => {
-      alert(123)
+      alert("submitting")
   });
+
+  //--------------------------------API-------------------------------------//
+
+  const stateStore = useStateStore();
+
+  const activeDropdownId = ref('');
+
+  const stateOpt = computed(() => stateStore.states.map((state) => state.name));
+  const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
+  
+  const stateSelected = ref<string>('Select State'); 
+  const citySelected = ref<string>('Select City'); 
+
+  watch(stateSelected, async (newState) => {
+    const state = stateStore.states.find((state) => state.name === newState);
+    if (state) {
+      await stateStore.fetchCities(state.code); 
+    } else {
+      stateStore.resetCities();
+    }
+  });
+
+  function setState(stateOption: string) {
+    stateSelected.value = stateOption;
+  }
+  function setCity(cityOption: string) {
+    citySelected.value = cityOption;
+  }
+  function setActiveDropdownId(id: string) {
+    activeDropdownId.value = id;
+  }
+  // Fetch states khi component mounted
+  onMounted(async () => {
+    await stateStore.fetchStates();
+  });
+
 </script>
   
 <style lang="css" scoped>

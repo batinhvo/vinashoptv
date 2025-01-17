@@ -23,7 +23,7 @@
         name: { type: String, required: true },
         label: { type: String, required: true },
         type: { type: String, default: 'text' },
-        widthfull: { type: Boolean, default: true },
+        widthfull: { type: Boolean, default: false },
         placeholder: { type: String, default: '' },
         rules: { type: String, default: '' },
         modelValue: { type: String, required: true },

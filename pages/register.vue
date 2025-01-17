@@ -20,43 +20,29 @@
               <!-- form -->
               <form @submit.prevent="onSubmit">
                 <div class="flex flex-wrap mt-8">
-                  <InputField name="firstName" v-model="firstName" label="First Name" rules="required" placeholder="enter your first name" :widthfull=false />
-                  <InputField name="lastName" v-model="lastName" label="Last Name" rules="required" placeholder="enter your last name" :widthfull=false />
-                  <InputField name="email" v-model="email" label="Email Address" rules="required|email|emailExist" type="email" placeholder="info@vinashoptv.com" :widthfull=false />
-                  <InputField name="phone" v-model="phone" label="Phone Number" rules="required|phone" placeholder="(000) 000-0000" :widthfull=false />
-                  <InputField name="password" v-model="password" label="Password" rules="required" placeholder="********" type="password" :widthfull=false />
-                  <InputField name="confPassword" v-model="confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" :widthfull=false />
-                  <InputSelect id="state" label="State" rules="stateSelect"
-                    :options="stateOpt"
-                    :activeDropdownId="activeDropdownId"
-                    :defaultOption="stateSelected"
-                    @update:selectedOption="setState"
-                    @update:activeDropdownId="setActiveDropdownId"
-                  />      
-                  <InputSelect id="city" label="City"
-                    :options="cityOpt"
-                    :activeDropdownId="activeDropdownId"
-                    :defaultOption="citySelected"
-                    @update:selectedOption="setCity"
-                    @update:activeDropdownId="setActiveDropdownId"
-                  />   
-                  <InputField name="postCode" v-model="postCode" label="PostCode/Zip" rules="required" placeholder="9999" :widthfull=false />
-                  <InputField name="address" v-model="address" label="Street Address" rules="required" placeholder="123 street" :widthfull=false />
+                  <InputField name="firstName" v-model="formData.firstName" label="First Name" rules="required" placeholder="enter your first name" />
+                  <InputField name="lastName" v-model="formData.lastName" label="Last Name" rules="required" placeholder="enter your last name" />
+                  <InputField name="email" v-model="formData.email" label="Email Address" rules="required|email|emailExist" type="email" placeholder="info@vinashoptv.com" />
+                  <InputField name="phone" v-model="formData.phone" label="Phone Number" rules="required|phone" placeholder="(000) 000-0000" />
+                  <InputField name="password" v-model="formData.password" label="Password" rules="required" placeholder="********" type="password" />
+                  <InputField name="confPassword" v-model="formData.confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" />
+                  <InputSelective name="state" label="State" v-model="formData.state" rules="required" :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
+                  <InputSelective name="city" label="City" v-model="formData.city" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
+                  <InputField name="postCode" v-model="formData.postCode" label="PostCode/Zip" rules="required" placeholder="9999" />
+                  <InputField name="address" v-model="formData.address" label="Street Address" rules="required" placeholder="123 street" />
 
                   <!-- check agree -->
                   <div class="w-full px-4 pb-5 flex flex-wrap items-center">                   
                     <div class="w-full">
                       <input id="agree" type="checkbox" class="accent-[#169100]">                    
                       <label for="agree" class="font-bold ml-2">I agree to the Terms & Conditions.</label>
-                    </div>       
-                    
+                    </div>                           
                   </div>                      
                   
                   <!-- check receive email -->
                   <div class="w-full px-4 pb-5 flex items-center">                   
                     <input  id="receiveEmail" type="checkbox" class="accent-[#169100]">                    
-                    <label for="receiveEmail" class="font-bold ml-2">Yes, I would like to receive emails about special promotions, events and exclusive offers.</label>
-                      
+                    <label for="receiveEmail" class="font-bold ml-2">Yes, I would like to receive emails about special promotions, events and exclusive offers.</label>                      
                   </div>  
 
                   <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
@@ -71,34 +57,43 @@
   </template>
   
 <script setup lang="ts">
-
-  const firstName = ref('');
-  const lastName = ref('');
-  const email = ref('');
-  const password = ref('');
-  const confPassword = ref('');
-  const phone = ref('');
-  const postCode = ref('');
-  const address = ref('');
+ 
+  const formData = ref({
+    state: '',
+    city: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confPassword: '',
+    phone: '',
+    postCode: '',
+    address: ''
+  });
 
   const { handleSubmit } = useForm();
   const onSubmit = handleSubmit(() => {
       alert("submitting")
+      console.log(formData.value)
   });
 
   //--------------------------------API-------------------------------------//
 
   const stateStore = useStateStore();
 
-  const activeDropdownId = ref('');
-
   const stateOpt = computed(() => stateStore.states.map((state) => state.name));
   const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
-  
-  const stateSelected = ref<string>('Select State'); 
-  const citySelected = ref<string>('Select City'); 
 
-  watch(stateSelected, async (newState) => {
+  const newStateSelect = ref<string>('');
+
+  const stateOnSelected = (value: string) => {
+    newStateSelect.value = value;
+  }
+  const cityOnSelected = (value: string) => {
+    console.log('Selected value:', value)
+  }
+
+  watch(newStateSelect, async (newState) => {
     const state = stateStore.states.find((state) => state.name === newState);
     if (state) {
       await stateStore.fetchCities(state.code); 
@@ -107,16 +102,6 @@
     }
   });
 
-  function setState(stateOption: string) {
-    stateSelected.value = stateOption;
-  }
-  function setCity(cityOption: string) {
-    citySelected.value = cityOption;
-  }
-  function setActiveDropdownId(id: string) {
-    activeDropdownId.value = id;
-  }
-  // Fetch states khi component mounted
   onMounted(async () => {
     await stateStore.fetchStates();
   });

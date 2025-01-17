@@ -22,12 +22,12 @@
             <!-- form -->
             <form @submit.prevent="onSubmit">
               <div class="flex flex-wrap mt-8">
-                <InputField name="firstName" v-model="firstName" rules="required" label="First Name" :widthfull=false placeholder="enter your first name" />
-                <InputField name="lastName" v-model="lastName" rules="required" label="Last Name" :widthfull=false placeholder="enter your last name" />
-                <InputField name="phone" v-model="phone" rules="required|phone" label="Phone" :widthfull=false placeholder="enter your phone number" />
-                <InputField name="email" v-model="email" rules="required|email" label="Email" type="email" :widthfull=false placeholder="enter your email address" />
-                <InputField name="title" v-model="title" label="Title" rules="required" placeholder="title is...." />
-                <InputField name="message" v-model="message" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." />
+                <InputField name="firstName" v-model="firstName" rules="required" label="First Name" placeholder="enter your first name" />
+                <InputField name="lastName" v-model="lastName" rules="required" label="Last Name" placeholder="enter your last name" />
+                <InputField name="phone" v-model="phone" rules="required|phone" label="Phone" placeholder="enter your phone number" />
+                <InputField name="email" v-model="email" rules="required|email" label="Email" type="email" placeholder="enter your email address" />
+                <InputField name="title" v-model="title" label="Title" rules="required" placeholder="title is...." :widthfull=true />
+                <InputField name="message" v-model="message" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." :widthfull=true />
                 <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                   Send Message
                 </button>

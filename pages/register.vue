@@ -31,19 +31,8 @@
                   <InputField name="postCode" v-model="formData.postCode" label="PostCode/Zip" rules="required" placeholder="9999" />
                   <InputField name="address" v-model="formData.address" label="Street Address" rules="required" placeholder="123 street" />
 
-                  <!-- check agree -->
-                  <div class="w-full px-4 pb-5 flex flex-wrap items-center">                   
-                    <div class="w-full">
-                      <input id="agree" type="checkbox" class="accent-[#169100]">                    
-                      <label for="agree" class="font-bold ml-2">I agree to the Terms & Conditions.</label>
-                    </div>                           
-                  </div>                      
-                  
-                  <!-- check receive email -->
-                  <div class="w-full px-4 pb-5 flex items-center">                   
-                    <input  id="receiveEmail" type="checkbox" class="accent-[#169100]">                    
-                    <label for="receiveEmail" class="font-bold ml-2">Yes, I would like to receive emails about special promotions, events and exclusive offers.</label>                      
-                  </div>  
+                  <InputCheckBox name="angree" v-model="formData.angree" widthfull label="I agree to the Terms & Consditions." />
+                  <InputCheckBox name="receiveEmail" v-model="formData.receiveEmail" widthfull :isStrong="false" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
 
                   <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                     Send Message
@@ -68,7 +57,9 @@
     confPassword: '',
     phone: '',
     postCode: '',
-    address: ''
+    address: '',
+    angree: false,
+    receiveEmail: false,
   });
 
   const { handleSubmit } = useForm();

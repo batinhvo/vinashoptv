@@ -7,6 +7,13 @@ export default defineNuxtPlugin(() => {
       }
       return true;
     });
+
+    defineRule('booRequired', (value:boolean | undefined) => {
+      if (value === undefined || !value) {
+        return 'This field must be checked';
+      }
+      return true;
+    });
     
     defineRule('email', (value: string | undefined) => {
       if (!value || !value.length) {

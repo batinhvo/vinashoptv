@@ -18,191 +18,38 @@
                             <h3 class="text-2xl pb-2">Billing address</h3>
                         </div>                      
                         <div class="flex flex-wrap">
-                            <!-- first name -->
-                            <div class="w-full md:w-1/2 px-4 pb-10">
-                                <label for="firstName" class="font-bold">First Name<span class="text-red-500"> *</span></label>
-                                <input v-model="formData.firstName" id="firstName" type="text" placeholder="enter your first name"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.firstName? 'border-red-500' : 'border-gray-300']">
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.firstName">{{ errors.firstName }}</p>
-                            </div>              
-
-                            <!-- last name -->
-                            <div class="w-full md:w-1/2 px-4 pb-10">
-                                <label for="lastName" class="font-bold">Last Name<span class="text-red-500"> *</span></label>
-                                <input v-model="formData.lastName" id="lastName" type="text" placeholder="enter your last name"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.lastName? 'border-red-500' : 'border-gray-300']">
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.lastName">{{ errors.lastName }}</p>
-                            </div>        
-                            
-                            <!-- State -->
-                            <div class="w-full px-4 pb-10">
-                                <label for="state" class="font-bold">State<span class="text-red-500"> *</span></label>
-                                <select v-model="formData.state" id="state" type="text" placeholder="Select State"
-                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                :class="[errors.state? 'border-red-500' : 'border-gray-300']">
-                                    <option>123</option>
-                                    <option>123</option>
-                                </select>                   
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.state">{{ errors.state }}</p>
-                            </div>     
-
-                            <!-- City -->
-                            <div class="w-full md:w-1/2 px-4 pb-10">
-                                <label for="city" class="font-bold">City<span class="text-red-500"> *</span></label>
-                                <input v-model="formData.city" id="city" type="text" placeholder="Select City"
-                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                :class="[errors.city? 'border-red-500' : 'border-gray-300']">
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.city">{{ errors.city }}</p>
-                            </div>              
-
-                            <!-- PostCode/Zip -->
-                            <div class="w-full md:w-1/2 px-4 pb-10">
-                                <label for="postCode" class="font-bold">PostCode/Zip<span class="text-red-500"> *</span></label>
-                                <input v-model="formData.postCode" id="postCode" type="text" placeholder="9999"
-                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                :class="[errors.postCode? 'border-red-500' : 'border-gray-300']">
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.postCode">{{ errors.postCode }}</p>
-                            </div>     
-                            
-                            <!-- Street Address -->
-                            <div class="w-full px-4 pb-10">
-                                <label for="address" class="font-bold">Strees Address<span class="text-red-500"> *</span></label>
-                                <input v-model="formData.address" id="address" type="text" placeholder="enter your address"
-                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                :class="[errors.address? 'border-red-500' : 'border-gray-300']">                   
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.address">{{ errors.address }}</p>
-                            </div>     
-
-                            <!-- email -->
-                            <div class="w-full md:w-1/2 px-4 pb-10">
-                                <label for="email" class="font-bold">Email Address<span class="text-red-500"> *</span></label>
-                                <input v-model="formData.email" id="email" type="email" placeholder="enter your email address"
-                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                :class="[errors.email? 'border-red-500' : 'border-gray-300']">
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.email">{{ errors.email }}</p>
-                            </div>        
-
-                            <!-- phone -->
-                            <div class="w-full md:w-1/2 px-4 pb-10">
-                                <label for="phone" class="font-bold">Phone<span class="text-red-500"> *</span></label>
-                                <input v-model="formData.phone" id="phone" type="text" placeholder="enter your phone"
-                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                :class="[errors.phone? 'border-red-500' : 'border-gray-300']">
-                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.phone">{{ errors.phone }}</p>
-                            </div>       
+                            <InputField name="firstName" label="First Name" rules="required" v-model="formData.firstName" placeholder="enter your first name" />
+                            <InputField name="lastName" label="Last Name" rules="required" v-model="formData.lastName" placeholder="enter your last name" />
+                            <InputSelective name="state" label="State" v-model="formData.state" rules="required" :widthfull=true :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
+                            <InputSelective name="city" label="City" v-model="formData.city" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
+                            <InputField name="postCode" label="PostCode/Zip" rules="required" v-model="formData.postCode" placeholder="9999" />
+                            <InputField name="street" label="Street Address" rules="required" v-model="formData.street" :widthfull=true placeholder="enter your address" />
+                            <InputField name="email" label="Email Address" rules="required|email" v-model="formData.email" placeholder="enter your email address" />
+                            <InputField name="phone" label="Phone" rules="required|phone" v-model="formData.phone" placeholder="enter your phone number" />
                         </div>
 
                         <div class="title border-b border-gray-300 mb-10">
                             <h3 class="text-2xl pb-2">Shipping address</h3>
                         </div>
-
                         <!-------------------------------------------------------------------- different address ---------------------------------------------------------------------->
-                        <div class="px-4 pb-10 flex flex-wrap items-center">                   
-                            <div class="w-full">
-                                <input v-model="formData.isDifferentAddress" id="difAddres" type="checkbox" class="accent-[#169100]">                    
-                                <label for="difAddres" class="font-bold ml-2">Ship to a different address?</label>
-                            </div>                                           
+                        <div class="px-4 pb-4 flex flex-wrap items-center">                    
+                            <InputCheckBox name="difAddres" v-model="formData.difAddres" :isStrong=false :value=true label="Ship to a different address ?" />                                        
                         </div>   
 
-                        <div v-if="formData.isDifferentAddress">
+                        <div v-if="formData.difAddres">
                             <div class="flex flex-wrap">
-                                <!-- first name -->
-                                <div class="w-full md:w-1/2 px-4 pb-10">
-                                    <label for="firstNameDif" class="font-bold">First Name<span class="text-red-500"> *</span></label>
-                                    <input v-model="formData.firstNameDif" id="firstNameDif" type="text" placeholder="enter your first name"
-                                        class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                        :class="[errors.firstNameDif? 'border-red-500' : 'border-gray-300']">
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.firstNameDif">{{ errors.firstNameDif }}</p>
-                                </div>              
-
-                                <!-- last name -->
-                                <div class="w-full md:w-1/2 px-4 pb-10">
-                                    <label for="lastNameDif" class="font-bold">Last Name<span class="text-red-500"> *</span></label>
-                                    <input v-model="formData.lastNameDif" id="lastNameDif" type="text" placeholder="enter your last name"
-                                        class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                        :class="[errors.lastNameDif? 'border-red-500' : 'border-gray-300']">
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.lastNameDif">{{ errors.lastNameDif }}</p>
-                                </div>        
-                                
-                                <!-- State -->
-                                <div class="w-full px-4 pb-10">
-                                    <label for="stateDif" class="font-bold">State<span class="text-red-500"> *</span></label>
-                                    <select v-model="formData.stateDif" id="stateDif" type="text" placeholder="Select State"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                                    disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.stateDif? 'border-red-500' : 'border-gray-300']">
-                                        <option>123</option>
-                                        <option>123</option>
-                                    </select>                   
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.stateDif">{{ errors.stateDif }}</p>
-                                </div>     
-
-                                <!-- City -->
-                                <div class="w-full md:w-1/2 px-4 pb-10">
-                                    <label for="cityDif" class="font-bold">City<span class="text-red-500"> *</span></label>
-                                    <input v-model="formData.cityDif" id="cityDif" type="text" placeholder="Select City"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                                    disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.cityDif? 'border-red-500' : 'border-gray-300']">
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.cityDif">{{ errors.cityDif }}</p>
-                                </div>              
-
-                                <!-- PostCode/Zip -->
-                                <div class="w-full md:w-1/2 px-4 pb-10">
-                                    <label for="postCodeDif" class="font-bold">PostCode/Zip<span class="text-red-500"> *</span></label>
-                                    <input v-model="formData.postCodeDif" id="postCodeDif" type="text" placeholder="9999"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                                    disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.postCodeDif? 'border-red-500' : 'border-gray-300']">
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.postCodeDif">{{ errors.postCodeDif }}</p>
-                                </div>     
-                                
-                                <!-- Street Address -->
-                                <div class="w-full px-4 pb-10">
-                                    <label for="addressDif" class="font-bold">Strees Address<span class="text-red-500"> *</span></label>
-                                    <input v-model="formData.addressDif" id="addressDif" type="text" placeholder="enter your address"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                                    disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.addressDif? 'border-red-500' : 'border-gray-300']">                   
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.addressDif">{{ errors.addressDif }}</p>
-                                </div>     
-
-                                <!-- email -->
-                                <div class="w-full md:w-1/2 px-4 pb-10">
-                                    <label for="emailDif" class="font-bold">Email Address<span class="text-red-500"> *</span></label>
-                                    <input v-model="formData.emailDif" id="emailDif" type="email" placeholder="enter your email address"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 
-                                    disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.emailDif? 'border-red-500' : 'border-gray-300']">
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.emailDif">{{ errors.emailDif }}</p>
-                                </div>        
-
-                                <!-- phone -->
-                                <div class="w-full md:w-1/2 px-4 pb-10">
-                                    <label for="phoneDif" class="font-bold">Phone<span class="text-red-500"> *</span></label>
-                                    <input v-model="formData.phoneDif" id="phoneDif" type="text" placeholder="enter your phone"
-                                    class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                    :class="[errors.phoneDif? 'border-red-500' : 'border-gray-300']">
-                                    <p class="text-red-600 text-xs text-left pl-6" v-if="errors.phoneDif">{{ errors.phoneDif }}</p>
-                                </div>       
-                            </div>   
+                            <InputField name="firstNameDif" label="First Name" rules="required" v-model="formData.firstNameDif" placeholder="enter your first name" />
+                            <InputField name="lastNameDif" label="Last Name" rules="required" v-model="formData.lastNameDif" placeholder="enter your last name" />
+                            <InputSelective name="stateDif" label="State" v-model="formData.stateDif" rules="required" :widthfull=true :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
+                            <InputSelective name="cityDif" label="City" v-model="formData.city" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
+                            <InputField name="postCodeDif" label="PostCode/Zip" rules="required" v-model="formData.postCodeDif" placeholder="9999" />
+                            <InputField name="streetDif" label="Street Address" rules="required" v-model="formData.streetDif" :widthfull=true placeholder="enter your address" />
+                            <InputField name="emailDif" label="Email Address" rules="required|email" v-model="formData.emailDif" placeholder="enter your email address" />
+                            <InputField name="phoneDif" label="Phone" rules="required|phone" v-model="formData.phoneDif" placeholder="enter your phone number" />
                         </div>
-
-                        <!-- message -->
-                        <div class="w-full px-4 pb-5">
-                            <label for="message" class="font-bold">Order notes (optional)</label>
-                            <textarea v-model="formData.message" id="message" rows="4" placeholder="Tell us something more than you want about this order"
-                                class="mt-2.5 p-8 border rounded-2xl w-full shadow-sm border-gray-300
-                                focus:outline-none focus:border-blue-300 disabled:bg-zinc-50 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                            ></textarea>
-                        </div>     
+                        </div>
+     
+                        <InputField name="message" v-model="formData.message" label="Order notes (optional)" as="textarea" rows="6" class="rounded-lg" :isStrong=false placeholder="Tell us something more than you want about this order" :widthfull=true />
                     </div>    
                     
                     <!-- ------------------------------------------------------------------invoice --------------------------------------------------------------------->
@@ -328,38 +175,18 @@
                                         <label class="font-bold ml-3">Credit Card</label>
                                     </div>                                   
                                     <div v-show="selectedPayment === 'creditcard'" class="p-6 bg-gray-100">
-                                        <!-- select card -->
-                                        <div class="mb-10">
-                                            <label class="font-bold">Select your credit card<span class="text-red-500"> *</span></label>
-                                            <BodyCheckoutInputSelect                                          
-                                            id="creditCard"
-                                            :options="creditcardOpt"
-                                            :activeDropdownId="activeDropdownId"
-                                            :defaultOption="creditCardSelected"
-                                            @update:selectedOption="setCard"
-                                            @update:activeDropdownId="setActiveDropdownId"/>
-                                            <p class="text-red-600 text-xs text-left pl-6" v-if="errors.creditCard">{{ errors.creditCard }}</p>
-                                        </div>                                       
-                                        <!-- name card -->
-                                        <div class="mb-1">
-                                            <div class="w-full pb-10">
-                                                <label for="nameCard" class="font-bold">Name On Card<span class="text-red-500"> *</span></label>
-                                                <input id="nameCard" type="text" v-model="formData.nameCard"
-                                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                                >                   
-                                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.nameCard">{{ errors.nameCard }}</p>
-                                            </div>     
-                                        </div>
+                                        <InputSelective name="creditCard" label="Select Your Credit Card" v-model="formData.creditCard" rules="required" :widthfull=true :options="creditcardOpt" placeholder="Nothing Selected"/>                                       
+                                        <InputField name="nameCard" label="Name On Card" v-model="formData.nameCard" rules="required" :widthfull=true placeholder="enter name on card" />
+                                        <InputField name="cardNumber" label="Card Number" v-model="formData.cardNumber" rules="required" maxlength="16" :widthfull=true placeholder="0000-0000-0000-0000"/>
                                         <!-- card number -->
                                         <div class="mb-1">
                                             <div class="w-full pb-10">
                                                 <label for="cardNumber" class="font-bold">Card Number<span class="text-red-500"> *</span></label>
-                                                <input id="cardNumber" v-model="formData.cardNumber" type="number" placeholder="0000-0000-0000-0000"
+                                                <input id="cardNumber" type="number" placeholder="0000-0000-0000-0000"
                                                 class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
                                                 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                                                 >                   
-                                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.cardNumber">{{ errors.cardNumber }}</p>
+                                             
                                             </div>     
                                         </div>
                                         <!-- select month -->
@@ -372,7 +199,7 @@
                                             :defaultOption="monthSelected"
                                             @update:selectedOption="setMonth"
                                             @update:activeDropdownId="setActiveDropdownId"/>
-                                            <p class="text-red-600 text-xs text-left pl-6" v-if="errors.monthCard">{{ errors.monthCard }}</p>
+                                            
                                         </div>
                                         <!-- select year -->
                                         <div class="mb-10">
@@ -384,17 +211,17 @@
                                             :defaultOption="yearSelected"
                                             @update:selectedOption="setYear"
                                             @update:activeDropdownId="setActiveDropdownId"/>
-                                            <p class="text-red-600 text-xs text-left pl-6" v-if="errors.yearCard">{{ errors.yearCard }}</p>
+                                          
                                         </div>
                                         <!-- security code -->
                                         <div class="mb-1">
                                             <div class="w-full pb-10">
                                                 <label for="securCode" class="font-bold">Security code<span class="text-red-500"> *</span></label>
-                                                <input v-model="formData.securityCode" id="securCode" type="text" placeholder="enter security code on card"
+                                                <input  id="securCode" type="text" placeholder="enter security code on card"
                                                 class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
                                                 disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
                                                 >                   
-                                                <p class="text-red-600 text-xs text-left pl-6" v-if="errors.securityCode">{{ errors.securityCode }}</p>
+                                                
                                             </div>     
                                         </div>
                                     </div>
@@ -402,13 +229,13 @@
                             </div>
                             <div class="px-4 pb-2 flex flex-wrap items-center my-5">                   
                                 <div class="w-full flex items-start">
-                                    <input v-model="formData.receiveEmail" id="receiveEmail" type="checkbox" class="accent-[#169100] mt-1">                    
+                                    <input  id="receiveEmail" type="checkbox" class="accent-[#169100] mt-1">                    
                                     <label for="receiveEmail" class="font-bold ml-2">Yes, I would like to receive emails about special promotions, events and exclusive offers.</label>
                                 </div>                                           
                             </div> 
                             <div class="px-4 pb-5 flex flex-wrap items-center my-5">                   
                                 <div class="w-full flex items-start">
-                                    <input v-model="formData.agree" id="conditions" type="checkbox" class="accent-[#169100] mt-1" checked>                    
+                                    <input id="conditions" type="checkbox" class="accent-[#169100] mt-1" checked>                    
                                     <label for="conditions" class="font-bold ml-2">I have read and agree to the website <span class="text-[#169100]">Terms And Conditions</span><span class="text-red-500"> *</span></label>
                                 </div>                                           
                             </div> 
@@ -424,8 +251,73 @@
 </template>
 
 <script setup lang="ts">
+    const formData = ref({
+        firstName: '',
+        lastName: '',
+        state: '',
+        city: '',
+        postCode: '',
+        street: '',
+        email: '',
+        phone: '',
+        address: '',
+
+        difAddres: false,
+
+        firstNameDif: '',
+        lastNameDif: '',
+        stateDif: '',
+        cityDif: '',
+        postCodeDif: '',
+        streetDif: '',
+        emailDif: '',
+        phoneDif: '',
+        addressDif: '',
+
+        message: '',
+
+        nameCard: '',
+        creditCard: '',
+        cardNumber: '',
+    });
+
+    const { handleSubmit } = useForm();
+    const onSubmit = handleSubmit(() => {
+        alert(123)
+    });
+
+    //--------------------------------API-------------------------------------//
+
+    const stateStore = useStateStore();
+
+    const stateOpt = computed(() => stateStore.states.map((state) => state.name));
+    const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
+
+    const newStateSelect = ref<string>('');
+
+    const stateOnSelected = (value: string) => {
+        newStateSelect.value = value;
+    }
+    const cityOnSelected = (value: string) => {
+        console.log('Selected value:', value)
+    }
+
+    watch(newStateSelect, async (newState) => {
+        const state = stateStore.states.find((state) => state.name === newState);
+        if (state) {
+            await stateStore.fetchCities(state.code); 
+        } else {
+            stateStore.resetCities();
+        }
+    });
+
+    onMounted(async () => {
+        await stateStore.fetchStates();
+    });
+
+
+    const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];
     //-----------------------------SUBMIT------------------------------------------------//
-    const { formData, errors, isSubmitting, onSubmit } = useformCheckout();
 
     //----------------------------INVOICE FORM-----------------------------------//
     const products = ref([
@@ -457,7 +349,9 @@
 
     const activeDropdownId = ref('');
 
-    const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];
+    
+
+
     const monthOpt = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     const yearOpt: string[] = Array.from({ length: 30 }, (_, i) => (2025 + i).toString());
 

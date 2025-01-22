@@ -8,8 +8,8 @@ export default defineNuxtPlugin(() => {
       return true;
     });
 
-    defineRule('booRequired', (value:boolean | undefined) => {
-      if (value === undefined || !value) {
+    defineRule('booRequired', (value: boolean | undefined) => {
+      if (!value) {
         return 'This field must be checked';
       }
       return true;

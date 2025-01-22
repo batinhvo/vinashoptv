@@ -30,10 +30,9 @@
                   <InputSelective name="city" label="City" v-model="formData.city" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
                   <InputField name="postCode" v-model="formData.postCode" label="PostCode/Zip" rules="required" placeholder="9999" />
                   <InputField name="address" v-model="formData.address" label="Street Address" rules="required" placeholder="123 street" />
-
-                  <InputCheckBox name="angree" v-model="formData.angree" widthfull label="I agree to the Terms & Consditions." />
-                  <InputCheckBox name="receiveEmail" v-model="formData.receiveEmail" widthfull :isStrong="false" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
-
+                  <InputCheckBox name="angree" v-model="formData.angree" widthfull rules="booRequired" :value="true" label="I agree to the Terms & Consditions." />
+                  <InputCheckBox name="receiveEmail" v-model="formData.receiveEmail" widthfull :isStrong="false" :value="true" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
+                  
                   <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                     Send Message
                   </button>

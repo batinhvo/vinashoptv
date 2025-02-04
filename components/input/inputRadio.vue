@@ -3,7 +3,7 @@
         <div class="flex items-center">
             <Field 
             class="accent-[#169100]"
-            type="checkbox"           
+            type="radio"           
             v-bind="$attrs"
             v-model="modelValue"
             :name

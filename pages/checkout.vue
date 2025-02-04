@@ -16,7 +16,8 @@
                     <div class="w-full xl:w-3/5 px-4">
                         <div class="title border-b border-gray-300 mb-10">
                             <h3 class="text-2xl pb-2">Billing address</h3>
-                        </div>                      
+                        </div>      
+                                        
                         <div class="flex flex-wrap">
                             <InputField name="firstName" label="First Name" rules="required" v-model="formData.firstName" placeholder="enter your first name" />
                             <InputField name="lastName" label="Last Name" rules="required" v-model="formData.lastName" placeholder="enter your last name" />
@@ -149,27 +150,19 @@
                             <div class="pt-5 border-t-2 border-gray-300">
                                 <div>
                                     <div class="flex items-center p-4 border-b border-gray-300">
-                                        <input 
-                                            type="radio" 
-                                            name="payment" 
-                                            value="paypal"
-                                            v-model="selectedPayment"
-                                            @change="onPaymentChange"                                                          
+                                        <input type="radio" name="payment" value="paypal"
+                                            v-model="selectedPayment"                                                                                                    
                                             class="accent-[#169100] w-4 h-4" >
                                         <label class="font-bold ml-3">PayPal <span class="text-[#167000]">What Is PayPal?</span></label>
                                     </div>
                                     <div v-show="selectedPayment === 'paypal'" class="p-6 bg-gray-100 border-b border-gray-300">
                                         <span>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal account.</span>
                                     </div>
-                                </div>  
+                                </div>                                 
                                 <div>
                                     <div class="flex items-center p-4 border-b border-gray-300">
-                                        <input 
-                                            type="radio" 
-                                            name="payment" 
-                                            value="creditcard"
-                                            v-model="selectedPayment"  
-                                            @change="onPaymentChange"                                                        
+                                        <input type="radio" name="payment" value="creditcard"
+                                            v-model="selectedPayment"                                                                                                     
                                             class="accent-[#169100] w-4 h-4 border" 
                                             >
                                         <label class="font-bold ml-3">Credit Card</label>
@@ -177,68 +170,22 @@
                                     <div v-show="selectedPayment === 'creditcard'" class="p-6 bg-gray-100">
                                         <InputSelective name="creditCard" label="Select Your Credit Card" v-model="formData.creditCard" rules="required" :widthfull=true :options="creditcardOpt" placeholder="Nothing Selected"/>                                       
                                         <InputField name="nameCard" label="Name On Card" v-model="formData.nameCard" rules="required" :widthfull=true placeholder="enter name on card" />
-                                        <InputField name="cardNumber" label="Card Number" v-model="formData.cardNumber" rules="required" maxlength="16" :widthfull=true placeholder="0000-0000-0000-0000"/>
-                                        <!-- card number -->
-                                        <div class="mb-1">
-                                            <div class="w-full pb-10">
-                                                <label for="cardNumber" class="font-bold">Card Number<span class="text-red-500"> *</span></label>
-                                                <input id="cardNumber" type="number" placeholder="0000-0000-0000-0000"
-                                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                                >                   
-                                             
-                                            </div>     
-                                        </div>
-                                        <!-- select month -->
-                                        <div class="mb-10">
-                                            <label class="font-bold">Month Expired<span class="text-red-500"> *</span></label>
-                                            <BodyCheckoutInputSelect
-                                            id="month"
-                                            :options="monthOpt"
-                                            :activeDropdownId="activeDropdownId"
-                                            :defaultOption="monthSelected"
-                                            @update:selectedOption="setMonth"
-                                            @update:activeDropdownId="setActiveDropdownId"/>
-                                            
-                                        </div>
-                                        <!-- select year -->
-                                        <div class="mb-10">
-                                            <label class="font-bold">Year Expired<span class="text-red-500"> *</span></label>
-                                            <BodyCheckoutInputSelect
-                                            id="year"
-                                            :options="yearOpt"
-                                            :activeDropdownId="activeDropdownId"
-                                            :defaultOption="yearSelected"
-                                            @update:selectedOption="setYear"
-                                            @update:activeDropdownId="setActiveDropdownId"/>
-                                          
-                                        </div>
-                                        <!-- security code -->
-                                        <div class="mb-1">
-                                            <div class="w-full pb-10">
-                                                <label for="securCode" class="font-bold">Security code<span class="text-red-500"> *</span></label>
-                                                <input  id="securCode" type="text" placeholder="enter security code on card"
-                                                class="mt-2.5 py-3 px-5 border rounded-full w-full shadow-sm appearance-none focus:outline-none focus:border-blue-300 disabled:bg-zinc-50
-                                                disabled:text-zinc-500 disabled:border-zinc-200 disabled:shadow-none"
-                                                >                   
-                                                
-                                            </div>     
-                                        </div>
+                                        <InputField name="cardNumber" label="Card Number" v-model="formData.cardNumber" rules="required" :widthfull=true placeholder="0000-0000-0000-0000" @input="maxInput"/>
+                                        <InputSelective name="monthCard" label="Month Expired" v-model="formData.monthCard" rules="required" :widthfull=true :options="monthOpt" placeholder="Nothing Selected"/>
+                                        <InputSelective name="yearCard" label="Year Expired" v-model="formData.yearCard" rules="required" :widthfull=true :options="yearOpt" placeholder="Nothing Selected"/>
+                                        <InputField name="securityCode" label="Security Code" v-model="formData.securityCode" rules="required" :widthfull=true placeholder="enter security code on card" />
+                                        
                                     </div>
                                 </div>                       
-                            </div>
-                            <div class="px-4 pb-2 flex flex-wrap items-center my-5">                   
-                                <div class="w-full flex items-start">
-                                    <input  id="receiveEmail" type="checkbox" class="accent-[#169100] mt-1">                    
-                                    <label for="receiveEmail" class="font-bold ml-2">Yes, I would like to receive emails about special promotions, events and exclusive offers.</label>
-                                </div>                                           
-                            </div> 
+                            </div>                                              
+                            <InputCheckBox name="receiveEmail" v-model="formData.receiveEmail" :isStrong=false :widthfull=true :value=true label="Yes, I would like to receive emails about special promotions, events and exclusive offers." class="my-5"/>                                                                                                  
                             <div class="px-4 pb-5 flex flex-wrap items-center my-5">                   
-                                <div class="w-full flex items-start">
-                                    <input id="conditions" type="checkbox" class="accent-[#169100] mt-1" checked>                    
+                                <div class="w-full flex">
+                                    <Field name="conditions" type="checkbox" v-model="formData.conditions" :value=true class="accent-[#169100]" />                    
                                     <label for="conditions" class="font-bold ml-2">I have read and agree to the website <span class="text-[#169100]">Terms And Conditions</span><span class="text-red-500"> *</span></label>
                                 </div>                                           
                             </div> 
+
                             <button class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6">
                                 Place order
                             </button>
@@ -279,8 +226,17 @@
         nameCard: '',
         creditCard: '',
         cardNumber: '',
+        monthCard: '',
+        yearCard: '',
+        securityCode: '',
+        receiveEmail: false,
+        conditions: true,
+
+        isPaypal: false,
+        isCreditCard: false,
     });
 
+    //-----SUBMIT-----//
     const { handleSubmit } = useForm();
     const onSubmit = handleSubmit(() => {
         alert(123)
@@ -317,13 +273,22 @@
 
 
     const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];
-    //-----------------------------SUBMIT------------------------------------------------//
+    const monthOpt = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    const yearOpt: string[] = Array.from({ length: 30 }, (_, i) => (2025 + i).toString());
+
+    const maxInput = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    if (target.value.length > 16) {
+        target.value = target.value.slice(0, 16); // Cắt bớt nếu vượt quá
+    }
+    };
 
     //----------------------------INVOICE FORM-----------------------------------//
     const products = ref([
         { id: '01', name: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g - default', price: 139, quantity: 1 },
         { id: '02', name: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g - default', price: 99, quantity: 1 }
     ]);
+
     // quantity
     const increment = (index: number) => {
         products.value[index].quantity++;
@@ -334,50 +299,8 @@
         }
     };
 
-    //---------------------------------PAYMENT METHOD-------------------------------------------//
-    // Toggle PayPal visibility when selected
     const selectedPayment = ref<string | null>(null);
-    const onPaymentChange = () => {
-        if (selectedPayment.value === 'paypal') {
-            formData.isPaypal = true;
-            formData.isCreditCard = false;
-        } else if (selectedPayment.value === 'creditcard') {
-            formData.isCreditCard = true;
-            formData.isPaypal = false;
-        }
-    };
 
-    const activeDropdownId = ref('');
-
-    
-
-
-    const monthOpt = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    const yearOpt: string[] = Array.from({ length: 30 }, (_, i) => (2025 + i).toString());
-
-    const creditCardSelected = ref('Nothing Selected');
-    const monthSelected = ref('Nothing Selected');
-    const yearSelected = ref('Nothing Selected');
-
-    function setActiveDropdownId(id: string) {
-        activeDropdownId.value = id;
-    }
-
-    function setCard(cardOption: string) {
-        creditCardSelected.value = cardOption;
-        formData.creditCard = cardOption;
-    }
-    function setMonth(monthOption: string) {
-        monthSelected.value = monthOption;
-        formData.monthCard = monthOption;
-    }
-    function setYear(yearOption: string) {
-        yearSelected.value = yearOption;
-        formData.yearCard = yearOption;
-    }
-    
-
-    
 </script>
 
 <style lang="css" scoped>

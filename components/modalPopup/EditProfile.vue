@@ -5,20 +5,8 @@
             <InputField v-model="lastName" rules="required" name="LastName" label="Last Name" :widthfull=false :isStrong=false />
             <InputField v-model="emailAddress" rules="required|email" name="emailAddress" label="Email Address" type="email" :widthfull=false :isStrong=false />
             <InputField v-model="phone" rules="required|phone" name="phone" label="Phone Number" :widthfull=false :isStrong=false />
-            <InputSelect id="state" label="State"
-                :options="stateOpt"
-                :activeDropdownId="activeDropdownId"
-                :defaultOption="stateSelected"
-                @update:selectedOption="setState"
-                @update:activeDropdownId="setActiveDropdownId"
-            />      
-            <InputSelect id="city" label="City"
-                :options="cityOpt"
-                :activeDropdownId="activeDropdownId"
-                :defaultOption="citySelected"
-                @update:selectedOption="setCity"
-                @update:activeDropdownId="setActiveDropdownId"
-            />     
+            <InputSelective name="state" label="State" v-model="formData.stateDif" rules="required" :widthfull=true :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
+            <InputSelective name="city" label="City" v-model="formData.city" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />  
             <InputField v-model="postCode" rules="required" name="postCode" label="Postcode/Zip" :widthfull=false :isStrong=false />
             <InputField v-model="street" rules="required" name="street" label="Street Address" :widthfull=false :isStrong=false />
         </div>
@@ -27,75 +15,45 @@
 
 <script setup lang="ts">
 
-    const firstName = ref('');
-    const lastName = ref('');
-    const emailAddress = ref('');
-    const phone = ref('');
-    const postCode = ref('');
-    const street = ref('');
+    const formData = ref ({
+        firstName: '',
+        lastName: '',
+        emailAddress: '',
+        phone: '',
+        state: '',
+        city: '',
+        postCode: '',
+        street: '',
+    });
 
-    interface State {
-        code: string;
-        name: string;
-    }
-
-    interface City {
-        id: bigint;
-        name: string;
-    }
     
-    const stateOpt = ref<string[]>([]);
-    const cityOpt = ref<string[]>([]);
-    const stateSelected = ref<string>('Alabama');   
-    const citySelected = ref<string>('');
-  
-    const { data:stateData, error:stateError } = await useAsyncData<{ error: number; data: State[]; message: string }>(
-        'states', () => $fetch<{ error: number; data: State[]; message:string }>("https://vinashoptv.com/api/v1/states")
-    );
-    if(stateData.value) {
-        stateOpt.value = stateData.value.data.map((state) => state.name);
-    } else {
-        console.log('Error fetching states:', stateError.value);
+
+    const stateStore = useStateStore();
+
+    const stateOpt = computed(() => stateStore.states.map((state) => state.name));
+    const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
+
+    const newStateSelect = ref<string>('');
+
+    const stateOnSelected = (value: string) => {
+        newStateSelect.value = value;
+    }
+    const cityOnSelected = (value: string) => {
+        console.log('Selected value:', value)
     }
 
-    async function fetchCities(stateCode: string) {
-        try {
-            const { data: cityData, error: cityError } = await useAsyncData<{ error: number; data: City[]; message: string }>(
-                'cities', () => $fetch<{ error: number; data: City[]; message: string }>(`https://vinashoptv.com/api/v1/cities?state=${stateCode}`)
-            );
-            if (cityData.value) {
-                cityOpt.value = cityData.value.data.map((city) => city.name);
-            } else {
-                console.error('Error fetching cities:', cityError);
-                cityOpt.value = [];
-            }
-        } catch (error) {
-            console.error('Error fetching cities:', error);
-            cityOpt.value = [];
-        }
-    }
-
-    // Watch for state selection changes and fetch cities accordingly
-    watch(stateSelected, (newStateSelected) => {
-        const state = stateData.value?.data.find(state => state.name === newStateSelected);
+    watch(newStateSelect, async (newState) => {
+        const state = stateStore.states.find((state) => state.name === newState);
         if (state) {
-            fetchCities(state.code);
+            await stateStore.fetchCities(state.code); 
         } else {
-            cityOpt.value = [];
+            stateStore.resetCities();
         }
     });
 
-    function setState(stateOption: string) {
-        stateSelected.value = stateOption;
-    }
-    function setCity(cityOption: string) {
-        citySelected.value = cityOption;
-    }
-
-    const activeDropdownId = ref('');
-    function setActiveDropdownId(id: string) {
-        activeDropdownId.value = id;
-    }
+    onMounted(async () => {
+        await stateStore.fetchStates();
+    });
 
     //submit
     const emit = defineEmits();

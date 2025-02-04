@@ -41,20 +41,37 @@
 </template>
 
 <script setup lang="ts">
+    import { useForm, ErrorMessage } from 'vee-validate';
+
+    const notify = useNotify();
     const formData = ref({
         email: '',
         password: '',
     });
 
-    const { handleSubmit, errors } = useForm();
-    const onSubmit = handleSubmit(() => {
-        alert("submitting")
-        console.log(formData.value)
-    });
-
     const emailError = computed(() => { return !!errors.value.email;});
     const passError = computed(() => { return !!errors.value.password;});
 
+    const { handleSubmit, errors } = useForm({
+        initialValues: formData.value
+    });
+    const onSubmit = handleSubmit(() => {
+        
+        if (formData.value.email === 'tinh.vo@lldtek.com' && formData.value.password === 'tinhvo0123') {
+            localStorage.setItem('user', JSON.stringify({
+                email: formData.value.email,
+                password: formData.value.password
+            }));
+            // Điều hướng đến trang người dùng
+            window.location.replace('/user');               
+        } else {
+            notify({
+                message: 'Invalid email or password',
+                type: 'error',
+                time: 1000
+            });
+        }         
+    });
 </script>
 
 <style scoped>

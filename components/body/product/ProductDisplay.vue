@@ -6,12 +6,12 @@
             </div>
             <div :class="['px-6', { 'border-l border-gray-200': index % columns !== 0 }]">
                 <div class="relative group">
-                    <button @click="openQuickView(product)">
+                    <button @click="openShowQuickView">
                         <NuxtImg class="w-full" :src="product.image" :alt="product.title"/>
                     </button>
                     <div class="pop-up">
                         <button class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300"
-                            @click="openQuickView(product)">
+                            @click="openShowQuickView">
                             Quick View
                         </button>                                              
                         <NuxtLink
@@ -29,16 +29,29 @@
                     <div class="text-xs line-clamp-2 my-5">{{ product.desc }}</div>         
                 </div>
             </div>
-            <div class="flex justify-between products-end mt-3 px-6">
+            <div class="flex justify-between items-end products-end mt-3 px-6">
                 <div class="text-base lg:text-xl" :class="[product.disc ? 'text-red-500': '']">${{ product.disc ? product.discPrice : product.price }}.00</div>                
                 <div v-if="product.disc && product.discPrice" class="text-xs lg:text-base line-through">${{ product.price }}.00</div>
             </div>
         </div>   
         <ModalPopupQuickView v-if="selectedProduct" :product="selectedProduct" @close="closeQuickView" />
+
+        <Modal v-if="showQuickView" @close="showQuickView = false">
+            <template #body>
+                <ModalPopupProductQuickView />
+            </template>           
+        </Modal>
     </div>
 </template>
 
 <script setup lang="ts">
+
+    //show modal
+    const showQuickView = ref(false);
+    const openShowQuickView = () => {
+        showQuickView.value = true;
+    };
+
     // -----------------border product----------------------- //
 
     const columns = ref(2);
@@ -74,7 +87,7 @@
         thumImages?: string[];
     };
     const selectedProduct = ref<Product | null>(null);
-        const openQuickView = (product: Product) => {
+    const openQuickView = (product: Product) => {
         selectedProduct.value = product;
         document.body.classList.add('overflow-hidden'); 
     };

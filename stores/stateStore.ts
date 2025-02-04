@@ -9,7 +9,6 @@ interface City {
 }
 
 export const useStateStore = defineStore('states', () => {
-
     // Dữ liệu state
     const states = ref<State[]>([]);  
     const cities = ref<City[]>([]);

@@ -38,7 +38,6 @@
                             </ul>
                         </div>
                     </div>
-
                     <BodyProductDisplay />
                 </div>
             </div>

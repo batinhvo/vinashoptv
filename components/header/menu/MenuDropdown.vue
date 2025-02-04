@@ -320,6 +320,13 @@
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value;
     }
+
+
+
+    //-------------------API-------------------------//
+    const cateStore = useCateStore();
+    console.log(cateStore)
+
 </script>
 
 <style lang="css" scoped>

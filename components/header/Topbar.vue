@@ -12,8 +12,7 @@
                     <div v-if="user" class="relative group cursor-pointer">                       
                         {{ user.email }}
                         <div class="w-40 absolute z-50 py-3 hidden group-hover:block">
-                            <div class="bg-white border border-gray-200 shadow-xl py-3">
-                                
+                            <div class="bg-white border border-gray-200 shadow-xl py-3">                               
                                 <NuxtLink to="/user" class="block py-1.5 px-5 hover:bg-zinc-200">Profile</NuxtLink>                                    
                                 <button @click.prevent="openEditProfile" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Edit Profile</button>
                                 <button @click.prevent="openChangePass" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Change Password</button>

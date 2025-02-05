@@ -324,8 +324,13 @@
 
 
     //-------------------API-------------------------//
-    const cateStore = useCateStore();
-    console.log(cateStore)
+    const cateStore = useCateStore();    
+    onMounted(async () => {
+        await cateStore.fetchCate();
+        //console.log("data : ", cateStore.categories); 
+        //console.log("name : ", cateStore.groupCate); 
+
+    });
 
 </script>
 

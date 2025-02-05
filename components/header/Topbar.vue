@@ -32,10 +32,10 @@
         <!-- edit profile -->
         <Modal v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
             <template #body>
-                <ModalPopupEditProfile @submit="onSubmit"/>
+                <ModalPopupEditProfile ref="modalPopupEditProfileRef"/>
             </template>
             <template #actions>
-                <button @click.prevent="submitUpdateProfile" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
+                <button @click.prevent="modalPopupEditProfileRef?.submitForm()" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
             </template>
         </Modal>
 
@@ -43,10 +43,10 @@
         <!-- edit password -->
         <Modal v-if="showchangePass" title="Change Password" @close="showchangePass = false">
             <template #body>
-                <ModalPopupChangePass @submit="onSubmit"/>
+                <ModalPopupChangePass ref="modalPopupChangePassRef"/>
             </template>
             <template #actions>
-                <button @click.prevent="submitChangePass" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
+                <button @click.prevent="modalPopupChangePassRef?.submitForm()" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
             </template>
         </Modal>
 
@@ -63,18 +63,11 @@
     
 </template>
 
-<script setup lang="ts">    
-    const onSubmit = () => {
-        console.log("Sự kiện submit từ component con đã được gọi!");
-    };
-    const submitChangePass = () => {
-        const form = document.querySelector('form');
-        if (form) form.requestSubmit();
-    }
-    const submitUpdateProfile = () => {
-        const form = document.querySelector('form');
-        if(form) form.requestSubmit();
-    }
+<script setup lang="ts">
+import type { ModalPopupChangePass, ModalPopupEditProfile } from '.nuxt/components';
+
+    const modalPopupChangePassRef = ref<InstanceType<typeof ModalPopupChangePass> | null>(null);
+    const modalPopupEditProfileRef = ref<InstanceType<typeof ModalPopupEditProfile> | null>(null);
 
     const isOpenSignIn = ref(false);
     const isSignInVisible = ref(false);

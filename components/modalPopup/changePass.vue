@@ -21,4 +21,6 @@
         alert(123)
     });
 
+    defineExpose({submitForm:onSubmit});
+
 </script>

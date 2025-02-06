@@ -26,8 +26,6 @@
         street: '',
     });
 
-    
-
     const stateStore = useStateStore();
 
     const stateOpt = computed(() => stateStore.states.map((state) => state.name)); // khi giá trị thay đổi thì computed tự động cập nhật lại

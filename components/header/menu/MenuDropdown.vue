@@ -321,17 +321,6 @@
         isMenuOpen.value = !isMenuOpen.value;
     }
 
-
-
-    //-------------------API-------------------------//
-    const cateStore = useCateStore();    
-    onMounted(async () => {
-        await cateStore.fetchCate();
-        //console.log("data : ", cateStore.categories); 
-        //console.log("name : ", cateStore.groupCate); 
-
-    });
-
 </script>
 
 <style lang="css" scoped>

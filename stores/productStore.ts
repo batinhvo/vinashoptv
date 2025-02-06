@@ -1,25 +1,39 @@
-interface Content {
+interface Products {
     id: number;
+    useTax: string;
+    tax: string;
+    status: string;
+    categoryId: number;
+    venderId: number;
+    isBestSeller: string;
+    isSpecial: string;
+    minPrice: number;
+    total: number;
+    totalOut: number;
+    totalOutFake: number;
+    media: string;
     title: string;
+    summary: string;
     content: string;
+    howToUse: string;
 }
 
-export const useContentStore = defineStore('content', () => {
+export const useProductStore = defineStore('products', () => {
     const config = useRuntimeConfig();
     const apiUrl = config.public.apiBaseUrl;
 
-    const content = ref<Content | null>(null);
+    const products = ref<Products[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
     const message = ref<string>(''); 
     const loading = ref<boolean>(false); // Trạng thái đang tải
 
-    const fetchContent =  async (article: string) => {
+    const fetchProducts =  async () => {
         loading.value = true; // Bắt đầu tải
         try {
-            const data = await $fetch<{ error: number; data: Content | null; message: string }>(`${apiUrl}/articles/${article}`);      
-
-            if ( data.error === 0 && data.data ) {
-                content.value = data.data;
+            const data = await $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>('https://vinashoptv.com/api/v1/products?categoryId=41&descending=1&page=1&perPage=8&sortBy=createdAt');      
+            console.log(data.data.list)
+            if ( data.error === 0 ) {
+                products.value = data.data.list;
                 message.value = data.message || 'Không có thông báo';                          
             } else {
                 error.value = 1;
@@ -34,5 +48,5 @@ export const useContentStore = defineStore('content', () => {
         }
     };
 
-    return { content, fetchContent, error, message, loading };
+    return { products, fetchProducts, error, message, loading };
 });

@@ -9,6 +9,9 @@ interface City {
 }
 
 export const useStateStore = defineStore('states', () => {
+    const config = useRuntimeConfig();
+    const apiUrl = config.public.apiBaseUrl;
+
     // Dữ liệu state
     const states = ref<State[]>([]);  
     const cities = ref<City[]>([]);
@@ -18,7 +21,7 @@ export const useStateStore = defineStore('states', () => {
     
     const fetchStates =  async () => {
         try {
-            const data = await $fetch<{ error: number; data: State[]; message: string }>('https://vinashoptv.com/api/v1/states');
+            const data = await $fetch<{ error: number; data: State[]; message: string }>(`${apiUrl}states`);
             if (data) {
                 states.value = data.data || [];
                 message.value = data.message || 'Không có thông báo';
@@ -32,7 +35,7 @@ export const useStateStore = defineStore('states', () => {
     const fetchCities = async (stateCode: string) => {
         try {
             cities.value = [];
-            const data = await $fetch<{ error: number; data: City[]; message: string }>(`https://vinashoptv.com/api/v1/cities?state=${stateCode}`);
+            const data = await $fetch<{ error: number; data: City[]; message: string }>(`${apiUrl}cities?state=${stateCode}`);
             if (data.data) {
                 cities.value = data.data || [];
                 message.value = data.message || 'Không có thông báo';

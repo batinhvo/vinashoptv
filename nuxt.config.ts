@@ -8,6 +8,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   plugins: ['~/plugins/veeValidate.ts'],
   components: true,
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: 'https://vinashoptv.com/api/v1/',
+    },
+  },
   modules: [
     '@nuxtjs/tailwindcss', 
     '@nuxt/image', 

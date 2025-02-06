@@ -12,48 +12,32 @@ interface Category {
 
 export const useCateStore = defineStore('categories', () => {
 
+    const config = useRuntimeConfig();
+    const apiUrl = config.public.apiBaseUrl;
+
     const categories = ref<Category[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
     const message = ref<string>(''); 
+    const loading = ref<boolean>(false); // Trạng thái đang tải
 
     const fetchCate =  async () => {
+        loading.value = true; // Bắt đầu tải
         try {
-            const data = await $fetch<{ error: number; data: Category[]; message: string }>('https://vinashoptv.com/api/v1/categories');      
-            if (data) {
+            const data = await $fetch<{ error: number; data: Category[]; message: string }>(`${apiUrl}categories`);      
+            if (data.error === 0) {
                 categories.value = data.data || [];
                 message.value = data.message || 'Không có thông báo';                          
+            } else {
+                error.value = 1;
+                message.value = data.message || 'Có lỗi xảy ra từ phía máy chủ';
             }
-        } catch (err) {
+        } catch (err: any) {
             error.value = 1;
-            message.value = 'Lỗi khi tải dữ liệu categories.';
+            message.value = err.message || 'Lỗi khi kết nối tới máy chủ';
+        } finally {
+            loading.value = false; // Kết thúc tải
         }
     };
-
-    // Hàm trả về các category có cùng parentId
-    const groupCate = computed(() => {
-        return categories.value.reduce((acc, category) => {
-            if(!acc[category.parentId]) { //kiểm tra xem id đã tồn tại trong mảng chưa
-                acc[category.parentId] = []; //khởi tạo mảng rỗng cho id
-            }
-             // Thêm category vào nhóm
-            acc[category.parentId].push(category);
-            // Sắp xếp danh mục trong từng nhóm theo sort
-            acc[category.parentId].sort((a, b) => a.sort - b.sort);
-
-            return acc;
-        }, {} as Record<number, Category[]>);
-    });
-
-    // Lấy ra chỉ các mảng tên đã sắp xếp
-    const groupedNames = computed(() => {
-        const grouped = groupCate.value;
-        return Object.fromEntries(
-            Object.entries(grouped).map(([parentId, categories]) => [
-                parentId,
-                categories.map((category) => category.name), // Chỉ lấy name
-            ])
-        );
-    });
-
-    return { categories, error, message, fetchCate, groupCate, groupedNames};
+    
+    return { categories, error, message, fetchCate};
 });

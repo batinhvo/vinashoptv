@@ -34,8 +34,7 @@
                 <div v-if="product.disc && product.discPrice" class="text-xs lg:text-base line-through">${{ product.price }}.00</div>
             </div>
         </div>   
-        <ModalPopupQuickView v-if="selectedProduct" :product="selectedProduct" @close="closeQuickView" />
-
+    
         <Modal v-if="showQuickView" @close="showQuickView = false">
             <template #body>
                 <ModalPopupProductQuickView />
@@ -53,7 +52,6 @@
     };
 
     // -----------------border product----------------------- //
-
     const columns = ref(2);
     const updateColumns = () => {
         if (window.innerWidth >= 768) {
@@ -62,15 +60,6 @@
             columns.value = 2;
         }
     };
-
-    onMounted(() => {
-        updateColumns();
-        window.addEventListener('resize', updateColumns); // listen
-    });
-
-    onBeforeUnmount(() => {
-        window.removeEventListener('resize', updateColumns); // remove
-    });
 
     //----------------Call-Quick-View-------------------//
     type Product = {
@@ -86,15 +75,7 @@
         subImages: boolean;
         thumImages?: string[];
     };
-    const selectedProduct = ref<Product | null>(null);
-    const openQuickView = (product: Product) => {
-        selectedProduct.value = product;
-        document.body.classList.add('overflow-hidden'); 
-    };
-    const closeQuickView = () => {
-        selectedProduct.value = null;
-        document.body.classList.remove('overflow-hidden');
-    };
+
 
     //data
     const products: Product[] = [
@@ -121,6 +102,23 @@
     const generateSlug = (name: string): string =>
     name.toLowerCase().replace(/\s+/g, '-');
 
+
+    //-----------------------API-----------------------------//
+    const productStore = useProductStore();
+
+    onMounted(async () => {
+        await productStore.fetchProducts;
+        console.log(productStore.products)
+    });
+
+    onMounted(() => {
+        updateColumns();
+        window.addEventListener('resize', updateColumns); // listen
+    });
+
+    onBeforeUnmount(() => {
+        window.removeEventListener('resize', updateColumns); // remove
+    });
 </script>
 
 <style lang="css" scoped>

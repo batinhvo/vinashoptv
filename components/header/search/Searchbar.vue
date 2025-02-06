@@ -18,7 +18,7 @@
 
             <div v-show="isOpenCategories" class="absolute max-w-72 min-w-44 max-h-80 min-h-36 bg-white top-11 right-10 shadow-lg z-40 border border-gray-100 rounded-lg overflow-hidden overflow-y-auto">
                 <ul class="py-3">
-                    <li v-for="(item, index) in cate" :key="index" class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory(item)">
+                    <li v-for="(item, index) in cateParent" :key="index" class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory(item)">
                         {{item}}
                     </li>
                 </ul>
@@ -34,7 +34,6 @@
 <script setup lang="ts">
     
     const notify = useNotify();
-    const cate = ['All categories', 'Ginseng-LINGZHI', 'Supplements', 'Food & Drink', 'Skin Care', 'Hair Care', 'Masks & Sanitizer', 'Electronics +'];
     const query = ref(""); //trạn thái lưu trữ
     const isOpenCategories = ref(false);
     const selectedCategory = ref("All categories");
@@ -59,6 +58,18 @@
         selectedCategory.value = category; // Cập nhật category đã chọn       
         toggleOpenCategories(); // Đóng dropdown sau khi chọn
     }  
+
+    //-----------------------------API--------------------------------------//
+
+    const cateStore = useCateStore();
+
+    const cateParent = ref<string[]>(['All categories',]);
+
+    onMounted( async () => {
+        await cateStore.fetchCate();
+        const filteredCate  = cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort).map((cate) => cate.name);
+        cateParent.value = [...cateParent.value, ...filteredCate];
+    });
     
 </script>
 

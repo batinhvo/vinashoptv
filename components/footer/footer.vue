@@ -117,11 +117,11 @@
                         <h6 class="mb-4 font-bold text-base underline">Important</h6>            
                         <div class="my-4">
                             <ul class="flex flex-col">
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Privacy</a></li>                                
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Billing & Orders</a></li>       
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Return Policy</a></li>       
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Term & Condition</a></li>       
-                                <li class="my-1.5"><a href="https://www.facebook.com/VinashopUSA" class="hover:text-black">Contacts</a></li>       
+                                <li class="my-1.5"><NuxtLink to="/article/privacy" class="hover:text-black">Privacy</NuxtLink></li>                                
+                                <li class="my-1.5"><NuxtLink to="/article/billing-orders" class="hover:text-black">Billing & Orders</NuxtLink></li>       
+                                <li class="my-1.5"><NuxtLink to="/article/return-policy" class="hover:text-black">Return Policy</NuxtLink></li>       
+                                <li class="my-1.5"><NuxtLink to="/article/term-condition" class="hover:text-black">Term & Condition</NuxtLink></li>       
+                                <li class="my-1.5"><NuxtLink to="/contact" class="hover:text-black">Contacts</NuxtLink></li>       
                             </ul>
                         </div>                           
                     </div>
@@ -133,7 +133,7 @@
             <div class="flex mx-auto">
                 <div class="container px-4 md:px-0">
                     <span>@ </span>
-                    <a href="/" class="font-bold">Vinashop</a>
+                    <NuxtLink to="/" class="font-bold">Vinashop</NuxtLink>
                     <span> - All rights Reserved</span>
                 </div>
             </div>

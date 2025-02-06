@@ -48,4 +48,12 @@
             link: 'https://beta.vinashoptv.com/detail/product/fucoidan-umi-no-shizuku-capsule-dietary-supplement.rs.html',
         }
     ]
+
+    const productStore = useProductStore();
+
+    onMounted( async () => {
+        await productStore.fetchProducts;
+
+        
+    });
 </script>

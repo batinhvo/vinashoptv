@@ -6,7 +6,7 @@
         <!-- main-header-desktop -->
         <div class="container hidden xl:block">
             <div class="flex items-center py-2 xl:py-8">
-                <Logo />
+                <vinaLogo />
                 <HeaderSearchSearchbar />
                 <HeaderIconCartIcon />
             </div>
@@ -23,7 +23,7 @@
                 <div class="flex">
                 <HeaderMenuButtonMenu />
                 <div class="max-w-[250px]">
-                    <Logo />
+                    <vinaLogo />
                 </div>
             </div>
             <div class="flex">

@@ -11,7 +11,7 @@
     <div v-if="isMobileMenuVisible" class="fixed inset-0 bg-white z-50 w-72 menu" :class="[isMobileMenuOpen ? 'show' : '']">
         <div class="flex justify-between p-4">
             <div class="m-3 pr-8">
-                <Logo />
+                <vinaLogo />
             </div> 
             <button @click="toggleMobileMenu" class="text-xl text-zinc-400" :aria-expanded="isMobileMenuOpen">
                 <i class="ec ec-close-remove"></i>

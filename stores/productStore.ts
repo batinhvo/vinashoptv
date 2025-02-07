@@ -13,6 +13,7 @@ interface Products {
     totalOutFake: number;
     media: string;
     title: string;
+    slug: string;
     summary: string;
     content: string;
     howToUse: string;
@@ -24,29 +25,30 @@ export const useProductStore = defineStore('products', () => {
 
     const products = ref<Products[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
-    const message = ref<string>(''); 
-    const loading = ref<boolean>(false); // Trạng thái đang tải
 
     const fetchProducts =  async () => {
-        loading.value = true; // Bắt đầu tải
+        if (products.value.length > 0) return;
+
         try {
-            const data = await $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>('https://vinashoptv.com/api/v1/products?categoryId=41&descending=1&page=1&perPage=8&sortBy=createdAt');      
-            console.log(data.data.list)
-            if ( data.error === 0 ) {
-                products.value = data.data.list;
-                message.value = data.message || 'Không có thông báo';                          
-            } else {
-                error.value = 1;
-                message.value = data.message || 'Có lỗi xảy ra từ phía máy chủ';
+            const {data: proData, error: proError} = await useAsyncData(
+                'products',
+                () => $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>(`${apiUrl}products?categoryId=41&descending=1&page=1&perPage=8&sortBy=createdAt`)
+            );
+
+            if(proError.value) {
+                error.value = 1; // Có lỗi xảy ra
+                console.error('Error fetching categories:', proError.value);
+                return;
             }
 
-        } catch (err: any) {
+            products.value = proData.value?.data.list || [];
+            error.value = 0; // Không có lỗi
+
+        } catch (e) {
             error.value = 1;
-            message.value = err.message || 'Lỗi khi kết nối tới máy chủ';
-        } finally {
-            loading.value = false; // Kết thúc tải
-        }
+            console.error('Exception in fetchProducts:', e);
+        } 
     };
 
-    return { products, fetchProducts, error, message, loading };
+    return { products, fetchProducts, error };
 });

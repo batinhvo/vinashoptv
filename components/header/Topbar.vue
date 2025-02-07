@@ -30,25 +30,25 @@
             </div>
         </div>
         <!-- edit profile -->
-        <Modal v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
+        <ModalPages v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
             <template #body>
                 <ModalPopupEditProfile ref="modalPopupEditProfileRef"/>
             </template>
             <template #actions>
                 <button @click.prevent="modalPopupEditProfileRef?.submitForm()" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
             </template>
-        </Modal>
+        </ModalPages>
 
 
         <!-- edit password -->
-        <Modal v-if="showchangePass" title="Change Password" @close="showchangePass = false">
+        <ModalPages v-if="showchangePass" title="Change Password" @close="showchangePass = false">
             <template #body>
                 <ModalPopupChangePass ref="modalPopupChangePassRef"/>
             </template>
             <template #actions>
                 <button @click.prevent="modalPopupChangePassRef?.submitForm()" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
             </template>
-        </Modal>
+        </ModalPages>
 
         <div v-if="isSignInVisible" class="fixed inset-y-0 right-0 bg-white z-40 w-96 shadow-lg Signin" :class="[ isOpenSignIn ? 'show' : '' ]">
             <div class="flex pt-4 px-7">

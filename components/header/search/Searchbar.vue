@@ -18,8 +18,11 @@
 
             <div v-show="isOpenCategories" class="absolute max-w-72 min-w-44 max-h-80 min-h-36 bg-white top-11 right-10 shadow-lg z-40 border border-gray-100 rounded-lg overflow-hidden overflow-y-auto">
                 <ul class="py-3">
-                    <li v-for="(item, index) in cateParent" :key="index" class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory(item)">
-                        {{item}}
+                    <li class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory('All categories')">                     
+                        All categories
+                    </li>
+                    <li v-for="cate in cateParent" :key="cate.id" class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory(cate.name)">                     
+                        {{ cate.name }}
                     </li>
                 </ul>
             </div>
@@ -61,15 +64,11 @@
 
     //-----------------------------API--------------------------------------//
 
+    const cateParent = ref();
     const cateStore = useCateStore();
-
-    const cateParent = ref<string[]>(['All categories',]);
-
-    onMounted( async () => {
-        await cateStore.fetchCate();
-        const filteredCate  = cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort).map((cate) => cate.name);
-        cateParent.value = [...cateParent.value, ...filteredCate];
-    });
+    // Gọi hàm fetchCate trong SSR để fetch dữ liệu từ API
+    await cateStore.fetchCate();
+    cateParent.value = cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort);
     
 </script>
 

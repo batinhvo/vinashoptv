@@ -29,25 +29,25 @@
     </div>
 
     <!-- edit profile -->
-    <Modal v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
+    <ModalPages v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
         <template #body>
             <ModalPopupEditProfile @submit="onSubmit"/>
         </template>
         <template #actions>
             <button @click.prevent="submitUpdateProfile" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
         </template>
-    </Modal>
+    </ModalPages>
 
 
     <!-- edit password -->
-    <Modal v-if="showchangePass" title="Change Password" @close="showchangePass = false">
+    <ModalPages v-if="showchangePass" title="Change Password" @close="showchangePass = false">
         <template #body>
             <ModalPopupChangePass @submit="onSubmit"/>
         </template>
         <template #actions>
             <button @click.prevent="submitChangePass" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
         </template>
-    </Modal>
+    </ModalPages>
 </template>
 
 <script setup lang="ts">

@@ -38,7 +38,7 @@
                             </ul>
                         </div>
                     </div>
-                    <BodyProductDisplay />
+                    <!-- <BodyProductDisplay /> -->
                 </div>
             </div>
         </div>

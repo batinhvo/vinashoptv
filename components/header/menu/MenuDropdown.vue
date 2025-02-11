@@ -7,7 +7,7 @@
         <div ref="menu"  :class="['list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-40', isMenuOpen ? 'show overflow-visible' : '']">
             <ul class="p-2 relative">
                 <li v-for="(item, index) in menuItems" :key="index" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative group">
-                    <NuxtLink to="/categories/haircolor" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
+                    <NuxtLink to="/categories/mask" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
                         <i v-if="item.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
                     </NuxtLink>
                     <!-- Submenu 1 -->                       

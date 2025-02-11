@@ -38,7 +38,7 @@
                             </ul>
                         </div>
                     </div>
-                    <BodyProductDisplay :cateTitle="cateTitle" />
+                    <BodyProductDisplay :cateTitle="cateTitle" :slugCate="slug" />
                 </div>
             </div>
         </div>
@@ -46,7 +46,6 @@
 </template>
 
 <script setup lang="ts">
-
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
     const isOpenSort = ref(false);
@@ -65,12 +64,14 @@
     const productStore = useProductStore();
     const cateStore = useCateStore();
 
-    await cateStore.fetchCate();
-    await productStore.fetchProducts();
-
     const slug = route.params.slug as string;
 
-    const cateTitle = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.name).join('');
+    await cateStore.fetchCate();
 
+    const cateTitle = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.name).join('');
+    const categoryId = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.id).join('');
+
+    await productStore.fetchProducts(categoryId);
+    
 </script>
 

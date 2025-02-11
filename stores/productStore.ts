@@ -1,23 +1,4 @@
-interface Products {
-    id: number;
-    useTax: string;
-    tax: string;
-    status: string;
-    categoryId: number;
-    venderId: number;
-    isBestSeller: string;
-    isSpecial: string;
-    minPrice: number;
-    total: number;
-    totalOut: number;
-    totalOutFake: number;
-    media: string;
-    title: string;
-    slug: string;
-    summary: string;
-    content: string;
-    howToUse: string;
-}
+import { type Products } from "types/productTypes";
 
 export const useProductStore = defineStore('products', () => {
     const config = useRuntimeConfig();
@@ -26,13 +7,15 @@ export const useProductStore = defineStore('products', () => {
     const products = ref<Products[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
 
-    const fetchProducts =  async () => {
+    const fetchProducts =  async (params: any) => {
         if (products.value.length > 0) return;
 
         try {
+            const queryString = new URLSearchParams(params.value).toString();
+
             const {data: proData, error: proError} = await useAsyncData(
                 'products',
-                () => $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>(`${apiUrl}products?categoryId=41&descending=1&page=1&perPage=8&sortBy=createdAt`)
+                () => $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>(`${apiUrl}products?${queryString}`)
             );
 
             if(proError.value) {

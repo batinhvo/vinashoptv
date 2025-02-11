@@ -20,7 +20,7 @@
         {
             img : '/images/banner/on-sale.jpg',
             desc : 'On Sale',
-            link: '/onsale'
+            link: '/saleoff'
         }
     ]
 </script>

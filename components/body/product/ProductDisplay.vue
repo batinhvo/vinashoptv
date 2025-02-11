@@ -1,19 +1,18 @@
 <template>
     <div class="flex flex-wrap relative my-5">
-        <div v-for="(pro, index) in productStore.products" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
+        <div v-for="pro in productStore.products" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
             <div class="mb-2 px-6">
-                <NuxtLink class="text-xs">{{ cateTitle }}</NuxtLink>
+                <NuxtLink :to="`/categories/${slugCate}`" class="text-xs">{{ cateTitle }}</NuxtLink>
             </div>
             <div class="px-6 border-x border-zinc-100">
                 <div class="relative group">
-                    <button @click="openShowQuickView">
-                        <NuxtImg class="w-full" :src="proImg" :alt="pro.title"  crossorigin="anonymous"/>
-                        
+                    <button @click="openShowQuickView(pro)">                       
+                        <BodyProductImages :linkImg="pro.media" :altImg="pro.title" />
                     </button>
                     
                     <div class="pop-up">
                         <button class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300"
-                            @click="openShowQuickView">
+                            @click="openShowQuickView(pro)">
                             Quick View
                         </button>                                              
                         <NuxtLink
@@ -32,47 +31,38 @@
                 </div>
             </div>
             <div class="flex justify-between items-end products-end mt-3 px-6">
-                
                 <div class="text-base lg:text-xl">${{ pro.minPrice }}</div>     
-                
-                <!-- <div class="text-base lg:text-xl" :class="[pro.minPrice ? 'text-red-500': '']">${{ pro.minPrice ? pro.minPrice : pro.minPrice }}</div>           
-                <div v-if="product.disc && product.discPrice" class="text-xs lg:text-base line-through">${{ product.price }}.00</div> -->
             </div>
         </div>   
-    
         <ModalPages v-if="showQuickView" @close="showQuickView = false">
             <template #body>
-                <ModalPopupProductQuickView />
+                <ModalPopupProductQuickView 
+                :products="productData" 
+                :cateTitle="cateTitle" 
+                />
             </template>           
         </ModalPages>
     </div>
 </template>
 
 <script setup lang="ts">
+    import { type Products } from 'types/productTypes';
 
     //show modal
     const showQuickView = ref(false);
-    const openShowQuickView = () => {
+    const productData = ref<Products | null>(null);
+    const openShowQuickView = (proData: Products) => {
+        productData.value = proData;
         showQuickView.value = true;
     };
 
-    const props = defineProps<{
-        cateTitle: string;
-    }>();
-
-    const proImg = ref('')
-    
+    defineProps<{
+        cateTitle?: string;
+        slugCate?: string;
+    }>();   
     //-----------------------API-----------------------------//
     const productStore = useProductStore();
     await productStore.fetchProducts();
-
-    const codeImg = encodeURIComponent('upload/2024/12/product/75a41e81-b94f-48f5-b80b-4027d5f8bc99.jpeg');
-
-    const imgProductStore = useImagesProduct();
-    
-    await imgProductStore.fetchImagesProduct(codeImg);
-    proImg.value = imgProductStore.dataImg
-    
 </script>
 
 <style lang="css" scoped>

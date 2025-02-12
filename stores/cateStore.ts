@@ -18,7 +18,7 @@ export const useCateStore = defineStore('categories', () => {
     const categories = ref<Category[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
 
-    const fetchCate =  async () => {
+    const fetchCategories =  async ():Promise<string | undefined> => {
         if (categories.value.length > 0) return; // nếu dữ liệu đã có thì không gọi lại
 
         try {
@@ -42,7 +42,7 @@ export const useCateStore = defineStore('categories', () => {
         }
     };
     
-    return { categories, error, fetchCate};
+    return { categories, fetchCategories};
 });
 
 

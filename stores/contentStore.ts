@@ -13,7 +13,7 @@ export const useContentStore = defineStore('content', () => {
     const message = ref<string>(''); 
     const loading = ref<boolean>(false); // Trạng thái đang tải
 
-    const fetchContent =  async (article: string) => {
+    const fetchContent =  async (article: string):Promise<void> => {
         loading.value = true; // Bắt đầu tải
         try {
             const data = await $fetch<{ error: number; data: Content | null; message: string }>(`${apiUrl}/articles/${article}`);      
@@ -34,5 +34,7 @@ export const useContentStore = defineStore('content', () => {
         }
     };
 
-    return { content, fetchContent, error, message, loading };
+    return { content, fetchContent, loading };
 });
+
+/*Promise<void> nghĩa là hàm này không trả về giá trị cụ thể nào (kiểu void), nhưng nó vẫn trả về một Promise để biểu thị rằng hành động bất đồng bộ đã hoàn thành (hoặc bị lỗi). */

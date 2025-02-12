@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-wrap relative my-5">
-        <div v-for="pro in productStore.products" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
+        <div v-for="pro in dataProduct.proDataList" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
             <div class="mb-2 px-6">
-                <NuxtLink :to="`/categories/${slugCate}`" class="text-xs">{{ cateTitle }}</NuxtLink>
+                <NuxtLink :to="`/categories/${dataProduct.slugCate}`" class="text-xs">{{ dataProduct.titleCate }}</NuxtLink>
             </div>
             <div class="px-6 border-x border-zinc-100">
                 <div class="relative group">
@@ -38,7 +38,7 @@
             <template #body>
                 <ModalPopupProductQuickView 
                 :products="productData" 
-                :cateTitle="cateTitle" 
+                :cateTitle="dataProduct.titleCate" 
                 />
             </template>           
         </ModalPages>
@@ -56,13 +56,16 @@
         showQuickView.value = true;
     };
 
-    defineProps<{
-        cateTitle?: string;
-        slugCate?: string;
-    }>();   
-    //-----------------------API-----------------------------//
-    const productStore = useProductStore();
-    await productStore.fetchProducts();
+    defineProps({
+        dataProduct: {
+            type: Object as PropType<{ 
+                titleCate?: string; 
+                slugCate?: string; 
+                proDataList?: Products[] 
+            }>,
+            required: true
+        }
+    });
 </script>
 
 <style lang="css" scoped>

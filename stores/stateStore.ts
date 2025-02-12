@@ -51,7 +51,7 @@ export const useStateStore = defineStore('states', () => {
         cities.value = [];
     };
     
-    return { states, cities, error, message, fetchStates, fetchCities, resetCities };
+    return { states, cities, fetchStates, fetchCities, resetCities };
 });
 
 

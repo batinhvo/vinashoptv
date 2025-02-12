@@ -13,6 +13,8 @@ export const useProductStore = defineStore('products', () => {
         try {
             const queryString = new URLSearchParams(params.value).toString();
 
+            console.log("query: ",queryString)
+
             const {data: proData, error: proError} = await useAsyncData(
                 'products',
                 () => $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>(`${apiUrl}products?${queryString}`)
@@ -33,5 +35,5 @@ export const useProductStore = defineStore('products', () => {
         } 
     };
 
-    return { products, fetchProducts, error };
+    return { products, fetchProducts };
 });

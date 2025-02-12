@@ -62,13 +62,29 @@
         toggleOpenCategories(); // Đóng dropdown sau khi chọn
     }  
 
+    //query
+    const searchKey: Record<string, any> = {};
     //-----------------------------API--------------------------------------//
-
     const cateParent = ref();
     const cateStore = useCateStore();
-    // Gọi hàm fetchCate trong SSR để fetch dữ liệu từ API
-    await cateStore.fetchCate();
+    const productStores = useProductStore();
+    //const productStore
+    await cateStore.fetchCategories();
     cateParent.value = cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort);
+
+    watchEffect(() => {
+        if (selectedCategory.value != 'All categories') {
+            searchKey.categoryId = selectedCategory.value;
+        }
+
+        //productStores.fetchProducts(searchKey)
+
+        // } else if (query.value.trim()) {
+        //     searchKey.pro = query.value;
+        // }
+        //console.log(productStores.products)
+
+    });
     
 </script>
 

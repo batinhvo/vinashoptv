@@ -5,7 +5,7 @@ export const useImagesProduct = defineStore('imagesProduct', () => {
     const dataImgCache = ref<{ [key: string]: string }>({}); // Cache hình ảnh theo imgName
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
 
-    const fetchImagesProduct =  async (imgName: string) => {
+    const fetchImagesProduct =  async (imgName: string):Promise<string | undefined> => {
 
         if (dataImgCache.value[imgName]) {
             return dataImgCache.value[imgName];
@@ -32,7 +32,7 @@ export const useImagesProduct = defineStore('imagesProduct', () => {
         }
     };
 
-    return { dataImgCache, fetchImagesProduct, error };
+    return { fetchImagesProduct, error };
 });
 
 

@@ -8,12 +8,8 @@ export const useProductStore = defineStore('products', () => {
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
 
     const fetchProducts =  async (params: any) => {
-        if (products.value.length > 0) return;
-
         try {
             const queryString = new URLSearchParams(params.value).toString();
-
-            console.log("query: ",queryString)
 
             const {data: proData, error: proError} = await useAsyncData(
                 'products',

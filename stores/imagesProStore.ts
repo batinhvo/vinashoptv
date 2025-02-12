@@ -32,7 +32,7 @@ export const useImagesProduct = defineStore('imagesProduct', () => {
         }
     };
 
-    return { fetchImagesProduct, error };
+    return { fetchImagesProduct };
 });
 
 

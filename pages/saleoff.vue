@@ -25,7 +25,7 @@
                         <p>Showing 1-2 of 2 results</p>
                     </div>
                     <BodyHomeSelectSort />
-                    <!-- <BodyProductDisplay :products="dataProduct" /> -->
+                    <BodyProductDisplay :dataProduct="dataProductList" />
                 </div>
             </div>
         </div>
@@ -33,29 +33,44 @@
 </template>
 
 <script setup lang="ts">
+    import { type Products } from "types/productTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
     //----------------------------API------------------------------------//
+
     const route = useRoute();
     const productStore = useProductStore();
     const cateStore = useCateStore();
 
     const slug = route.params.slug as string;
-
-    await cateStore.fetchCategories();
+    const productListData = ref<Products[]>([]);
 
     const params = ref({
         descending: 1,
         page: 1,
         perPage: 8,
+        sale: 1,
         sortBy: 'createdAt',
-        special: 1,
     });
 
+    await cateStore.fetchCategories();
     await productStore.fetchProducts(params);
+    
+    productListData.value = productStore?.products || [];
 
-    const dataProduct = cateStore.categories.filter((cate) => cate.slug === slug);
+    //Lấy toàn bộ cateId từ danh sách sản phẩm, dùng Set để loại bỏ các cateId trùng lặp
+    const cateIds = [...new Set(productListData.value.map((pro) => pro.categoryId))];
+    //Duyệt qua cateIds, lấy cateName tương ứng. Lọc ra các cateName không null
+    const cateName = cateIds.map((cateId) => cateStore.categories.find((cate) => cate.id === cateId)?.name).filter((name) => name);
+
+    const cateTitle = cateName.length > 0 ? cateName.join(', ') : '';
+
+    const dataProductList = ref({
+        titleCate: cateTitle,
+        slugCate: slug,
+        proDataList: productListData.value,
+    });
 
 </script>
 

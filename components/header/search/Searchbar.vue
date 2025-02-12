@@ -3,7 +3,7 @@
         <div class="input-group flex px-5 relative">
             <input 
             type="search" 
-            v-model="query"
+            v-model="queryProducts"
             placeholder="Search for Products" 
             class="w-full border-2 border-r-0 border-primary rounded-l-full py-2 px-4 focus:outline-none"
             />
@@ -35,22 +35,19 @@
 </template>
 
 <script setup lang="ts">
-    
-    const notify = useNotify();
-    const query = ref(""); //trạn thái lưu trữ
+
+    const router = useRouter();
+    const cateStore = useCateStore();
+
+    const queryProducts = ref(""); //trạng thái lưu trữ
+    const dataQueryProduct = ref({
+        category: "",
+        keyword: "",
+    }); //lưu query
+
     const isOpenCategories = ref(false);
     const selectedCategory = ref("All categories");
-
-    //test
-    function onSearch() {
-        if(query.value.trim()) {
-            notify({
-                message: "Search: " + query.value + " in " + selectedCategory.value,
-                type: "info",
-                time: 2000
-            });
-        }
-    }
+    const cateParent = ref();
 
     //show categories
     function toggleOpenCategories() {
@@ -62,29 +59,24 @@
         toggleOpenCategories(); // Đóng dropdown sau khi chọn
     }  
 
-    //query
-    const searchKey: Record<string, any> = {};
-    //-----------------------------API--------------------------------------//
-    const cateParent = ref();
-    const cateStore = useCateStore();
-    const productStores = useProductStore();
-    //const productStore
-    await cateStore.fetchCategories();
-    cateParent.value = cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort);
-
-    watchEffect(() => {
-        if (selectedCategory.value != 'All categories') {
-            searchKey.categoryId = selectedCategory.value;
+    function onSearch() {
+        if(queryProducts.value.trim()) {
+            dataQueryProduct.value.keyword = queryProducts.value;
+            if(selectedCategory.value != "All categories") {
+                dataQueryProduct.value.category = cateStore.categories.filter((cate) => cate.name === selectedCategory.value).map((cate) => cate.name).join('');
+            } else {
+                dataQueryProduct.value.category = selectedCategory.value;
+            }
         }
+        router.push({
+            path: '/search?',    
+            query: dataQueryProduct.value,
+        });
+    }
+    
+    await cateStore.fetchCategories();
 
-        //productStores.fetchProducts(searchKey)
-
-        // } else if (query.value.trim()) {
-        //     searchKey.pro = query.value;
-        // }
-        //console.log(productStores.products)
-
-    });
+    cateParent.value = cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort);
     
 </script>
 

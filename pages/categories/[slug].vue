@@ -45,11 +45,6 @@
     const slug = route.params.slug as string;
     const productListData = ref<Products[]>([]);
 
-    await cateStore.fetchCategories();
-
-    const cateTitle = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.name).join('');
-    const categoryId = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.id).join('');
-
     const params = ref({
         categoryId: categoryId,
         descending: 1,
@@ -57,6 +52,11 @@
         perPage: 8,
         sortBy: 'createdAt'
     });
+
+    await cateStore.fetchCategories();
+
+    const cateTitle = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.name).join('');
+    const categoryId = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.id).join('');
 
     await productStore.fetchProducts(params);
     productListData.value = productStore?.products || [];

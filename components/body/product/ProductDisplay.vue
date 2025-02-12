@@ -63,7 +63,7 @@
                 slugCate?: string; 
                 proDataList?: Products[] 
             }>,
-            required: true
+            required: true,
         }
     });
 </script>

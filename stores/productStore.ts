@@ -7,7 +7,7 @@ export const useProductStore = defineStore('products', () => {
     const products = ref<Products[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
 
-    const fetchProducts =  async (params: any) => {
+    const fetchProducts =  async (params: any):Promise<Array<string> | undefined> => {
         try {
             const queryString = new URLSearchParams(params.value).toString();
 

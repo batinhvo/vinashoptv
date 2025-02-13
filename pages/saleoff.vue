@@ -25,7 +25,7 @@
                         <p>Showing 1-2 of 2 results</p>
                     </div>
                     <BodyHomeSelectSort />
-                    <BodyProductDisplay :dataProduct="dataProductList" />
+                    <BodyProductDisplay :dataProduct="productListData"/>
                 </div>
             </div>
         </div>
@@ -43,7 +43,6 @@
     const productStore = useProductStore();
     const cateStore = useCateStore();
 
-    const slug = route.params.slug as string;
     const productListData = ref<Products[]>([]);
 
     const params = ref({
@@ -56,21 +55,7 @@
 
     await cateStore.fetchCategories();
     await productStore.fetchProducts(params);
-    
     productListData.value = productStore?.products || [];
-
-    //Lấy toàn bộ cateId từ danh sách sản phẩm, dùng Set để loại bỏ các cateId trùng lặp
-    const cateIds = [...new Set(productListData.value.map((pro) => pro.categoryId))];
-    //Duyệt qua cateIds, lấy cateName tương ứng. Lọc ra các cateName không null
-    const cateName = cateIds.map((cateId) => cateStore.categories.find((cate) => cate.id === cateId)?.name).filter((name) => name);
-
-    const cateTitle = cateName.length > 0 ? cateName.join(', ') : '';
-
-    const dataProductList = ref({
-        titleCate: cateTitle,
-        slugCate: slug,
-        proDataList: productListData.value,
-    });
 
 </script>
 

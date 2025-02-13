@@ -1,8 +1,9 @@
 <template>
     <div class="flex flex-wrap relative my-5">
-        <div v-for="pro in dataProduct.proDataList" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
+        <div v-for="pro in data.dataProduct" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
             <div class="mb-2 px-6">
-                <NuxtLink :to="`/categories/${dataProduct.slugCate}`" class="text-xs">{{ dataProduct.titleCate }}</NuxtLink>
+               
+                <NuxtLink v-if="slugCate" :to="`/categories/${slugCate}`" class="text-xs">{{ cateTitle }}</NuxtLink>
             </div>
             <div class="px-6 border-x border-zinc-100">
                 <div class="relative group">
@@ -38,7 +39,7 @@
             <template #body>
                 <ModalPopupProductQuickView 
                 :products="productData" 
-                :cateTitle="dataProduct.titleCate" 
+                :cateTitle="cateTitle" 
                 />
             </template>           
         </ModalPages>
@@ -56,16 +57,25 @@
         showQuickView.value = true;
     };
 
-    defineProps({
-        dataProduct: {
-            type: Object as PropType<{ 
-                titleCate?: string; 
-                slugCate?: string; 
-                proDataList?: Products[] 
-            }>,
-            required: true,
-        }
-    });
+    const data = defineProps<{
+        dataProduct?: Products[];
+    }>();
+
+    const cateStore = useCateStore();
+
+    //Lấy toàn bộ cateId từ danh sách sản phẩm, dùng Set để loại bỏ các cateId trùng lặp
+    const cateIds = [...new Set(data.dataProduct?.map((pro) => pro.categoryId))];
+
+    //Duyệt qua cateIds, lấy cateInfo tương ứng. Lọc ra các cateName không null
+    const cateInfo = cateIds
+    .map((cateId) => cateStore.categories.find((cate) => cate.id === cateId))
+    .filter((cate) => cate) // Loại bỏ các giá trị null hoặc undefined
+    .map((cate) => ({name: cate!.name, slug: cate!.slug})); // Lấy cả name và slug
+
+    const cateTitle = cateInfo.map((info) => info.name).join(', ');
+    const slugCate = cateInfo.map((info) => info.slug).join(', ');
+
+    console.log(slugCate)
 </script>
 
 <style lang="css" scoped>

@@ -13,7 +13,7 @@
                     <!-- Submenu 1 -->                       
                     <ul v-if="item.hasSubmenu" class="submenu bg-white shadow-md absolute rounded-lg left-full mt-0 w-[270px] z-50 top-0 p-2">
                         <li v-for="(subItem, subIndex) in item.subItems" :key="subIndex" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
-                            <NuxtLink to="/" class="flex justify-between items-center hover:text-black hover:font-bold">
+                            <NuxtLink to="/categories/haircolor" class="flex justify-between items-center hover:text-black hover:font-bold">
                                 {{ subItem.label }}
                                 <i v-if="subItem.hasSubmenu" class="fa fa-angle-right text-neutral-400"></i>
                             </NuxtLink>

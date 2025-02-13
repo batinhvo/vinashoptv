@@ -17,7 +17,7 @@
                         <p>Showing 1-2 of 2 results</p>
                     </div>
                     <BodyHomeSelectSort />
-                    <!-- <BodyProductDisplay /> -->
+                    <BodyProductDisplay :dataProduct="productListData"/>
                 </div>
             </div>
         </div>
@@ -25,10 +25,39 @@
 </template>
 
 <script setup lang="ts">
-
+    import { type Products } from "types/productTypes";
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
     //----------------------------API------------------------------------//
-    
-</script>
 
+    const route = useRoute();
+    const productStore = useProductStore();
+
+    const keyword = ref<string>(route.query.keyword as string || '');
+
+    const productListData = ref<Products[]>([]);
+
+    const params = ref({
+        descending: 1,
+        page: 1,
+        perPage: 8,
+        search: keyword.value,
+        sortBy: 'createdAt',
+    });
+
+    const updateProducts = async () => {
+        await productStore.fetchProducts(params);
+        productListData.value = productStore?.products || [];
+    }
+
+    watch(
+        () => route.query.keyword, 
+        (newKeyword) => {
+            keyword.value = newKeyword as string || '';  
+            params.value.search = keyword.value;        
+            // Gọi hàm updateProducts để fetch lại dữ liệu sản phẩm
+            updateProducts();
+        },
+        { immediate: true }  // Đảm bảo chạy ngay khi component được mount
+    )
+</script>

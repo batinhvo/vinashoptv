@@ -44,22 +44,32 @@
 
     const slug = route.params.slug as string;
     const productListData = ref<Products[]>([]);
-
-    await cateStore.fetchCategories();
-
-    const cateTitle = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.name).join('');
-    const categoryId = cateStore.categories.filter((cate) => cate.slug === slug).map((cate) => cate.id).join('');
+    const cateTitle = ref('');
+    const categoryId = ref<number>(0);
 
     const params = ref({
-        categoryId: categoryId,
+        categoryId: 0,
         descending: 1,
         page: 1,
         perPage: 8,
         sortBy: 'createdAt'
     });
 
-    await productStore.fetchProducts(params);
-    productListData.value = productStore?.products || [];
+    const fetchData = async () => {
+        await cateStore.fetchCategories();
+
+        const category = cateStore.categories.find((cate) => cate.slug === slug);
+        if (category) {
+            cateTitle.value = category.name;
+            categoryId.value = category.id;
+            params.value.categoryId = category.id; // Gán ID vào params
+        }
+
+        await productStore.fetchProducts(params);
+        productListData.value = productStore.products || [];
+    };
+
+    fetchData();
     
 </script>
 

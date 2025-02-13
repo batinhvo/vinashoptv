@@ -39,7 +39,6 @@
 
     //----------------------------API------------------------------------//
 
-    const route = useRoute();
     const productStore = useProductStore();
     const cateStore = useCateStore();
 
@@ -53,9 +52,12 @@
         sortBy: 'createdAt',
     });
 
-    await cateStore.fetchCategories();
-    await productStore.fetchProducts(params);
-    productListData.value = productStore?.products || [];
+    const fetchDataProductSaleOff = async () => {
+        await cateStore.fetchCategories();
+        await productStore.fetchProducts(params);
+        productListData.value = productStore?.products || [];
+    }
 
+    fetchDataProductSaleOff();
 </script>
 

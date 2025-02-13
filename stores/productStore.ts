@@ -7,22 +7,20 @@ export const useProductStore = defineStore('products', () => {
     const products = ref<Products[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
 
-    const fetchProducts =  async (params: any):Promise<Array<string> | undefined> => {
+    const fetchProducts =  async (params: any):Promise<void> => {
         try {
+        
             const queryString = new URLSearchParams(params.value).toString();
 
-            const {data: proData, error: proError} = await useAsyncData(
-                'products',
-                () => $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>(`${apiUrl}products?${queryString}`)
-            );
+            const data = await $fetch<{ error: number; data:{list: Products[]; count: number}; message: string }>(`${apiUrl}products?${queryString}`)
 
-            if(proError.value) {
+            if(data.error) {
                 error.value = 1; // Có lỗi xảy ra
-                console.error('Error fetching categories:', proError.value);
+                console.error('Error fetching categories:', error.value);
                 return;
             }
 
-            products.value = proData.value?.data.list || [];
+            products.value = data.data.list || [];
             error.value = 0; // Không có lỗi
 
         } catch (e) {

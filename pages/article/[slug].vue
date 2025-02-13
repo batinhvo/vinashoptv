@@ -23,10 +23,12 @@
     const content = ref('');
     const title = ref('');
 
-    onMounted(async () => {
-        await articleContent.fetchContent(slug);
-        content.value = articleContent.content?.content ?? '';
-        title.value = articleContent.content?.title ?? '';
-    });
+    const fetchDataContent = async () => {
+      await articleContent.fetchContent(slug);
+      content.value = articleContent.content?.content ?? '';
+      title.value = articleContent.content?.title ?? '';
+    };
+
+    fetchDataContent();
 
 </script>

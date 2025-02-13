@@ -40,13 +40,17 @@
     const router = useRouter();
     const cateStore = useCateStore();
 
-    const queryProducts = ref(""); //trạng thái lưu trữ
-    const categoryQuery = ref(''); //lưu query
-    const keywordQuery = ref(''); //lưu query
+    //trạng thái lưu trữ
+    const queryProducts = ref(""); 
+    const categoryQuery = ref(''); 
+    const keywordQuery = ref('');
 
     const isOpenCategories = ref(false);
     const selectedCategory = ref("All categories");
-    const cateParent = ref();
+
+    const cateParent = computed(() => {
+        return cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort);
+    });
 
     //show categories
     function toggleOpenCategories() {
@@ -58,36 +62,42 @@
         toggleOpenCategories(); // Đóng dropdown sau khi chọn
     }  
 
-    function onSearch() {
-        if(queryProducts.value.trim()) {
-            keywordQuery.value = queryProducts.value;
+    // Fetch danh mục trước khi sử dụng
+    const fetchDataCategories =  async () => {
+        await cateStore.fetchCategories();
+    };
+    
+    fetchDataCategories();
 
-            if(selectedCategory.value != "All categories") {
-                categoryQuery.value = cateStore.categories.filter((cate) => cate.name === selectedCategory.value).map((cate) => cate.slug).join('');
+    // Xử lý tìm kiếm
+    const onSearch = () => {
+        const keyword = queryProducts.value.trim();
+        if (!keyword) return; // Không tìm nếu keyword rỗng
 
-                router.push({
-                    path: '/search?',    
-                    query: {
-                        category: categoryQuery.value,
-                        keyword: keywordQuery.value,
-                    },
-                });
-            } else {
-                router.push({
-                    path: '/search?',    
-                    query: {                     
-                        keyword: keywordQuery.value,
-                    },
-                });
-            
-            }
+        keywordQuery.value = keyword;
+
+        // Nếu chọn category khác "All categories", lấy slug
+        if (selectedCategory.value !== "All categories") {
+            const selectedCate = cateStore.categories.find(
+                (cate) => cate.name === selectedCategory.value
+            );
+            categoryQuery.value = selectedCate ? selectedCate.slug : "";
+        } else {
+            categoryQuery.value = "";
         }
 
-    }
+        // Chuyển hướng với query params
+        router.push({
+            path: "/search",
+            query: {
+                ...(categoryQuery.value && { category: categoryQuery.value }),
+                keyword: keywordQuery.value,
+            },
+        });
+    };
 
-    await cateStore.fetchCategories();
+    
 
-    cateParent.value = cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort);
     
 </script>
 

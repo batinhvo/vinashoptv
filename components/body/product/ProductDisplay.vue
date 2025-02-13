@@ -1,8 +1,7 @@
 <template>
     <div class="flex flex-wrap relative my-5">
         <div v-for="pro in data.dataProduct" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
-            <div class="mb-2 px-6">
-               
+            <div class="mb-2 px-6">              
                 <NuxtLink v-if="slugCate" :to="`/categories/${slugCate}`" class="text-xs">{{ cateTitle }}</NuxtLink>
             </div>
             <div class="px-6 border-x border-zinc-100">
@@ -61,21 +60,26 @@
         dataProduct?: Products[];
     }>();
 
+    //-------------------------API----------------------------//
+
     const cateStore = useCateStore();
 
-    //Lấy toàn bộ cateId từ danh sách sản phẩm, dùng Set để loại bỏ các cateId trùng lặp
-    const cateIds = [...new Set(data.dataProduct?.map((pro) => pro.categoryId))];
+    // Lấy danh sách category không trùng lặp
+    const cateInfo = computed(() => {
+    if (!data.dataProduct) return [];
 
-    //Duyệt qua cateIds, lấy cateInfo tương ứng. Lọc ra các cateName không null
-    const cateInfo = cateIds
-    .map((cateId) => cateStore.categories.find((cate) => cate.id === cateId))
-    .filter((cate) => cate) // Loại bỏ các giá trị null hoặc undefined
-    .map((cate) => ({name: cate!.name, slug: cate!.slug})); // Lấy cả name và slug
+    const cateIds = new Set(data.dataProduct.map((pro) => pro.categoryId));
 
-    const cateTitle = cateInfo.map((info) => info.name).join(', ');
-    const slugCate = cateInfo.map((info) => info.slug).join(', ');
+    return [...cateIds]
+        .map((id) => cateStore.categories.find((cate) => cate.id === id))
+        .filter(Boolean) // Loại bỏ undefined
+        .map((cate) => ({ name: cate!.name, slug: cate!.slug }));
+    });
 
-    console.log(slugCate)
+    // Ghép category thành chuỗi
+    const cateTitle = computed(() => cateInfo.value.map((info) => info.name).join(", "));
+    const slugCate = computed(() => cateInfo.value.map((info) => info.slug).join(", "));
+
 </script>
 
 <style lang="css" scoped>

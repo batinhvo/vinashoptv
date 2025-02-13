@@ -33,9 +33,8 @@
     const route = useRoute();
     const productStore = useProductStore();
 
-    const keyword = ref<string>(route.query.keyword as string || '');
-
-    const productListData = ref<Products[]>([]);
+    const keyword = ref(route.query.keyword?.toString() || "");
+    //const category = ref(route.query.category?.toString() || "");
 
     const params = ref({
         descending: 1,
@@ -45,19 +44,27 @@
         sortBy: 'createdAt',
     });
 
+    const productListData = ref<Products[]>([]);
+
     const updateProducts = async () => {
         await productStore.fetchProducts(params);
         productListData.value = productStore?.products || [];
-    }
+    };
 
+    // Watch keyword thay đổi và fetch lại sản phẩm
     watch(
-        () => route.query.keyword, 
+        () => route.query.keyword,
         (newKeyword) => {
-            keyword.value = newKeyword as string || '';  
-            params.value.search = keyword.value;        
-            // Gọi hàm updateProducts để fetch lại dữ liệu sản phẩm
-            updateProducts();
+            const sanitizedKeyword = newKeyword?.toString() || ""; //Nếu newKeyword không phải null hoặc undefined, nó sẽ được chuyển thành chuỗi (toString()).
+            
+            if (sanitizedKeyword !== keyword.value) {
+                keyword.value = sanitizedKeyword;
+                params.value.search = keyword.value;
+                updateProducts();
+            } else {
+                updateProducts();
+            }
         },
-        { immediate: true }  // Đảm bảo chạy ngay khi component được mount
-    )
+        { immediate: true }
+    );
 </script>

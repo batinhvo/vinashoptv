@@ -41,7 +41,21 @@
 </template>
 
 <script setup lang="ts">
+    import { type Products } from "types/productTypes";
+
     const imgBanner = '/images/banner/bg-banner-01.jpg';
+
+    //-----------------------------API------------------------------//
+
+    const route = useRoute();
+    const cateStore = useCateStore();
+    const productStore = useProductStore();
+
+    const slug = route.params.slug as string;
+    const productListData = ref<Products[]>([]);
+
+    console.log(slug);
+
 </script>
 
 

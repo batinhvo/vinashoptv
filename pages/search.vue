@@ -45,7 +45,6 @@
         search: string,
         categoryId?: number,
         sortBy: 'createdAt',
-
     }
 
     const params = ref<Params>({

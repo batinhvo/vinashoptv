@@ -24,10 +24,11 @@
                         <h3 class="text-2xl">{{ cateTitle }}</h3>
                         <p>Showing 1-2 of 2 results</p>
                     </div>
-                    <BodyProductSelectSort />
+                    <BodyProductSelectSort :cateId="categoryId"  @updateParams="updateProductsFromSort"/>
                     <BodyProductDisplay :dataProduct="productListData"/>
-                </div>
-            </div>
+                    <BodyProductPagination />
+                </div>              
+            </div>            
         </div>
     </div>
 </template>
@@ -68,8 +69,13 @@
         await productStore.fetchProducts(params);
         productListData.value = productStore.products || [];
     };
-
     fetchData();
+
+    const updateProductsFromSort = async (newParams: any) => {
+        params.value = newParams;
+        await productStore.fetchProducts(params);
+        productListData.value = productStore.products || [];
+    }
     
 </script>
 

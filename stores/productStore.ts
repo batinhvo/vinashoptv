@@ -16,7 +16,7 @@ export const useProductStore = defineStore('products', () => {
 
             if(data.error) {
                 error.value = 1; // Có lỗi xảy ra
-                console.error('Error fetching categories:', error.value);
+                console.error('Error fetching products:', error.value);
                 return;
             }
 

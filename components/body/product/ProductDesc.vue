@@ -19,22 +19,10 @@
             <!-- content -->
             <div class="border border-gray-200 rounded-xl p-4 xl:p-12 ">
                 <div v-if="activeTab === 'about'">
-                    <h2>About This Product</h2>
-                    <p>
-                    Enriched with keratin, ceramide, natural ingredients (Green Tea Extract, Jojoba, Olive Oil, Aloe Vera Gel, Acorus Calamus Root Extract) and with no ammonia, it nourishes hair fibers deep within and keeps hair healthy.
-                    </p>
-                    <p>
-                    The unique formula makes hair coloring simple and fast. You can easily color your hair by yourself. It takes just 1 minute from application to development. After 1 minute, shampoo and rinse your hair.
-                    </p>
+                    <div v-html="contentPro"></div>
                 </div>
                 <div v-if="activeTab === 'how'">
-                    <h2>How To Use</h2>
-                    <p>
-                    1. Apply the cream evenly to dry hair.<br />
-                    2. Leave it on for 1 minute.<br />
-                    3. Rinse thoroughly with water and shampoo.<br />
-                    4. Enjoy your new hair color!
-                    </p>
+                    <div v-html="howToUsePro"></div>
                 </div>
             </div>
         </div>
@@ -43,4 +31,9 @@
 
 <script setup lang="ts">
     const activeTab = ref('about');
+
+    defineProps<{
+        contentPro?: string,
+        howToUsePro?: string,
+    }>();
 </script>

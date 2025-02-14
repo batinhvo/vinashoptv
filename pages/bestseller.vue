@@ -24,7 +24,7 @@
                         <h3 class="text-2xl">Best Seller</h3>
                         <p>Showing 1-2 of 2 results</p>
                     </div>
-                    <BodyHomeSelectSort />
+                    <BodyProductSelectSort />
                     <!-- <BodyProductDisplay /> -->
                 </div>
             </div>

@@ -27,4 +27,5 @@
         selectedSort.value = sortOption;
         isOpenSort.value = false;
     }
+
 </script>

@@ -31,12 +31,24 @@
     //----------------------------API------------------------------------//
 
     const route = useRoute();
+    const cateStore = useCateStore();
     const productStore = useProductStore();
-
+    
     const keyword = ref(route.query.keyword?.toString() || "");
-    //const category = ref(route.query.category?.toString() || "");
+    const category = ref(route.query.category?.toString() || "");
+    const cateParentId = ref();
 
-    const params = ref({
+    interface Params {
+        descending: number,
+        page: number,
+        perPage: number,
+        search: string,
+        categoryId?: number,
+        sortBy: 'createdAt',
+
+    }
+
+    const params = ref<Params>({
         descending: 1,
         page: 1,
         perPage: 8,
@@ -48,10 +60,9 @@
 
     const updateProducts = async () => {
         await productStore.fetchProducts(params);
-        productListData.value = productStore?.products || [];
+        productListData.value = productStore?.products || []; 
     };
 
-    // Watch keyword thay đổi và fetch lại sản phẩm
     watch(
         () => route.query.keyword,
         (newKeyword) => {
@@ -61,10 +72,25 @@
                 keyword.value = sanitizedKeyword;
                 params.value.search = keyword.value;
                 updateProducts();
-            } else {
+            } 
+        },
+        { immediate: true }
+    );
+
+    watch(
+        () => route.query.category,
+        (newCategory) => {
+            const sanitizedCategory = newCategory?.toString() || "";
+            if(sanitizedCategory) {
+                cateParentId.value = cateStore.categories.find((cate) => cate.slug === sanitizedCategory)?.id;
+                params.value.categoryId = cateParentId.value;
                 updateProducts();
+            } else {
+                delete params.value.categoryId;
             }
         },
         { immediate: true }
     );
+
+    updateProducts();   
 </script>

@@ -1,8 +1,8 @@
 <template>
     <div class="flex flex-wrap relative my-5">
-        <div v-for="pro in data.dataProduct" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
+        <div v-for="pro in updateProducts" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
             <div class="mb-2 px-6">              
-                <NuxtLink v-if="slugCate" :to="`/categories/${slugCate}`" class="text-xs">{{ cateTitle }}</NuxtLink>
+                <NuxtLink :to="`/categories/${pro.categorySlug}`" class="text-xs">{{ pro.categoryName }}</NuxtLink>
             </div>
             <div class="px-6 border-x border-zinc-100">
                 <div class="relative group">
@@ -31,14 +31,14 @@
                 </div>
             </div>
             <div class="flex justify-between items-end products-end mt-3 px-6">
-                <div class="text-base lg:text-xl">${{ pro.minPrice }}</div>     
+                <div class="text-base lg:text-xl">${{ formatPrice(pro.minPrice) }}</div>     
             </div>
         </div>   
         <ModalPages v-if="showQuickView" @close="showQuickView = false">
             <template #body>
                 <ModalPopupProductQuickView 
                 :products="productData" 
-                :cateTitle="cateTitle" 
+                :cateTitle="productData?.categoryName" 
                 />
             </template>           
         </ModalPages>
@@ -56,6 +56,11 @@
         showQuickView.value = true;
     };
 
+    //xử lý giá
+    const formatPrice = (price: number): string => {
+        return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
+    };
+
     const data = defineProps<{
         dataProduct?: Products[];
     }>();
@@ -64,22 +69,17 @@
 
     const cateStore = useCateStore();
 
-    // Lấy danh sách category không trùng lặp
-    const cateInfo = computed(() => {
-    if (!data.dataProduct) return [];
-
-    const cateIds = new Set(data.dataProduct.map((pro) => pro.categoryId));
-
-    return [...cateIds]
-        .map((id) => cateStore.categories.find((cate) => cate.id === id))
-        .filter(Boolean) // Loại bỏ undefined
-        .map((cate) => ({ name: cate!.name, slug: cate!.slug }));
+    const updateProducts = computed(() => {
+        if (!data.dataProduct) return [];
+        return data.dataProduct?.map((pro) => {
+            const matchingCategory = cateStore.categories.find((cate) => cate.id === pro.categoryId);
+            return {
+                ...pro,
+                categoryName: matchingCategory ? matchingCategory.name : undefined,
+                categorySlug: matchingCategory ? matchingCategory.slug : undefined,
+            };
+        });
     });
-
-    // Ghép category thành chuỗi
-    const cateTitle = computed(() => cateInfo.value.map((info) => info.name).join(", "));
-    const slugCate = computed(() => cateInfo.value.map((info) => info.slug).join(", "));
-
 </script>
 
 <style lang="css" scoped>

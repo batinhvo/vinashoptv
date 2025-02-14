@@ -10,9 +10,10 @@
             <div class="input-group flex px-5">
                 <input 
                 type="search" 
-                v-model="query"
+                v-model="queryProducts"
                 placeholder="Search for Products" 
                 class="w-full border border-gray-300 rounded-l-full py-2 px-4 focus:outline-none focus:border-blue-300"
+                required
                 />
                 <button type="submit" class="bg-primary px-4 rounded-r-full">
                     <i class="ec ec-search text-2xl text-green-022"></i>
@@ -39,20 +40,27 @@
         }
     }
 
-    //test
-    const notify = useNotify();
+    //---------------------------API------------------------------//
 
-    const query = ref(""); //trạn thái lưu trữ
+    const router = useRouter();
+
+    //trạng thái lưu trữ
+    const queryProducts = ref(""); 
+    const keywordQuery = ref('');
     
-    function onSearch() {
-        if(query.value.trim()) {
-            notify({
-                message: "Search: " + query.value,
-                type: "info",
-                time: 1000
-            });
-        }
-    }
+    // Xử lý tìm kiếm
+    const onSearch = () => {
+        const keyword = queryProducts.value.trim();
+        if (!keyword) return; // Không tìm nếu keyword rỗng
+        keywordQuery.value = keyword;
+        // Chuyển hướng với query params
+        router.push({
+            path: "/search",
+            query: {
+                keyword: keywordQuery.value,
+            },
+        });
+    };
 
 </script>
 

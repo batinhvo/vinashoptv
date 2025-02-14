@@ -17,4 +17,6 @@ export interface Products {
     summary: string;
     content: string;
     howToUse: string;
+    categoryName?: string;
+    categorySlug?: string;
 }

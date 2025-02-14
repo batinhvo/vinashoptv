@@ -1,13 +1,13 @@
 <template>
-    <div class="p-8 border-2 border-neutral-300 rounded-2xl">
+    <div class="p-8 border-2 border-neutral-300 rounded-2xl" v-if="data.dataPro">
         <!-- Info -->
         <div class="border-b border-gray-300 pb-2">
             <span>Availability: </span>
-            <span class="text-[#5cb85c] font-bold">10000 in stock</span>
+            <span class="text-[#5cb85c] font-bold">{{ data.dataPro.totalOutFake }} in stock</span>
         </div>
         <div class="flex items-end my-5">                           
-            <div class="text-4xl text-red-500">$99.00</div>       
-            <div class="text-lg line-through pl-3">$139.00</div>                     
+            <div class="text-4xl">${{ formatPrice(data.dataPro.minPrice) }}</div>       
+            <!-- <div class="text-lg line-through pl-3">$139.00</div>                      -->
         </div>
 
         <!-- Type -->
@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+    import type { ProductDetails, Variant } from "types/productDetailTypes";
     // quantity
     const quantity = ref(1);
     const increment = () => {
@@ -87,7 +88,19 @@
     const selectOption = (key: string, val: string) => {
         selectedOptions.value[key] = val;
     };
-</script>
+
+    //xử lý giá
+    const formatPrice = (price: number): string => {
+        return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
+    };
+    const dataVariant = <Variant | null>(null);
+
+    const data = defineProps<{
+        dataPro?: ProductDetails;
+    }>();
+ 
+
+</script> 
 
 <style lang="css" scoped>
     input[type="number"]::-webkit-inner-spin-button, 

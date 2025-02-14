@@ -95,10 +95,6 @@
             },
         });
     };
-
-    
-
-    
 </script>
 
 <style scoped>

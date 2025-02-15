@@ -15,7 +15,7 @@
             <div class="flex flex-wrap">
                 <!-- left -->
                 <div class="w-full xl:w-1/5 px-4 hidden xl:block">          
-                    <BodyProductMenuNav />
+                    <MenuCategoryBody />
                 </div>
 
                 <!-- right -->

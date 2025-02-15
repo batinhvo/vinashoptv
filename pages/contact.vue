@@ -47,12 +47,12 @@
               <p class="mt-8 pb-5 text-justify leading-6">
                 Houston: 11322 Bellaire Blvd, Suite 111, Houston, TX - 77072, USA<br>
                 Support: <a href="tel:+1(281) 619-5000" class="underline underline-offset-2 text-green-700 hover:text-green-900 hover:no-underline">(281) 619-5000</a><br>
-                Business Hours: <span class="underline-offset-2 hover:no-underline text-green-700 underline underline-offset-2">Mon - Sun: 09:30 AM - 06:00 PM</span>
+                Business Hours: <span class="hover:no-underline text-green-700 underline underline-offset-2">Mon - Sun: 09:30 AM - 06:00 PM</span>
               </p>
               <p class="mt-4 pb-5 text-justify leading-6">
                 Dallas: 3112 N Jupiter Rd #317, Garland, Texas 75044<br>
                 Support: <a href="tel:+1(214) 300-2000" class="underline underline-offset-2 text-green-700 hover:text-green-900 hover:no-underline">(214) 300-2000</a><br>
-                Business Hours: <span class="underline-offset-2 hover:no-underline text-green-700 underline underline-offset-2">Mon - Sun: 10:00 AM - 06:00 PM</span>
+                Business Hours: <span class="hover:no-underline text-green-700 underline underline-offset-2">Mon - Sun: 10:00 AM - 06:00 PM</span>
               </p>
               <p class="mt-4 pb-5">             
                 Email: <a href="mailto:info@vinashoptv.com" class="underline underline-offset-2 text-green-700 hover:text-green-900 hover:no-underline">Info@vinashoptv.com</a>                

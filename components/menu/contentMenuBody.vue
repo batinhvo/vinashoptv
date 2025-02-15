@@ -1,26 +1,22 @@
 <template>
     <li>
         <div class="border-b border-gray-100 px-2">
-            <div 
-                class="cursor-pointer flex justify-between items-center hover:bg-neutral-100 px-4 py-2"
-                @click="toggleMenu"
-            >
-                <NuxtLink to="/bestseller" class="hover:text-black" :class="{ 'font-bold': isOpen }" >
-                    {{ item.label }}
+            <div class="cursor-pointer flex justify-between cates-center hover:bg-neutral-100 px-4 py-2 group" @click.prevent="toggleMenu(cate.name)">
+                <NuxtLink v-if="cate.status === 'active'" :to="`/categories/${cate.slug}`" class="group-hover:font-bold hover:text-primary" :class="[openState[cate.name] ? 'font-bold' : '']">
+                    {{ cate.name }}
                 </NuxtLink>
-                <button v-if="item.hasSubmenu">
-                    <i class="fa text-xs" :class="isOpen ? 'fa-angle-up' : 'fa-angle-down'"></i>
+                <button v-if="cate.children && cate.children.length > 0">
+                    <i class="text-xs fa" :class="[openState[cate.name] ? 'fa-angle-up' : 'fa-angle-down']"></i>
                 </button>
             </div>  
 
             <!-- Submenu -->
-            <div v-if="item.hasSubmenu" v-show="isOpen">
+            <div v-if="cate.children && cate.children.length > 0" v-show="openState[cate.name]">
                 <ul class="px-2">
                     <MenuContentMenuBody 
-                        v-for="(subItem, subIndex) in item.subItems" 
+                        v-for="(subcate, subIndex) in cate.children" 
                         :key="subIndex" 
-                        :item="subItem"
-                        :level="level + 1"
+                        :cate="subcate"
                     />
                 </ul>
             </div>
@@ -29,13 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+defineProps<{ cate: any; }>();
 
-defineProps<{ item: any; level: number }>();
+const openState = ref<{ [key: string]: boolean }>({});
 
-const isOpen = ref(false);
-
-const toggleMenu = () => {
-    isOpen.value = !isOpen.value;
+const toggleMenu = (key: string) => {
+    openState.value[key] = !openState.value[key];
 };
 </script>

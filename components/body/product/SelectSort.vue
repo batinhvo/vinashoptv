@@ -23,44 +23,34 @@
 
     const emit = defineEmits(['updateParams']);
     const selectedSort = ref('Default Sorting');
-    const data = defineProps<{
-        cateId: number;
-    }>();
-
-    const params = ref({
-        categoryId: 0,
-        descending: 1,
-        page: 1,
-        perPage: 8,
-        sortBy: 'createdAt'
-    });
+    const descending = ref(0);
+    const sortBy = ref('');
 
     const route = useRoute();
 
     function setSort(sortOption: string) {
         isOpenSort.value = false;
         selectedSort.value = sortOption;
-        params.value.categoryId = data.cateId;
         let sortQuery: string | undefined = undefined;
 
         switch (sortOption) {
             case 'Default Sorting':
-                params.value.sortBy = 'createdAt';
+                sortBy.value = 'createdAt';
                 sortQuery = undefined; // Xóa sort khỏi URL
                 break;
             case 'Sort by Price: Low to Hight':
-                params.value.sortBy = 'price';
-                params.value.descending = 1;
+                sortBy.value = 'price';
+                descending.value = 1;
                 sortQuery = 'price_from_low';
                 break;
             case 'Sort by Price: Hight to Low':
-                params.value.sortBy = 'price';
-                params.value.descending = 0;
+                sortBy.value = 'price';
+                descending.value = 0;
                 sortQuery = 'price_from_high';
                 break;
             case 'Sort by Lates':
-                params.value.sortBy = 'createdAt';
-                params.value.descending = 1;
+                sortBy.value = 'createdAt';
+                descending.value = 1;
                 sortQuery = 'latest';
                 break;
         } 
@@ -71,6 +61,6 @@
             query: { ...route.query, sort: sortQuery } // Giữ nguyên các query khác
         }, { replace: true });
 
-        emit('updateParams', params.value);
+        emit('updateParams', sortBy.value, descending.value);
     }
 </script>

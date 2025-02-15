@@ -14,10 +14,11 @@
                 <div class="w-full xl:w-4/5 px-4">          
                     <div class="flex justify-end mb-4">
                         <!-- <h3 class="text-2xl">Best Seller</h3> -->
-                        <p>Showing 1-2 of 2 results</p>
+                    <p>Showing 1-{{ totalProducts < 8 ? totalProducts : 8 }} of {{ totalProducts }} results</p>
                     </div>
-                    <BodyHomeSelectSort />
+                    <BodyProductSelectSort @updateParams="updateProductsFromSort" />
                     <BodyProductDisplay :dataProduct="productListData"/>
+                    <BodyProductPagination v-if="totalProducts > 0" :dataTotalPro="totalProducts" @updatePages="updatePages"/>
                 </div>
             </div>
         </div>
@@ -35,8 +36,8 @@
     const productStore = useProductStore();
     
     const keyword = ref(route.query.keyword?.toString() || "");
-    const category = ref(route.query.category?.toString() || "");
     const cateParentId = ref();
+    const totalProducts = computed(() => productStore.productTotal || 0);
 
     interface Params {
         descending: number,
@@ -44,7 +45,7 @@
         perPage: number,
         search: string,
         categoryId?: number,
-        sortBy: 'createdAt',
+        sortBy: string,
     }
 
     const params = ref<Params>({
@@ -62,33 +63,48 @@
         productListData.value = productStore?.products || []; 
     };
 
-    watch(
-        () => route.query.keyword,
-        (newKeyword) => {
-            const sanitizedKeyword = newKeyword?.toString() || ""; //Nếu newKeyword không phải null hoặc undefined, nó sẽ được chuyển thành chuỗi (toString()).
-            
-            if (sanitizedKeyword !== keyword.value) {
-                keyword.value = sanitizedKeyword;
-                params.value.search = keyword.value;
-                updateProducts();
-            } 
-        },
-        { immediate: true }
-    );
+    //sort products by price
+    const updateProductsFromSort = async (sortBy: string, descending: number) => {
+        params.value.sortBy = sortBy;
+        params.value.descending = descending;
+        updateProducts();
+    };
+
+    const updatePages = async (page: number) => {
+        params.value.page = page;
+        updateProducts();
+    };
 
     watch(
-        () => route.query.category,
-        (newCategory) => {
-            const sanitizedCategory = newCategory?.toString() || "";
-            if(sanitizedCategory) {
-                cateParentId.value = cateStore.categories.find((cate) => cate.slug === sanitizedCategory)?.id;
-                params.value.categoryId = cateParentId.value;
-                updateProducts();
-            } else {
-                delete params.value.categoryId;
+        () => route.query,
+        (newQuery) => {
+            let hasChange = false;
+
+            // Cập nhật keyword
+            const newKeyword = newQuery.keyword?.toString() || "";
+            if (newKeyword !== keyword.value) {
+                keyword.value = newKeyword;
+                params.value.search = keyword.value;
+                hasChange = true;
             }
+
+            // Cập nhật categoryId
+            const newCategory = newQuery.category?.toString() || "";
+            if (newCategory) {
+                const newCateId = cateStore.categories.find((cate) => cate.slug === newCategory)?.id;
+                if (newCateId !== cateParentId.value) {
+                    cateParentId.value = newCateId;
+                    params.value.categoryId = cateParentId.value;
+                    hasChange = true;
+                }
+            } else if (params.value.categoryId) {
+                delete params.value.categoryId;
+                hasChange = true;
+            }
+
+            if (hasChange) updateProducts();
         },
-        { immediate: true }
+        { immediate: true, deep: true }
     );
 
     updateProducts();   

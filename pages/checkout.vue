@@ -112,7 +112,7 @@
                                         <tr>                   
                                             <td>
                                                 <div class="flex pb-5">                           
-                                                    <input class="w-full focus:outline-none p-2.5 pl-5 focus:border-blue-300 border border border-zinc-300 rounded-l-full bg-white" type="text" placeholder="Coupon Code" name="coupon">
+                                                    <input class="w-full focus:outline-none p-2.5 pl-5 focus:border-blue-300 border border-zinc-300 rounded-l-full bg-white" type="text" placeholder="Coupon Code" name="coupon">
                                                     <button class="pl-4 text-center text-white bg-gray-600 hover:shadow-xl">
                                                         Apply
                                                     </button>

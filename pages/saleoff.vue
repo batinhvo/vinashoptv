@@ -24,8 +24,9 @@
                         <h3 class="text-2xl">Sale Off</h3>
                         <p>Showing 1-2 of 2 results</p>
                     </div>
-                    <BodyProductSelectSort />
+                    <BodyProductSelectSort @updateParams="updateProductsFromSort"/>
                     <BodyProductDisplay :dataProduct="productListData"/>
+                    <BodyProductPagination v-if="totalProducts > 0" :dataTotalPro="totalProducts" @updatePages="updatePages"/>
                 </div>
             </div>
         </div>
@@ -40,11 +41,19 @@
     //----------------------------API------------------------------------//
 
     const productStore = useProductStore();
-    const cateStore = useCateStore();
 
     const productListData = ref<Products[]>([]);
+    const totalProducts = ref(0);
 
-    const params = ref({
+    interface Params {
+        descending: number;
+        page: number;
+        perPage: number;
+        sale?: number;
+        sortBy: string,
+    };
+
+    const params = ref<Params>({
         descending: 1,
         page: 1,
         perPage: 8,
@@ -52,11 +61,22 @@
         sortBy: 'createdAt',
     });
 
-    const fetchDataProductSaleOff = async () => {
-        await cateStore.fetchCategories();
+    const fetchDataProductSaleOff = async () => {        
         await productStore.fetchProducts(params);
         productListData.value = productStore?.products || [];
+        totalProducts.value = productStore.productTotal || 0;
     }
+    
+    const updateProductsFromSort = async (sortBy: string, descending: number) => {
+        params.value.sortBy = sortBy;
+        params.value.descending = descending;
+        fetchDataProductSaleOff();
+    };
+
+    const updatePages = async (page: number) => {
+        params.value.page = page;
+        fetchDataProductSaleOff();
+    };
 
     fetchDataProductSaleOff();
 </script>

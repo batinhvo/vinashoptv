@@ -22,11 +22,11 @@
                 <div class="w-full xl:w-4/5 px-4">          
                     <div class="flex justify-between mb-4">
                         <h3 class="text-2xl">{{ cateTitle }}</h3>
-                        <p>Showing 1-2 of 2 results</p>
+                        <p>Showing 1-{{ totalProducts < 8 ? totalProducts : 8 }} of {{ totalProducts }} results</p>
                     </div>
-                    <BodyProductSelectSort :cateId="categoryId"  @updateParams="updateProductsFromSort"/>
+                    <BodyProductSelectSort @updateParams="updateProductsFromSort"/>
                     <BodyProductDisplay :dataProduct="productListData"/>
-                    <BodyProductPagination />
+                    <BodyProductPagination :dataTotalPro="totalProducts"/>
                 </div>              
             </div>            
         </div>
@@ -45,9 +45,9 @@
 
     const slug = route.params.slug as string;
     const productListData = ref<Products[]>([]);
+    const totalProducts = ref(0);
     const cateTitle = ref('');
-    const categoryId = ref<number>(0);
-
+    
     const params = ref({
         categoryId: 0,
         descending: 1,
@@ -56,26 +56,31 @@
         sortBy: 'createdAt'
     });
 
+    const updateProductsFromSort = async (sortBy: string, descending: number) => {
+        params.value.sortBy = sortBy;
+        params.value.descending = descending;
+
+        updateProducts();
+    }
+
+    const updateProducts = async () => {
+        await productStore.fetchProducts(params);
+        productListData.value = productStore?.products || []; 
+        totalProducts.value = productStore.productTotal || 0;
+    };
+
     const fetchData = async () => {
         await cateStore.fetchCategories();
 
         const category = cateStore.categories.find((cate) => cate.slug === slug);
         if (category) {
             cateTitle.value = category.name;
-            categoryId.value = category.id;
             params.value.categoryId = category.id; // Gán ID vào params
         }
 
-        await productStore.fetchProducts(params);
-        productListData.value = productStore.products || [];
+        updateProducts();
     };
-    fetchData();
-
-    const updateProductsFromSort = async (newParams: any) => {
-        params.value = newParams;
-        await productStore.fetchProducts(params);
-        productListData.value = productStore.products || [];
-    }
     
+    fetchData();
 </script>
 

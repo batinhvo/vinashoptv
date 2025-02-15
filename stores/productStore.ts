@@ -6,6 +6,7 @@ export const useProductStore = defineStore('products', () => {
 
     const products = ref<Products[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
+    const productTotal = ref<number>(0);
 
     const fetchProducts =  async (params: any):Promise<void> => {
         try {
@@ -21,6 +22,7 @@ export const useProductStore = defineStore('products', () => {
             }
 
             products.value = data.data.list || [];
+            productTotal.value = data.data.count || 0;
             error.value = 0; // Không có lỗi
 
         } catch (e) {
@@ -29,5 +31,5 @@ export const useProductStore = defineStore('products', () => {
         } 
     };
 
-    return { products, fetchProducts };
+    return { products, fetchProducts, productTotal };
 });

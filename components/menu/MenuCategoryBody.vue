@@ -59,8 +59,6 @@
 
         return sortCategories(parentCate);
     }
-    console.log(dataCatePro)
-
     fetchCateData();
 
 </script>

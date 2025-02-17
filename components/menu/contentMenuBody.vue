@@ -32,8 +32,10 @@
     defineProps<{ cate: any; }>();
 
     const openCategory = ref<string | null>(null);
+
     const toggleMenu = (key: string) => {
+        
         openCategory.value = openCategory.value === key ? null : key;
-        console.log(openCategory.value);
     };
+    
 </script>

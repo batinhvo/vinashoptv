@@ -4,7 +4,7 @@
             <i class="fa fa-list-ul mr-2"></i> All Departments
         </button>
 
-        <div ref="menu"  :class="['list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-40', isMenuOpen ? 'show overflow-visible' : '']">
+        <div :class="['list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-40', isMenuOpen ? 'show overflow-visible' : '']">
             <ul class="p-2 relative">
                 <li v-for="(item, index) in menuItems" :key="index" class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative group">
                     <NuxtLink to="/categories/mask" :class="['flex justify-between items-center hover:text-black hover:font-bold', (item.label === 'Sale Off' || item.label === 'SPECIAL') ? 'font-bold' : '']">{{ item.label }}
@@ -39,13 +39,16 @@
     const route = useRoute(); //lay thong tin route hien tai
     const isMenuOpen = ref(route.path === "/");
 
-    // Lắng nghe sự thay đổi của route.path 
-    // khi chuyển trang mà không reload lại toàn bộ trang thì useRoute sẽ không tự cập nhật lại nên phải dùng watch để lắng nghe sự thay đổi
+    //const menu = ref<HTMLElement | null>(null);
+
+    const toggleMenu = () => {
+        isMenuOpen.value = !isMenuOpen.value;
+    }
+
     watch(() => route.path, (newPath) => {
         isMenuOpen.value = newPath === "/";
     });
 
-    const menu = ref<HTMLElement | null>(null);
     const menuItems = [
         { label: 'Sale Off', hasSubmenu: false },
         { label: 'SPECIAL', hasSubmenu: false },
@@ -317,10 +320,7 @@
         }     
     ];
 
-    const toggleMenu = () => {
-        isMenuOpen.value = !isMenuOpen.value;
-    }
-
+    
 </script>
 
 <style lang="css" scoped>

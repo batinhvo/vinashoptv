@@ -6,6 +6,8 @@
                 v-for="(cate, index) in dataCatePro" 
                 :key="index" 
                 :cate="cate" 
+                :openCategory="openCategory"
+                @update:openCategory="openCategory = $event"
             />
         </ul>
     </div>                    
@@ -16,6 +18,7 @@
 
     const dataCategories = ref<Category[]>([]);
     const dataCatePro = ref<Category[]>([]);
+    const openCategory = ref<string | null>(null);
 
     const cateStores = useCateStore();
 

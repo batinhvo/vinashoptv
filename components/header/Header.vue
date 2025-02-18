@@ -12,7 +12,7 @@
             </div>
             <!-- menu -->
             <div class="flex items-center">
-                <HeaderMenuDropdown />
+                <MenuCategoryHeader />
                 <HeaderMenuMenubar />
             </div>
         </div>      
@@ -21,7 +21,7 @@
         <div class="xl:hidden h-12 bg-gray-80 py-2 px-3 bg-neutral-100">
             <div class="container flex justify-between">
                 <div class="flex">
-                <HeaderMenuButtonMenu />
+                <MenuCategoryPhone />               
                 <div class="max-w-[250px]">
                     <vinaLogo />
                 </div>

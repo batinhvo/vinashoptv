@@ -1,6 +1,6 @@
 <template>
     <li>
-        <div class="border-b border-gray-100 px-2">
+        <div class="border-b border-gray-100 px-2" v-if="cate.name !== 'SPECIAL'">
             <div class="cursor-pointer flex justify-between cates-center hover:bg-neutral-100 px-4 py-2 group" @click.prevent="toggleMenu(cate.name)">
                 <NuxtLink v-if="cate.status === 'active'" 
                 :to="`/categories/${cate.slug}`" 
@@ -17,9 +17,11 @@
             <div v-if="cate.children && cate.children.length > 0" v-show="openCategory === cate.name">
                 <ul class="px-2">
                     <MenuContentMenuBody 
-                        v-for="(subcate, subIndex) in cate.children" 
+                        v-for="(subCate, subIndex) in cate.children" 
                         :key="subIndex" 
-                        :cate="subcate"
+                        :cate="subCate"
+                        :openCategory="openSubCategory"
+                        @update:openCategory="openSubCategory = $event"
                     />
                 </ul>
             </div>
@@ -28,14 +30,18 @@
 </template>
 
 <script setup lang="ts">
+    import { type Category } from "types/categoryTypes";
 
-    defineProps<{ cate: any; }>();
+    const data = defineProps<{ 
+        cate: Category; 
+        openCategory: string | null;
+    }>();
 
-    const openCategory = ref<string | null>(null);
+    const openSubCategory = ref<string | null>(null);
 
+    const emit = defineEmits(['update:openCategory']);
     const toggleMenu = (key: string) => {
-        
-        openCategory.value = openCategory.value === key ? null : key;
+        emit('update:openCategory', data.openCategory === key ? null : key);
     };
     
 </script>

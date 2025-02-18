@@ -20,7 +20,7 @@
 
                 <!-- right -->
                 <div class="w-full xl:w-4/5 px-4">          
-                    <div class="flex justify-between mb-4">
+                    <div class="flex justify-between mb-4 mt-4 lg:mt-0">
                         <h3 class="text-2xl">{{ cateTitle }}</h3>
                         <p>Showing 1-{{ totalProducts < 8 ? totalProducts : 8 }} of {{ totalProducts }} results</p>
                     </div>

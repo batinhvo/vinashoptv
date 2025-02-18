@@ -13,7 +13,7 @@
             <!-- menu -->
             <div class="flex items-center">
                 <MenuCategoryHeader />
-                <HeaderMenuMenubar />
+                <HeaderMenuBar />
             </div>
         </div>      
 

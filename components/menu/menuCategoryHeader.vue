@@ -4,25 +4,25 @@
             <i class="fa fa-list-ul mr-2"></i> All Departments
         </button>
 
-        <div ref="menuDropDown" class="absolute z-40">
-            <Transition name="dropdown">
-                <div v-show="isMenuOpen" class="bg-white shadow-lg rounded-b-lg w-[270px]">
-                    <ul class="p-2 relative">
-                        <li class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
-                            <NuxtLink class="flex justify-between items-center hover:text-black font-bold" to="/categories/saleoff">
-                                Sale Off
-                            </NuxtLink>                    
-                        </li>
-                        <MenuContentMenuHeader 
-                        v-for="(cate, index) in dataCatePro" 
-                        :key="index" 
-                        :cate="cate"  
-                        />               
-                    </ul>
-                </div>
-            </Transition>
+        <div :class="[
+            'list-menu bg-white shadow-lg rounded-b-lg w-[270px] z-40', 
+            isOverflowHidden ? 'overflow-hidden' : '', 
+            isMenuOpen ? 'show' : ''
+        ]">
+            <ul class="p-2 relative">
+                <li class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
+                    <NuxtLink class="flex justify-between items-center hover:text-black font-bold" to="/categories/saleoff">
+                        Sale Off
+                    </NuxtLink>                    
+                </li>
+                <MenuContentMenuHeader 
+                v-for="(cate, index) in dataCatePro" 
+                :key="index" 
+                :cate="cate"  
+                />               
+            </ul>
         </div>
-        
+   
     </div>
 </template>
 
@@ -31,25 +31,27 @@
  
     const route = useRoute(); //lay thong tin route hien tai
     const isMenuOpen = ref(route.path === "/");
-
-    const menuDropDown = ref<HTMLElement | null>(null);
+    const isOverflowHidden = ref(true);
 
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value;
-
-        menuDropDown.value?.classList.add('overflow-hidden');
-        setTimeout(() => {
-            menuDropDown.value?.classList.remove('overflow-hidden')
-        },600)
     }
+
+    watch(isMenuOpen, async (newValue) => {
+        if (newValue) {
+            isOverflowHidden.value = true;
+            await nextTick(); // Chờ Vue cập nhật DOM
+            
+            setTimeout(() => {
+                isOverflowHidden.value = false;
+            }, 1000);
+        } else {
+            isOverflowHidden.value = true;
+        }
+    });
 
     watch(() => route.path, (newPath) => {
         isMenuOpen.value = newPath === "/";
-
-        menuDropDown.value?.classList.add('overflow-hidden');
-        setTimeout(() => {
-            menuDropDown.value?.classList.remove('overflow-hidden')
-        },600)
     });
 
     //----------------------------------API---------------------------------------//
@@ -107,47 +109,17 @@
         outline: none;
     }
 
-    /* Hiệu ứng sổ xuống */
-    .dropdown-enter-active, .dropdown-leave-active {
-        transition: max-height 0.6s ease-in-out, opacity 0.2s;
-        max-height: 300px; /* Độ cao tối đa */
-        opacity: 1;
-    }
-    .dropdown-enter-from, .dropdown-leave-to {
+    .list-menu {
+        position: absolute;
         max-height: 0;
         opacity: 0;
+        transition: max-height .6s ease-in-out, opacity 1.2s ease-in-out;
     }
 
-    .menu {
-        opacity: 0;
-        animation: fadeLeftEffect .5s ease-out forwards; 
-    }
-
-    .menu.show {
+    .list-menu.show {
+        max-height: 340px;
         opacity: 1;
-        animation: fadeRightEffect .5s ease-out forwards; 
-    }
-
-    @keyframes fadeUpEffect {
-        from {
-            opacity: 1;
-            transform: translateX(0px);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(-100%);
-        }
-    }
-
-    @keyframes fadeDownEffect {
-        from {
-            opacity: 0;
-            transform: translateX(-100%);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0px);
-        }
+        transition: max-height .5s ease-in-out, opacity .5s ease-in-out;
     }
 
 </style>

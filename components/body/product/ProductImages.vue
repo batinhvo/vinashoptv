@@ -12,6 +12,9 @@
     
     //------------------------------API------------------------------//
     const imageProductStore = useImagesProduct();
-    Imgsource.value = await imageProductStore.fetchImagesProduct(propImgs.linkImg!) || '';
+    const getImages = async () => {
+        Imgsource.value = await imageProductStore.fetchImagesProduct(propImgs.linkImg!) || '';
+    }
+    getImages();
     
 </script>

@@ -1,7 +1,7 @@
 <template>
     <li>
         <div class="flex justify-between items-center py-2" @click.prevent="toggleMenu(cate.name)">
-            <NuxtLink v-if="cate.status === 'active'"
+            <NuxtLink v-if="cate.status === 'active' && cate.slug"
             :class="[(cate.name === 'SPECIAL' || openCategory === cate.name) ? 'font-bold' : '']" 
             :to="`/categories/${cate.slug}`" @click.prevent="handleToggleMenu"> 
                 {{ cate.name }} 

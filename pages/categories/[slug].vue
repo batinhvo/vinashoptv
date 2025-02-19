@@ -72,7 +72,7 @@
     const fetchData = async () => {
         await cateStore.fetchCategories();
 
-        const category = cateStore.categories.find((cate) => cate.slug === slug);
+        const category = cateStore.dataCatePro.find((cate) => cate.slug === slug);
         if (category) {
             cateTitle.value = category.name;
             params.value.categoryId = category.id; // Gán ID vào params

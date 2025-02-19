@@ -10,7 +10,7 @@ export type Variant = {
     options: VariantOption[],
 };
 
-export type Skud = {
+export type Skus = {
     id: number,
     skuCode: string,
     price: number,
@@ -44,5 +44,5 @@ export type ProductDetails = {
     howToUse: string,
     stock: number,
     variants: Variant[],
-    skud: Skud[],
+    skus: Skus[],
 };

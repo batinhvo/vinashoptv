@@ -56,7 +56,7 @@
                     <i class="ec ec-close-remove"></i>
                 </button>
             </div>
-            <HeaderSigninPopup />
+            <HeaderSignInPopup />            
         </div>
     </div>
 
@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ModalPopupChangePass, ModalPopupEditProfile } from '.nuxt/components';
+    import type { ModalPopupChangePass, ModalPopupEditProfile } from '.nuxt/components';
 
     const modalPopupChangePassRef = ref<InstanceType<typeof ModalPopupChangePass> | null>(null);
     const modalPopupEditProfileRef = ref<InstanceType<typeof ModalPopupEditProfile> | null>(null);

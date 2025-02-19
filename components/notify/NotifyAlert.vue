@@ -8,23 +8,6 @@
             </span>
         </div>
     </div>
-
-    <!-- boostrap -->
-    <!-- <div v-if="isVisible" class="position-fixed top-3 right-3 z-index-9 ml-3" :class="[{ 'is-exiting': isExiting }]">
-        <div class="border px-4 py-3 rounded-sm shadow-sm d-flex align-items-center justify-content-between alert-content" :class="alertTypeClass" role="alert">
-            <i :class="alertIconClass" aria-hidden="true"></i>
-            <strong class="font-weight-bold">{{ message }}</strong>
-            <span class="top-0 bottom-0 right-0 ml-4 px-1" @click="close">
-                <i class="fill-primary hover:font-bold ec ec-close-remove" :class="alertButtonClass" role="button"></i>
-            </span>
-        </div>
-    </div> -->
-    <!-- end boostrap -->
-
-
-
-
-
 </template>
 
 <script lang="ts">

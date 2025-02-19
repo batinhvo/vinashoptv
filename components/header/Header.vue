@@ -1,13 +1,13 @@
 <template>
     <header class="bg-white shadow-sm">
         <!-- top-header -->
-        <HeaderTopbar />
+        <HeaderTopBar />
 
         <!-- main-header-desktop -->
         <div class="container hidden xl:block">
             <div class="flex items-center py-2 xl:py-8">
                 <vinaLogo />
-                <HeaderSearchSearchbar />
+                <HeaderSearchBar />
                 <HeaderIconCartIcon />
             </div>
             <!-- menu -->

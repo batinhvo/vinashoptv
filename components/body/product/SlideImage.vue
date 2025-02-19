@@ -14,7 +14,8 @@
         @slideChange="onSlideChange"
         >
             <swiper-slide v-for="(image, index) in images" :key="index">
-                <img :src="image" class="w-full swiper-lazy" alt="Slide image" />
+                <!-- <img :src="image" class="w-full swiper-lazy" alt="Slide image" /> -->
+                <BodyProductImages :linkImg="image" :altImg="dataAlt" />
             </swiper-slide>
             <!-- Custom Navigation Buttons -->
             <div class="custom-prev">
@@ -38,7 +39,7 @@
         class="mt-4"
         >
             <swiper-slide v-for="(image, index) in images" :key="index" class="p-2 border border-gray-300 cursor-pointer" :class="{ 'active': activeIndex === index }">
-                <img :src="image" class="w-full swiper-lazy" alt="Thumbnail image" />
+                <BodyProductImages :linkImg="image" :altImg="dataAlt" />
             </swiper-slide>
         </swiper>
     </div>
@@ -67,12 +68,18 @@
 
     // Mảng hình ảnh
     const images: string[] = [
-        '/images/products/gold-oil.jpg',
-        '/images/products/gold-oil.jpg',
-        '/images/products/fucoidan-AHCC.jpg',
-        '/images/products/gold-oil.jpg',
-        '/images/products/gold-oil.jpg',
+        'upload/2024/12/product/d9cb61c5-dadc-4e3b-b4bb-966042adc84c.jpeg',
+        'upload/2024/12/product/50fa4de0-eec8-4bc5-b77b-aed75eb4bb88.jpeg',
+        'upload/2024/12/product/b9ef6ea9-794c-4252-8c9e-5e619dcf173a.jpeg',
+        'upload/2024/12/product/50fa4de0-eec8-4bc5-b77b-aed75eb4bb88.jpeg',
     ];
+
+    const data = defineProps<{
+        dataImages: string;
+        dataAlt: string;
+    }>();
+
+    images.push(data.dataImages)
 </script>
 
 <style scoped>

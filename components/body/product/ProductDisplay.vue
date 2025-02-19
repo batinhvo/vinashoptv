@@ -2,7 +2,7 @@
     <div class="flex flex-wrap relative my-5">
         <div v-for="pro in updateProducts" :key="pro.id" class="w-1/2 md:w-1/4 py-4 mb-4 hover:shadow-[0_0_6px_0_rgba(1,1,1,0.3)]">
             <div class="mb-2 px-6">              
-                <NuxtLink :to="`/categories/${pro.categorySlug}`" class="text-xs">{{ pro.categoryName }}</NuxtLink>
+                <NuxtLink v-if="pro.categorySlug" :to="`/categories/${pro.categorySlug}`" class="text-xs">{{ pro.categoryName }}</NuxtLink>
             </div>
             <div class="px-6 border-x border-zinc-100">
                 <div class="relative group">
@@ -15,7 +15,7 @@
                             @click="openShowQuickView(pro)">
                             Quick View
                         </button>                                              
-                        <NuxtLink
+                        <NuxtLink v-if="pro.slug"
                         :to="`/product/${pro.slug}`"
                         class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300 mt-6"
                         >
@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="mt-2">
-                    <NuxtLink :to="`/product/${pro.slug}`">
+                    <NuxtLink v-if="pro.slug" :to="`/product/${pro.slug}`">
                         <div class="text-xs lg:text-sm text-[#167000] hover:text-[#104f00] font-bold line-clamp-2">{{ pro.title }}</div>
                     </NuxtLink>
                     <div class="text-xs line-clamp-2 my-5">{{ pro.summary }}</div>         
@@ -72,7 +72,7 @@
     const updateProducts = computed(() => {
         if (!data.dataProduct) return [];
         return data.dataProduct?.map((pro) => {
-            const matchingCategory = cateStore.categories.find((cate) => cate.id === pro.categoryId);
+            const matchingCategory = cateStore.dataCatePro.find((cate) => cate.id === pro.categoryId);
             return {
                 ...pro,
                 categoryName: matchingCategory ? matchingCategory.name : undefined,

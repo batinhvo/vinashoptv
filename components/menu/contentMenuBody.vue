@@ -2,7 +2,7 @@
     <li>
         <div class="border-b border-gray-100 px-2" v-if="cate.name !== 'SPECIAL'">
             <div class="cursor-pointer flex justify-between cates-center hover:bg-neutral-100 px-4 py-2 group" @click.prevent="toggleMenu(cate.name)">
-                <NuxtLink v-if="cate.status === 'active'" 
+                <NuxtLink v-if="cate.status === 'active' && cate.slug" 
                 :to="`/categories/${cate.slug}`" 
                 class="group-hover:font-bold hover:text-primary" 
                 :class="[openCategory === cate.name ? 'font-bold' : '']">

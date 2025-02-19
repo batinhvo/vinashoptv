@@ -4,7 +4,7 @@
         @mouseenter="isHovered = true"
         @mouseleave="isHovered = false"
     >
-        <NuxtLink        
+        <NuxtLink v-if="cate.slug"      
         :class="['flex justify-between items-center hover:text-black hover:font-bold', (cate.name === 'SPECIAL') ? 'font-bold' : '']"
         :to="`/categories/${cate.slug}`"
         >

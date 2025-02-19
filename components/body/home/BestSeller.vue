@@ -2,7 +2,7 @@
     <div class="container mx-auto my-8">
         <div class="flex flex-wrap">
             <div v-for="pro in products" :key="pro.id" class="w-full lg:w-1/2 xl:w-1/4 py-4 px-4 xl:py-0">
-                <NuxtLink :to="`/product/${pro.slug}`">
+                <NuxtLink v-if="pro.slug" :to="`/product/${pro.slug}`">
                     <div class="flex flex-wrap py-1 bg-neutral-100 items-center border border-inherit min-h-36 hover:border-gray-300 hover:shadow-sm">
                         <div class="w-1/2 p-2">
                             <BodyProductImages :linkImg="pro.media" :altImg="pro.title" />

@@ -22,7 +22,8 @@
                     <li class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory('All categories')">                     
                         All categories
                     </li>
-                    <li v-for="cate in cateParent" :key="cate.id" class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory(cate.name)">                     
+                    <li v-for="cate in filteredCategories" :key="cate.id" 
+                    class="py-1.5 hover:bg-neutral-100 px-5 cursor-pointer" @click="selectCategory(cate.name)">                     
                         {{ cate.name }}
                     </li>
                 </ul>
@@ -36,10 +37,12 @@
 </template>
 
 <script setup lang="ts">
+    import { type Category } from "types/categoryTypes";
 
     const router = useRouter();
     const cateStore = useCateStore();
 
+    const cateParent = ref<Category[]>([]);
     //trạng thái lưu trữ
     const queryProducts = ref(""); 
     const categoryQuery = ref(''); 
@@ -47,10 +50,6 @@
 
     const isOpenCategories = ref(false);
     const selectedCategory = ref("All categories");
-
-    const cateParent = computed(() => {
-        return cateStore.categories.filter((cate) => cate.parentId === 0).sort((a, b) => a.sort - b.sort);
-    });
 
     //show categories
     function toggleOpenCategories() {
@@ -60,13 +59,15 @@
     function selectCategory(category: string) {
         selectedCategory.value = category; // Cập nhật category đã chọn       
         toggleOpenCategories(); // Đóng dropdown sau khi chọn
-    }  
+    } 
 
-    // Fetch danh mục trước khi sử dụng
+    // Lọc danh mục để loại bỏ "SPECIAL"
+    const filteredCategories = computed(() => cateParent.value.filter((cate) => cate.name !== 'SPECIAL'));
+
     const fetchDataCategories =  async () => {
         await cateStore.fetchCategories();
+        cateParent.value = cateStore.categories;
     };
-    
     fetchDataCategories();
 
     // Xử lý tìm kiếm

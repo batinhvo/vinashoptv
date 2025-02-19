@@ -6,6 +6,7 @@ export const useCateStore = defineStore('categories', () => {
     const apiUrl = config.public.apiBaseUrl;
 
     const categories = ref<Category[]>([]);
+    const dataCatePro = ref<Category[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
 
     const fetchCategories =  async ():Promise<string | undefined> => {
@@ -23,8 +24,44 @@ export const useCateStore = defineStore('categories', () => {
                 return;
             }
 
-            categories.value = cateData.value?.data || [];
+            dataCatePro.value = cateData.value?.data || [];
             error.value = 0; // Không có lỗi
+
+            const dataCateProcessing = (dataCate: Category[]): Category[] => {
+                const parentCate: Category[] = [];
+                const categoryMap = new Map<number, Category>(); // Map of category
+        
+                // Gán từng danh mục vào Map
+                dataCate.forEach((cate) => {
+                    categoryMap.set(cate.id, {...cate, children: [] });
+                });
+        
+                //Gán các phần tử con vào đúng cha
+                dataCate.forEach((cate) => {
+                    if (cate.parentId === 0) {
+                        parentCate.push(categoryMap.get(cate.id)!);
+                    } else {
+                        const parent = categoryMap.get(cate.parentId);
+                        if (parent) {
+                            parent.children?.push(categoryMap.get(cate.id)!);
+                        }
+                    }
+                });
+        
+                // Sắp xếp danh mục theo `sort`
+                const sortCategories = (categories: Category[]): Category[] => {
+                    return categories
+                    .sort((a, b) => a.sort - b.sort)
+                    .map((cate) => ({
+                        ...cate,
+                        children: cate.children ? sortCategories(cate.children) : [],
+                    }));
+                };
+        
+                return sortCategories(parentCate);
+            }
+
+            categories.value = dataCateProcessing(dataCatePro.value);
 
         } catch (e) {
             error.value = 1; // Gán lỗi khi xảy ra exception
@@ -32,7 +69,7 @@ export const useCateStore = defineStore('categories', () => {
         }
     };
     
-    return { categories, fetchCategories};
+    return { categories, dataCatePro, fetchCategories};
 });
 
 

@@ -25,7 +25,7 @@
                     </div>                   
                 </li>   
                 <MenuContentMenuPhone 
-                v-for="(cate, index) in dataCatePro" 
+                v-for="(cate, index) in dataCategories" 
                 :key="index" 
                 :cate="cate" 
                 :openCategory="openCategory"
@@ -49,11 +49,11 @@
             </svg>
         </div>
 
-        <!-- <div class="z-20 absolute bottom-2 flex flex-wrap w-full text-center px-12">
-            <NuxtLink to="/article/privacy" class="text-xs w-1/3">Privacy</NuxtLink>
-            <NuxtLink to="/article/terms" class="text-xs w-1/3">Terms</NuxtLink>
-            <NuxtLink to="/" class="text-xs w-1/3"><i class="fa fa-info-circle" aria-hidden="true"></i></NuxtLink>
-        </div> -->
+        <div class="z-20 absolute bottom-2 flex flex-wrap w-full text-center px-12">
+            <NuxtLink to="/article/about-us" class="text-xs w-1/3" @click.prevent="toggleMobileMenu">About Us</NuxtLink>
+            <NuxtLink to="/contact" class="text-xs w-1/3" @click.prevent="toggleMobileMenu">Contact</NuxtLink>
+            <NuxtLink to="/" class="text-xs w-1/3" @click.prevent="toggleMobileMenu"><i class="fa fa-info-circle" aria-hidden="true"></i></NuxtLink>
+        </div>
     </div>
 </template>
 
@@ -80,7 +80,6 @@
     //-----------------------------------API-------------------------------------//
 
     const dataCategories = ref<Category[]>([]);
-    const dataCatePro = ref<Category[]>([]);
     const openCategory = ref<string | null>(null);
 
     const cateStores = useCateStore();
@@ -88,43 +87,7 @@
     const fetchCateData = async () => {
         await cateStores.fetchCategories();
         dataCategories.value = cateStores.categories || [];
-
-        dataCatePro.value = dataCateProcessing(dataCategories.value);
     };
-
-    const dataCateProcessing = (dataCate: Category[]): Category[] => {
-        const parentCate: Category[] = [];
-        const categoryMap = new Map<number, Category>(); // Map of category
-
-        // Gán từng danh mục vào Map
-        dataCate.forEach((cate) => {
-            categoryMap.set(cate.id, {...cate, children: [] });
-        });
-
-        //Gán các phần tử con vào đúng cha
-        dataCate.forEach((cate) => {
-            if (cate.parentId === 0) {
-                parentCate.push(categoryMap.get(cate.id)!);
-            } else {
-                const parent = categoryMap.get(cate.parentId);
-                if (parent) {
-                    parent.children?.push(categoryMap.get(cate.id)!);
-                }
-            }
-        });
-
-        // Sắp xếp danh mục theo `sort`
-        const sortCategories = (categories: Category[]): Category[] => {
-            return categories
-            .sort((a, b) => a.sort - b.sort)
-            .map((cate) => ({
-                ...cate,
-                children: cate.children ? sortCategories(cate.children) : [],
-            }));
-        };
-
-        return sortCategories(parentCate);
-    }
     fetchCateData();
     
 </script>

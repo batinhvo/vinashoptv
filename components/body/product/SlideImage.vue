@@ -67,12 +67,7 @@
     };
 
     // Mảng hình ảnh
-    const images: string[] = [
-        'upload/2024/12/product/d9cb61c5-dadc-4e3b-b4bb-966042adc84c.jpeg',
-        'upload/2024/12/product/50fa4de0-eec8-4bc5-b77b-aed75eb4bb88.jpeg',
-        'upload/2024/12/product/b9ef6ea9-794c-4252-8c9e-5e619dcf173a.jpeg',
-        'upload/2024/12/product/50fa4de0-eec8-4bc5-b77b-aed75eb4bb88.jpeg',
-    ];
+    const images: string[] = [];
 
     const data = defineProps<{
         dataImages: string;

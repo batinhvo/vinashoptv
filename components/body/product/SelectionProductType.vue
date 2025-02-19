@@ -5,9 +5,14 @@
             <span>Availability: </span>
             <span class="text-[#5cb85c] font-bold">{{ data.dataPro.totalOutFake }} in stock</span>
         </div>
-        <div class="flex items-end my-5">                           
-            <div class="text-4xl">${{ formatPrice(data.dataPro.minPrice) }}</div>       
-            <!-- <div class="text-lg line-through pl-3">$139.00</div>                      -->
+
+        <!-- Price -->
+        <div v-if="dataSkusfilter" class="flex items-end my-5">                           
+            <div class="text-4xl text-red-500">${{ formatPrice(dataSkusfilter.price) }}</div>       
+            <div v-if="dataSkusfilter.salePrice" class="text-lg line-through pl-3">${{ formatPrice(dataSkusfilter.salePrice) }}</div>                     
+        </div>
+        <div v-else class="flex items-end my-5">                           
+            <div class="text-4xl">${{ formatPrice(data.dataPro.minPrice) }}</div>                 
         </div>
 
         <!-- Type -->
@@ -72,10 +77,11 @@
     };
 
     ////////////////////////////////////////////////////////////
+    
     const dataVariant = ref<Variant[]>([]);
     const dataSkus = ref<Skus[]>([]);
     const selectedOptions = ref<Record<string, string>>({});
-    const dataSkusfilter = ref<Skus[]>([]);
+    const dataSkusfilter = ref<Skus | null>(null);
 
     const data = defineProps<{
         dataPro?: ProductDetails;
@@ -88,15 +94,8 @@
         isShowButton.value = true;
         selectedOptions.value = { ...selectedOptions.value, [key]: val };
        
-        dataSkusfilter.value = dataSkus.value.filter((sku) => sku.id === id) || null;
-        console.log(dataSkusfilter.value)
+        dataSkusfilter.value = dataSkus.value.find((sku) => sku.variantOptionIds === id.toString()) || null;
     };
-
-    // watch(selectedOptions, (newSelect) => {
-    //     console.log(newSelect)
-    // });
-
-    //console.log(dataSkus.value)
 </script> 
 
 <style lang="css" scoped>

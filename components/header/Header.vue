@@ -7,7 +7,7 @@
         <div class="container hidden xl:block">
             <div class="flex items-center py-2 xl:py-8">
                 <vinaLogo />
-                <HeaderSearchBar />
+                <HeaderSearchSearchbar />
                 <HeaderIconCartIcon />
             </div>
             <!-- menu -->
@@ -23,7 +23,7 @@
                 <div class="flex">
                 <MenuCategoryPhone />               
                 <div class="max-w-[250px]">
-                    <vinaLogo />
+                    <VinaLogo />
                 </div>
             </div>
             <div class="flex">

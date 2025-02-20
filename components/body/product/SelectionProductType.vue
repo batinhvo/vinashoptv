@@ -8,8 +8,14 @@
 
         <!-- Price -->
         <div v-if="dataSkusfilter" class="flex items-end my-5">                           
-            <div class="text-4xl text-red-500">${{ formatPrice(dataSkusfilter.price) }}</div>       
-            <div v-if="dataSkusfilter.salePrice" class="text-lg line-through pl-3">${{ formatPrice(dataSkusfilter.salePrice) }}</div>                     
+            <div class="text-4xl"
+            :class="[dataSkusfilter.salePrice && (dataSkusfilter.salePrice !== dataSkusfilter.price) ? 'text-red-500' : '']">
+                ${{ formatPrice(dataSkusfilter.price) }}
+            </div>      
+            <div v-if="dataSkusfilter.salePrice && (dataSkusfilter.salePrice !== dataSkusfilter.price)" 
+            class="text-lg line-through pl-3">
+                ${{ formatPrice(dataSkusfilter.salePrice) }}
+            </div>                     
         </div>
         <div v-else class="flex items-end my-5">                           
             <div class="text-4xl">${{ formatPrice(data.dataPro.minPrice) }}</div>                 
@@ -24,7 +30,7 @@
                 <button
                     v-for="varOpt in vari.options" :key="varOpt.id"
                     class="border border-gray-200 py-1 px-2 hover:shadow-inner hover:border-[#5cb85c] lg:hover:text-[#228322]"
-                    :class="[selectedOptions[vari.name] === varOpt.name ? 'bg-[#5cb85c] text-white' : '']"
+                    :class="[selectedOptions[vari.name]?.val === varOpt.name ? 'bg-[#5cb85c] text-white' : '']"
                     @click="selectOption(vari.name, varOpt.name, varOpt.id)">
                     {{ varOpt.name }}
                 </button>
@@ -76,26 +82,35 @@
         return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
     };
 
-    ////////////////////////////////////////////////////////////
+    // ---------------------------------------------------------
     
-    const dataVariant = ref<Variant[]>([]);
+    
     const dataSkus = ref<Skus[]>([]);
-    const selectedOptions = ref<Record<string, string>>({});
     const dataSkusfilter = ref<Skus | null>(null);
+    const selectedOptions = ref<Record<string, { val: string; id: number }>>({});
+    const ChoiceList = ref<string>('');
 
     const data = defineProps<{
         dataPro?: ProductDetails;
+        dataVariant?: Variant[];
     }>();
 
-    dataVariant.value = data.dataPro?.variants || [];
     dataSkus.value = data.dataPro?.skus || [];
 
     const selectOption = (key: string, val: string, id: number) => {
-        isShowButton.value = true;
-        selectedOptions.value = { ...selectedOptions.value, [key]: val };
-       
-        dataSkusfilter.value = dataSkus.value.find((sku) => sku.variantOptionIds === id.toString()) || null;
+        selectedOptions.value = { ...selectedOptions.value, [key]: {val, id} };
+        ChoiceList.value = Object.values(selectedOptions.value).map((val) => val.id).join(',');
     };
+
+    watch(ChoiceList, (newVal) => {
+        dataSkusfilter.value = dataSkus.value.find((sku) => sku.variantOptionIds === newVal) || null;
+        if(dataSkusfilter.value) {
+            isShowButton.value = true;
+        } else {
+            isShowButton.value = false;
+        }
+    });
+
 </script> 
 
 <style lang="css" scoped>

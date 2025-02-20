@@ -18,7 +18,7 @@
             <!-- main -->
             <div class="flex flex-wrap mb-6 mt-5 md:mt-0">
                 <div class="w-full md:w-1/2 lg:w-1/3 xl:w-5/12 px-4">
-                    <BodyProductSlideImage :dataImages="dataDetails.media" :dataAlt="dataDetails.title"/>              
+                    <BodyProductSlideImage :dataImages="listImages" :dataAlt="dataDetails.title"/>              
                 </div>
 
                 <div class="w-full md:w-1/2 lg:w-1/3 xl:w-4/12 px-4 mt-8 md:mt-0">
@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="w-full md:w-full lg:w-1/3 xl:w-3/12 px-4 mt-8 xl:mt-0">
-                    <BodyProductSelectionProductType :dataPro="dataDetails" />
+                    <BodyProductSelectionProductType :dataPro="dataDetails" :dataVariant="dataVariant" />
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-    import { type ProductDetails } from "types/productDetailTypes";
+    import type { ProductDetails, Variant } from "types/productDetailTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -52,8 +52,26 @@
 
     const slug = route.params.slug as string | '';
     const dataDetails = ref<ProductDetails | null>(null);
+    const dataVariant = ref<Variant[]>([]);
     const cateTitle = ref('');
     const cateSlug = ref('');
+
+    const listImages: string[] = [];
+    
+    const getImages = () => {
+        if(dataDetails.value) {
+            listImages.push(dataDetails.value.media) 
+        }
+
+        const mediaList = dataVariant.value
+        .flatMap(variant => variant.options
+        .map(option => option.media)
+        .filter(media => media !== ""));
+        
+        if(mediaList) {
+            listImages.push(...mediaList);
+        }
+    }
 
     const fetchDataProduct = async () => {
         await productDetailStore.fetchProductDetails(slug);
@@ -61,7 +79,11 @@
 
         cateTitle.value = cateStore.dataCatePro.find((cate) => cate.id === dataDetails.value?.categoryId)?.name || '';
         cateSlug.value = cateStore.dataCatePro.find((cate) => cate.id === dataDetails.value?.categoryId)?.slug || '';
+
+        dataVariant.value = dataDetails.value?.variants || [];
+        getImages();
     }
+
     fetchDataProduct();
 
 </script>

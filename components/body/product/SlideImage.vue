@@ -13,7 +13,7 @@
         :modules="[Thumbs, Navigation]"
         @slideChange="onSlideChange"
         >
-            <swiper-slide v-for="(image, index) in images" :key="index">
+            <swiper-slide v-for="(image, index) in dataImages" :key="index">
                 <!-- <img :src="image" class="w-full swiper-lazy" alt="Slide image" /> -->
                 <BodyProductImages :linkImg="image" :altImg="dataAlt" />
             </swiper-slide>
@@ -38,7 +38,7 @@
         :modules="[FreeMode, Thumbs]"
         class="mt-4"
         >
-            <swiper-slide v-for="(image, index) in images" :key="index" class="p-2 border border-gray-300 cursor-pointer" :class="{ 'active': activeIndex === index }">
+            <swiper-slide v-for="(image, index) in dataImages" :key="index" class="p-2 border border-gray-300 cursor-pointer" :class="{ 'active': activeIndex === index }">
                 <BodyProductImages :linkImg="image" :altImg="dataAlt" />
             </swiper-slide>
         </swiper>
@@ -66,15 +66,10 @@
         activeIndex.value = swiperInstance.realIndex; 
     };
 
-    // Mảng hình ảnh
-    const images: string[] = [];
-
     const data = defineProps<{
-        dataImages: string;
+        dataImages: string[];
         dataAlt: string;
     }>();
-
-    images.push(data.dataImages)
 </script>
 
 <style scoped>

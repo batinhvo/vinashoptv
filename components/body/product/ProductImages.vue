@@ -1,5 +1,5 @@
 <template>
-    <NuxtImg class="w-full" :src="Imgsource" :key="Imgsource" :alt="propImgs.altImg" crossorigin="anonymous" />
+    <img class="w-full" :src="Imgsource" :key="Imgsource" :alt="propImgs.altImg" crossorigin="anonymous" /> 
 </template>
 
 <script setup lang="ts">

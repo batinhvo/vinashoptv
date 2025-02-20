@@ -82,13 +82,15 @@
         return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
     };
 
-    // ---------------------------------------------------------
+    // ---------------------------------------------------------//
     
     
     const dataSkus = ref<Skus[]>([]);
     const dataSkusfilter = ref<Skus | null>(null);
     const selectedOptions = ref<Record<string, { val: string; id: number }>>({});
     const ChoiceList = ref<string>('');
+
+    const emit = defineEmits(['updateSlideImages']);
 
     const data = defineProps<{
         dataPro?: ProductDetails;
@@ -106,6 +108,7 @@
         dataSkusfilter.value = dataSkus.value.find((sku) => sku.variantOptionIds === newVal) || null;
         if(dataSkusfilter.value) {
             isShowButton.value = true;
+            emit('updateSlideImages', dataSkusfilter.value.variantOptionIds);
         } else {
             isShowButton.value = false;
         }

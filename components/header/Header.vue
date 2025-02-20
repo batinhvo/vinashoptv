@@ -6,7 +6,7 @@
         <!-- main-header-desktop -->
         <div class="container hidden xl:block">
             <div class="flex items-center py-2 xl:py-8">
-                <vinaLogo />
+                <VinaLogo />
                 <HeaderSearchBar />
                 <HeaderIconCartIcon />
             </div>

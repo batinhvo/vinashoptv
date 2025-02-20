@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="w-full md:w-full lg:w-1/3 xl:w-3/12 px-4 mt-8 xl:mt-0">
-                    <BodyProductSelectionProductType :dataPro="dataDetails" :dataVariant="dataVariant" />
+                    <BodyProductSelectionProductType :dataPro="dataDetails" :dataVariant="dataVariant" @updateSlideImages="updateSlideImages"/>
                 </div>
             </div>
         </div>
@@ -63,15 +63,25 @@
             listImages.push(dataDetails.value.media) 
         }
 
-        const mediaList = dataVariant.value
-        .flatMap(variant => variant.options
-        .map(option => option.media)
-        .filter(media => media !== ""));
+        const mediaList = dataVariant.value.flatMap(variant => variant.options.map(option => option.media).filter(media => media !== ""));
         
         if(mediaList) {
             listImages.push(...mediaList);
         }
     }
+
+    const updateSlideImages = (variantOptionIds: string) => {
+        const optId = variantOptionIds.split(",").map(Number); // Chuyển thành số
+
+        const mediaList = dataVariant.value.flatMap(variant =>
+            variant.options
+                .filter(option => optId.includes(option.id)) // Chỉ lấy option có id khớp
+                .map(option => option.media) // Lấy media của option đó
+        );
+
+        console.log(mediaList);
+    }
+
 
     const fetchDataProduct = async () => {
         await productDetailStore.fetchProductDetails(slug);

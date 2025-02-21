@@ -2,6 +2,7 @@
     <div>
         <!-- Main Slide -->
         <swiper
+         @swiper="onMainSwiper"
         :lazy="true"
         :slides-per-view="1"
         :loop="true"
@@ -13,9 +14,9 @@
         :modules="[Thumbs, Navigation]"
         @slideChange="onSlideChange"
         >
-            <swiper-slide v-for="(image, index) in dataImages" :key="index">
+            <swiper-slide v-for="(image, index) in dataImages" :key="image.id">
                 <!-- <img :src="image" class="w-full swiper-lazy" alt="Slide image" /> -->
-                <BodyProductImages :linkImg="image" :altImg="dataAlt" />
+                <BodyProductImages :linkImg="image.media" :altImg="dataAlt" />
             </swiper-slide>
             <!-- Custom Navigation Buttons -->
             <div class="custom-prev">
@@ -25,7 +26,7 @@
                 <i class="fa fa-arrow-right"></i>
             </div>
         </swiper>
-
+        
         <!-- Thumbnails Slide -->
         <swiper
         @swiper="onSwiper"
@@ -38,8 +39,8 @@
         :modules="[FreeMode, Thumbs]"
         class="mt-4"
         >
-            <swiper-slide v-for="(image, index) in dataImages" :key="index" class="p-2 border border-gray-300 cursor-pointer" :class="{ 'active': activeIndex === index }">
-                <BodyProductImages :linkImg="image" :altImg="dataAlt" />
+            <swiper-slide v-for="(image, index) in dataImages" :key="image.id" class="p-2 border border-gray-300 cursor-pointer" :class="{ 'active': activeIndex === index }">
+                <BodyProductImages :linkImg="image.media" :altImg="dataAlt" />
             </swiper-slide>
         </swiper>
     </div>
@@ -52,24 +53,40 @@
     import { Navigation } from 'swiper/modules';
     import 'swiper/swiper-bundle.css';
 
-    // Sử dụng kiểu `SwiperType` để khai báo
     const thumbsSwiper = ref<SwiperType | null>(null);
+    const mainSwiper = ref<SwiperType | null>(null); // Swiper chính
 
-    // Hàm xử lý sự kiện @swiper
     const onSwiper = (swiperInstance: SwiperType) => {
         thumbsSwiper.value = swiperInstance;
     };
 
-    // Cập nhật chỉ số slide hiện tại
+    const onMainSwiper = (swiperInstance: SwiperType) => {
+        mainSwiper.value = swiperInstance;
+    };
+
     const activeIndex = ref<number>(0);
+
     const onSlideChange = (swiperInstance: SwiperType) => {
         activeIndex.value = swiperInstance.realIndex; 
     };
 
     const data = defineProps<{
-        dataImages: string[];
+        dataImages: {id: number; media: string}[];
         dataAlt: string;
+        imageChoice?: number;
     }>();
+
+    watch(() => data.imageChoice, (newVal) => {
+        if (!newVal) return; 
+
+        if (mainSwiper.value) {
+            const index = data.dataImages.findIndex(img => img.id === newVal);
+            if (index !== -1) {
+                mainSwiper.value.slideTo(index);
+            }
+        } 
+    });
+    
 </script>
 
 <style scoped>

@@ -18,7 +18,7 @@
             <!-- main -->
             <div class="flex flex-wrap mb-6 mt-5 md:mt-0">
                 <div class="w-full md:w-1/2 lg:w-1/3 xl:w-5/12 px-4">
-                    <BodyProductSlideImage :dataImages="listImages" :dataAlt="dataDetails.title"/>              
+                    <BodyProductSlideImage :dataImages="listImages" :dataAlt="dataDetails.title" :imageChoice="imageChoice"/>              
                 </div>
 
                 <div class="w-full md:w-1/2 lg:w-1/3 xl:w-4/12 px-4 mt-8 md:mt-0">
@@ -55,33 +55,38 @@
     const dataVariant = ref<Variant[]>([]);
     const cateTitle = ref('');
     const cateSlug = ref('');
-
-    const listImages: string[] = [];
+    const imageChoice = ref(0);
+    const listImages = ref<{ id: number; media: string }[]>([]);
     
     const getImages = () => {
-        if(dataDetails.value) {
-            listImages.push(dataDetails.value.media) 
+        if (dataDetails.value) {
+            listImages.value = [{ id: dataDetails.value.id, media: dataDetails.value.media }];
         }
 
-        const mediaList = dataVariant.value.flatMap(variant => variant.options.map(option => option.media).filter(media => media !== ""));
-        
+        const mediaList = dataVariant.value.flatMap(variant => variant.options
+        .map(option => ({ id: option.id, media: option.media }))
+        .filter(item => item.media !== ""));
+
         if(mediaList) {
-            listImages.push(...mediaList);
+            listImages.value.push(...mediaList);
         }
     }
 
     const updateSlideImages = (variantOptionIds: string) => {
         const optId = variantOptionIds.split(",").map(Number); // Chuyển thành số
 
-        const mediaList = dataVariant.value.flatMap(variant =>
-            variant.options
-                .filter(option => optId.includes(option.id)) // Chỉ lấy option có id khớp
-                .map(option => option.media) // Lấy media của option đó
+        const selectedMedia = dataVariant.value.flatMap(
+            variant => variant.options.filter(
+                option => optId.includes(option.id) && option.media)
+                .map(option => ( option.id ))
         );
 
-        console.log(mediaList);
+        if(selectedMedia.length > 0) {
+            imageChoice.value = Number(selectedMedia.join(""));
+        } else {
+            imageChoice.value = 0;
+        }
     }
-
 
     const fetchDataProduct = async () => {
         await productDetailStore.fetchProductDetails(slug);

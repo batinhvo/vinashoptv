@@ -9,12 +9,19 @@
     }>();
 
     const Imgsource = ref<string>("");
-    
-    //------------------------------API------------------------------//
     const imageProductStore = useImagesProduct();
+    const defaultImage = "/images/default-images.jpg";
+
     const getImages = async () => {
-        Imgsource.value = await imageProductStore.fetchImagesProduct(propImgs.linkImg!) || '';
-    }
-    getImages();
-    
+        if (!propImgs.linkImg) {
+            Imgsource.value = defaultImage;
+            console.log("No linkImg provided, using default image:", defaultImage);
+            return;
+        }
+
+        Imgsource.value = await imageProductStore.fetchImagesProduct(propImgs.linkImg) || defaultImage;
+    };
+
+    // Theo dõi `linkImg`, nếu thay đổi thì fetch lại ảnh
+    watch(() => propImgs.linkImg, getImages, { immediate: true });
 </script>

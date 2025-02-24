@@ -2,6 +2,7 @@
     <div>
         <div>
             <NuxtImg :src="imgBanner" class="w-full" alt="" />
+             <!-- <BodyProductImages :src="cateImages" class="w-full" />{{ cateImages }} -->
         </div>
         <div class="container mx-auto min-h-[500px]">
             <div class="my-0 md:my-10">
@@ -47,6 +48,7 @@
     const productListData = ref<Products[]>([]);
     const totalProducts = ref(0);
     const cateTitle = ref('');
+    const cateImages = ref('');
     
     const params = ref({
         categoryId: 0,
@@ -74,8 +76,14 @@
 
         const category = cateStore.dataCatePro.find((cate) => cate.slug === slug);
         if (category) {
-            cateTitle.value = category.name;
             params.value.categoryId = category.id; // Gán ID vào params
+            cateTitle.value = category.name;
+            if(category.media) {
+                cateImages.value = category.media;
+            } else {
+                cateImages.value = "/images/banner/bg-banner-01.jpg";
+            }
+            console.log(cateImages.value)
         }
 
         updateProducts();

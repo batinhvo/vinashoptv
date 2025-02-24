@@ -14,8 +14,7 @@
 
     const getImages = async () => {
         if (!propImgs.linkImg) {
-            Imgsource.value = defaultImage;
-            console.log("No linkImg provided, using default image:", defaultImage);
+            Imgsource.value = defaultImage;           
             return;
         }
 

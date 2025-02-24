@@ -2,9 +2,9 @@
   <div class="container">
       <div class="mt-0 md:mt-10">
         <ul class="flex items-center bg-zinc-100 md:bg-white pl-2 xl:pl-0">
-          <li class="px-3 py-2 hover:bg-zinc-100 rounded hover:border hover:border-gray-200"><a href="/">Home</a></li>
+          <li class="px-3 py-2 hover:bg-zinc-100 rounded hover:border hover:border-gray-200"><NuxtLink to="/">Home</NuxtLink></li>
           <li class="px-2"><i class="ec ec-arrow-right-categproes"></i></li>
-          <li class="px-3 py-2 md:bg-zinc-100 hover:bg-gray-200 rounded md:border md:border-gray-100"><a href="/contact">Contacts</a></li>
+          <li class="px-3 py-2 md:bg-zinc-100 hover:bg-gray-200 rounded md:border md:border-gray-100"><NuxtLink to="/contact">Contacts</NuxtLink></li>
         </ul>
       </div>
       <div class="container my-10">
@@ -22,12 +22,12 @@
             <!-- form -->
             <form @submit.prevent="onSubmit">
               <div class="flex flex-wrap mt-8">
-                <InputField name="firstName" v-model="firstName" rules="required" label="First Name" placeholder="enter your first name" />
-                <InputField name="lastName" v-model="lastName" rules="required" label="Last Name" placeholder="enter your last name" />
-                <InputField name="phone" v-model="phone" rules="required|phone" label="Phone" placeholder="enter your phone number" />
-                <InputField name="email" v-model="email" rules="required|email" label="Email" type="email" placeholder="enter your email address" />
-                <InputField name="title" v-model="title" label="Title" rules="required" placeholder="title is...." :widthfull=true />
-                <InputField name="message" v-model="message" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." :widthfull=true />
+                <InputField name="firstName" v-model="formDataContact.firstName" rules="required" label="First Name" placeholder="enter your first name" />
+                <InputField name="lastName" v-model="formDataContact.lastName" rules="required" label="Last Name" placeholder="enter your last name" />
+                <InputField name="phone" v-model="formDataContact.phone" rules="required|phone" label="Phone" placeholder="enter your phone number" />
+                <InputField name="email" v-model="formDataContact.email" rules="required|email" label="Email" type="email" placeholder="enter your email address" />
+                <InputField name="title" v-model="formDataContact.title" label="Title" rules="required" placeholder="title is...." :widthfull=true />
+                <InputField name="message" v-model="formDataContact.content" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." :widthfull=true />
                 <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                   Send Message
                 </button>
@@ -67,16 +67,46 @@
 </template>
 
 <script setup lang="ts">
-  const firstName = ref('');
-  const lastName = ref('');
-  const phone = ref('');
-  const email = ref('');
-  const title = ref('');
-  const message = ref('');
 
-  const { handleSubmit } = useForm();
-  const onSubmit = handleSubmit(() => {
-      alert(123)
+  const formDataContact = ref({
+    content: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    title: '',
+  });
+
+  const notify = useNotify();
+  const { handleSubmit, resetForm  } = useForm();
+
+  const onSubmit = handleSubmit( async () => {
+    
+    try {
+      const postData = await $fetch('https://vinashoptv.com/api/v1/comments/contact', {
+        method: 'POST',
+        body: formDataContact.value,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      notify({
+        message: 'Successfully',
+        type: 'success',
+        time: 1000
+      });
+      resetForm();
+
+    } catch(e: any) {
+      notify({
+        message: 'Error',
+        type: 'error',
+        time: 1000
+      });
+      console.error('form contac: ', e);
+    }
+
   });
 </script>
 

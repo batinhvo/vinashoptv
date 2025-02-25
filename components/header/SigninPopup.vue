@@ -43,7 +43,22 @@
 <script setup lang="ts">
     import { useForm, ErrorMessage } from 'vee-validate';
 
+    interface DataUser {
+        accessToken: string,
+        name: string,
+        refreshToken: string,
+    }
+
+    const authStore = useAuthStore(); // Sử dụng store
+
+    const signIn = defineProps<{
+        toggleOpenSignIn: () => void,
+    }>();
+
     const notify = useNotify();
+    const config = useRuntimeConfig();
+    const apiUrl = config.public.apiBaseUrl;
+    
     const formData = ref({
         email: '',
         password: '',
@@ -52,25 +67,35 @@
     const emailError = computed(() => { return !!errors.value.email;});
     const passError = computed(() => { return !!errors.value.password;});
 
-    const { handleSubmit, errors } = useForm({
-        initialValues: formData.value
-    });
-    const onSubmit = handleSubmit(() => {
-        
-        if (formData.value.email === 'tinh.vo@lldtek.com' && formData.value.password === 'tinhvo0123') {
-            localStorage.setItem('user', JSON.stringify({
-                email: formData.value.email,
-                password: formData.value.password
-            }));
-            // Điều hướng đến trang người dùng
-            window.location.replace('/user');               
-        } else {
+    const { handleSubmit, errors, resetForm } = useForm();
+
+    const onSubmit = handleSubmit( async () => {
+
+        try {
+            const response = await $fetch<{ error: number; data: DataUser; message: string }>(`${apiUrl}auth/login`, {
+                method: 'POST',
+                body: formData.value,
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data) {
+                authStore.setUser(response.data); // Cập nhật store
+            }
+            
+            signIn.toggleOpenSignIn();
+            resetForm();
+
+        } catch(e: any) {
             notify({
-                message: 'Invalid email or password',
+                message: 'Error',
                 type: 'error',
                 time: 1000
             });
-        }         
+            console.error('form contac: ', e);
+        }
+        
     });
 </script>
 

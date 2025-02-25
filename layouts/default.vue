@@ -7,6 +7,5 @@
 </template>
 
 <script setup lang="ts">
-    const { loadUser } = useAuth();
-    loadUser();
+   
 </script>

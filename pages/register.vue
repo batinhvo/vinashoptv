@@ -20,18 +20,18 @@
               <!-- form -->
               <form @submit.prevent="onSubmit">
                 <div class="flex flex-wrap mt-8">
-                  <InputField name="firstName" v-model="formData.firstName" label="First Name" rules="required" placeholder="enter your first name" />
-                  <InputField name="lastName" v-model="formData.lastName" label="Last Name" rules="required" placeholder="enter your last name" />
-                  <InputField name="email" v-model="formData.email" label="Email Address" rules="required|email|emailExist" type="email" placeholder="info@vinashoptv.com" />
-                  <InputField name="phone" v-model="formData.phone" label="Phone Number" rules="required|phone" placeholder="(000) 000-0000" />
-                  <InputField name="password" v-model="formData.password" label="Password" rules="required" placeholder="********" type="password" />
-                  <InputField name="confPassword" v-model="formData.confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" />
-                  <InputSelective name="state" label="State" v-model="formData.state" rules="required" :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
-                  <InputSelective name="city" label="City" v-model="formData.city" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
-                  <InputField name="postCode" v-model="formData.postCode" label="PostCode/Zip" rules="required" placeholder="9999" />
-                  <InputField name="address" v-model="formData.address" label="Street Address" rules="required" placeholder="123 street" />
-                  <InputCheckBox name="angree" v-model="formData.angree" widthfull rules="booRequired" :value="true" label="I agree to the Terms & Consditions." />
-                  <InputCheckBox name="receiveEmail" v-model="formData.receiveEmail" widthfull :isStrong="false" :value="true" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
+                  <InputField name="firstName" v-model="formDataSubmit.firstName" label="First Name" rules="required" placeholder="enter your first name" />
+                  <InputField name="lastName" v-model="formDataSubmit.lastName" label="Last Name" rules="required" placeholder="enter your last name" />
+                  <InputField name="email" v-model="formDataSubmit.email" label="Email Address" rules="required|email|emailExist" type="email" placeholder="info@vinashoptv.com" />
+                  <InputField name="phone" v-model="formDataSubmit.phone" label="Phone Number" rules="required|phone" placeholder="(000) 000-0000" />
+                  <InputField name="password" v-model="formDataSubmit.password" label="Password" rules="required" placeholder="********" type="password" />
+                  <InputField name="confPassword" v-model="confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" />
+                  <InputSelective name="state" label="State" v-model="formDataSubmit.state" rules="required" :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
+                  <InputSelective name="city" label="City" v-model="formDataSubmit.cityId" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
+                  <InputField name="postCode" v-model="formDataSubmit.zip" label="PostCode/Zip" rules="required" placeholder="9999" />
+                  <InputField name="address" v-model="formDataSubmit.address" label="Street Address" rules="required" placeholder="123 street" />
+                  <InputCheckBox name="angree" v-model="angree" widthfull rules="booRequired" :value="true" label="I agree to the Terms & Consditions." />
+                  <InputCheckBox name="receiveEmail" v-model="formDataSubmit.receiveEmail" widthfull :isStrong="false" :value="true" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
                   
                   <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                     Send Message
@@ -45,26 +45,54 @@
   </template>
   
 <script setup lang="ts">
- 
-  const formData = ref({
-    state: '',
-    city: '',
+  const confPassword = ref();
+  const angree = ref(true);
+
+  const formDataSubmit = ref({
+    address: '',
+    cityId: 0,
+    country: 'US',
+    email: '',
     firstName: '',
     lastName: '',
-    email: '',
     password: '',
-    confPassword: '',
     phone: '',
-    postCode: '',
-    address: '',
-    angree: false,
     receiveEmail: false,
+    state: '',
+    zip: '',
   });
 
-  const { handleSubmit } = useForm();
-  const onSubmit = handleSubmit(() => {
-      alert("submitting")
-      console.log(formData.value)
+  const config = useRuntimeConfig();
+  const apiUrl = config.public.apiBaseUrl;
+  const notify = useNotify();
+  const { handleSubmit, resetForm } = useForm();
+
+  const onSubmit = handleSubmit( async () => {
+
+    try {
+      const postData = await $fetch(`${apiUrl}auth/register`, {
+        method: 'POST',
+        body: formDataSubmit.value,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      notify({
+        message: 'Registered! Now you can use this account to login!',
+        type: 'success',
+        time: 2000
+      });
+      resetForm();
+
+    } catch(e: any) {
+      notify({
+        message: 'Registration Error!!!',
+        type: 'error',
+        time: 1000
+      });
+      console.error('form contac: ', e);
+    }
   });
 
   //--------------------------------API-------------------------------------//
@@ -78,9 +106,11 @@
 
   const stateOnSelected = (value: string) => {
     newStateSelect.value = value;
+    formDataSubmit.value.state = stateStore.states.find((sta) => sta.name === value)?.code ?? '';
+
   }
   const cityOnSelected = (value: string) => {
-    console.log('Selected value:', value)
+    formDataSubmit.value.cityId = Number((stateStore.cities.find((city) => city.name === value)?.id)) || 0;
   }
 
   watch(newStateSelect, async (newState) => {

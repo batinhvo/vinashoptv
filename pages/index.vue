@@ -4,9 +4,18 @@
     <BodyHomeBestSeller />
     <BodyHomeMainSeller />
     <BodyHomeBigDiscount />
+
+    <ModalPages v-if="showSubcribe" @close="showSubcribe = false">
+      <template #body>
+        <ModalPopupSubcribeDiscount />
+      </template>
+      <template #actions>
+        <button class="w-full m-4 mt-0 px-5 py-3 text-black text-lg bg-[#26d000] rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Subcribe</button>
+      </template>
+    </ModalPages>
   </div>
 </template>
 
 <script setup lang="ts">
-  fetch("https://vinashoptv.com/api/v1/products");
+  const showSubcribe = ref(false);
 </script>

@@ -25,7 +25,7 @@
                 <i class="ec ec-close-remove"></i>
             </button>
         </div>
-        <HeaderSignInPopup />
+        <HeaderSignInPopup :toggleOpenSignIn="toggleOpenSignIn" />
     </div>
 
     <!-- edit profile -->
@@ -80,7 +80,7 @@
 
 
     //signed
-    const {user, logout} = useAuth(); 
+    const {user, logout} = useAuthStore(); 
 
     const isOpenChoice = ref(false);
     function toggleOpenChoice() {

@@ -77,13 +77,15 @@
     title: '',
   });
 
+  const config = useRuntimeConfig();
+  const apiUrl = config.public.apiBaseUrl;
   const notify = useNotify();
   const { handleSubmit, resetForm  } = useForm();
 
   const onSubmit = handleSubmit( async () => {
     
     try {
-      const postData = await $fetch('https://vinashoptv.com/api/v1/comments/contact', {
+      const postData = await $fetch(`${apiUrl}comments/contact`, {
         method: 'POST',
         body: formDataContact.value,
         headers: {
@@ -92,9 +94,9 @@
       });
 
       notify({
-        message: 'Successfully',
+        message: 'Successfully! We will contact you soon.',
         type: 'success',
-        time: 1000
+        time: 1500
       });
       resetForm();
 

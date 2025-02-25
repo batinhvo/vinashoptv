@@ -1,8 +1,7 @@
 <template>
     <div>
         <div>
-            <NuxtImg :src="imgBanner" class="w-full" alt="" />
-             <!-- <BodyProductImages :src="cateImages" class="w-full" />{{ cateImages }} -->
+            <NuxtImg :src="Imgsource" class="w-full" alt="" crossorigin="anonymous" />         
         </div>
         <div class="container mx-auto min-h-[500px]">
             <div class="my-0 md:my-10">
@@ -37,18 +36,17 @@
 <script setup lang="ts">
     import { type Products } from "types/productTypes";
 
-    const imgBanner = '/images/banner/bg-banner-01.jpg';
-
     //----------------------------API------------------------------------//
     const route = useRoute();
     const cateStore = useCateStore();
     const productStore = useProductStore();
+    const imageProductStore = useImagesProduct();
 
-    const slug = route.params.slug as string;
     const productListData = ref<Products[]>([]);
+    const slug = route.params.slug as string;
+    const Imgsource = ref<string>("");
     const totalProducts = ref(0);
     const cateTitle = ref('');
-    const cateImages = ref('');
     
     const params = ref({
         categoryId: 0,
@@ -78,17 +76,18 @@
         if (category) {
             params.value.categoryId = category.id; // Gán ID vào params
             cateTitle.value = category.name;
+
             if(category.media) {
-                cateImages.value = category.media;
+                const imageLink = encodeURIComponent(category.media)
+                Imgsource.value = await imageProductStore.fetchImagesProduct(imageLink) || 'sai';
             } else {
-                cateImages.value = "/images/banner/bg-banner-01.jpg";
-            }
-            console.log(cateImages.value)
+                Imgsource.value = "/images/banner/bg-banner-01.jpg";
+            }       
         }
 
         updateProducts();
     };
-    
+
     fetchData();
 </script>
 

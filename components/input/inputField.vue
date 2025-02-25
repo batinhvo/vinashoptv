@@ -21,7 +21,7 @@
 
     const props = defineProps({
         name: { type: String, required: true },
-        label: { type: String, required: true },
+        label: { type: String, default: '' },
         type: { type: String, default: 'text' },
         widthfull: { type: Boolean, default: false },
         placeholder: { type: String, default: '' },

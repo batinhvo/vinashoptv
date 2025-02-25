@@ -10,7 +10,7 @@
                 <div class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-user text-lg mr-1"></i>
                     <div v-if="user" class="relative group cursor-pointer">                       
-                        {{ user.email }}
+                        {{ user.name }}
                         <div class="w-40 absolute z-50 py-3 hidden group-hover:block">
                             <div class="bg-white border border-gray-200 shadow-xl py-3">                               
                                 <NuxtLink to="/user" class="block py-1.5 px-5 hover:bg-zinc-200">Profile</NuxtLink>                                    
@@ -56,10 +56,9 @@
                     <i class="ec ec-close-remove"></i>
                 </button>
             </div>
-            <HeaderSignInPopup />            
+            <HeaderSignInPopup :toggleOpenSignIn="toggleOpenSignIn" />            
         </div>
     </div>
-
     
 </template>
 
@@ -84,9 +83,6 @@
         }
     }
 
-    //signed
-    const {user, logout} = useAuth();    
-
     //show modal
     const showchangePass = ref(false);
     const openChangePass = () => {
@@ -97,6 +93,8 @@
     const openEditProfile = () => {
         showModalProfile.value = true;
     };
+
+    const {user, logout} = useAuthStore();    
 </script>
 
 <style lang="css" scoped>

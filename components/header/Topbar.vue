@@ -9,15 +9,15 @@
                 <span class="text-gray-5">|</span>
                 <div class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-user text-lg mr-1"></i>
-                    <div v-if="user" class="relative group cursor-pointer">                       
-                        {{ user.name }}
+                    <div v-if="isAuthenticated" class="relative group cursor-pointer">                       
+                        {{ user?.name }}
                         <div class="w-40 absolute z-50 py-3 hidden group-hover:block">
                             <div class="bg-white border border-gray-200 shadow-xl py-3">                               
                                 <NuxtLink to="/user" class="block py-1.5 px-5 hover:bg-zinc-200">Profile</NuxtLink>                                    
                                 <button @click.prevent="openEditProfile" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Edit Profile</button>
                                 <button @click.prevent="openChangePass" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Change Password</button>
                                 <NuxtLink to="/user/orderhistory" class="block py-1.5 px-5 hover:bg-zinc-200">Your Orders</NuxtLink>
-                                <button @click="logout" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
+                                <button @click="userLogout" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
                             </div>
                         </div>
                     </div>
@@ -68,6 +68,12 @@
     const modalPopupChangePassRef = ref<InstanceType<typeof ModalPopupChangePass> | null>(null);
     const modalPopupEditProfileRef = ref<InstanceType<typeof ModalPopupEditProfile> | null>(null);
 
+    const showchangePass = ref(false);
+    const openChangePass = () => { showchangePass.value = true };
+
+    const showModalProfile = ref(false);
+    const openEditProfile = () => { showModalProfile.value = true };
+
     const isOpenSignIn = ref(false);
     const isSignInVisible = ref(false);
 
@@ -83,18 +89,14 @@
         }
     }
 
-    //show modal
-    const showchangePass = ref(false);
-    const openChangePass = () => {
-        showchangePass.value = true;
+    const router = useRouter();
+    const userLogout = () => {
+        logout();
+        router.push('/');
     };
 
-    const showModalProfile = ref(false);
-    const openEditProfile = () => {
-        showModalProfile.value = true;
-    };
+    const { user, isAuthenticated, logout } = useAuthStore();
 
-    const {user, logout} = useAuthStore();    
 </script>
 
 <style lang="css" scoped>

@@ -5,19 +5,37 @@ export const useAuthStore = () => {
         refreshToken: string,
     }
 
-    const user = useState<DataUser | null>('user', () => null);
+    // Hàm gọi API để xác thực accessToken
+    // const config = useRuntimeConfig();
+    // const apiUrl = config.public.apiBaseUrl;
+    // const verifyToken = async (token: string): Promise<boolean> => {
+    //     try {
+    //         const response = await fetch(`${apiUrl}auth/login`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
+    //         const data = await response.json();
+    //         return data.valid; // Giả sử API trả về { valid: true } nếu token hợp lệ
+    //     } catch (error) {
+    //         return false;
+    //     }
+    // };
 
-    // Chỉ chạy trên client để tránh lỗi SSR
-    onMounted(() => {
+    // Kiểm tra nếu đang chạy trên client
+    const getUserFromLocalStorage = () => {
         if (process.client) {
             const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                user.value = JSON.parse(storedUser);
-            }
+            return storedUser ? JSON.parse(storedUser) : null;
         }
-    });
+        return null;
+    };
 
-    // Cập nhật user vào localStorage khi có thay đổi
+    const user = useState<DataUser | null>('user', () => getUserFromLocalStorage());
+
+    // Cập nhật localStorage khi user thay đổi
     watch(user, (newUser) => {
         if (process.client) {
             if (newUser) {
@@ -26,7 +44,7 @@ export const useAuthStore = () => {
                 localStorage.removeItem('user');
             }
         }
-    }, { deep: true });
+    });
 
     // Hàm đăng nhập (set user)
     const setUser = (newUser: DataUser | null) => {
@@ -38,9 +56,13 @@ export const useAuthStore = () => {
         user.value = null;
     };
 
+    // Kiểm tra xem user đã đăng nhập chưa
+    const isAuthenticated = computed(() => !!user.value);
+
     return {
         user,
         setUser,
         logout,
+        isAuthenticated,
     };
 };

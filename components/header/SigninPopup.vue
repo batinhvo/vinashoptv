@@ -49,12 +49,12 @@
         refreshToken: string,
     }
 
-    const authStore = useAuthStore(); // Sử dụng store
-
     const signIn = defineProps<{
         toggleOpenSignIn: () => void,
     }>();
 
+    const { setUser, user } = useAuthStore(); // Sử dụng store
+    const router = useRouter();
     const notify = useNotify();
     const config = useRuntimeConfig();
     const apiUrl = config.public.apiBaseUrl;
@@ -64,24 +64,27 @@
         password: '',
     });
 
+    //check error
     const emailError = computed(() => { return !!errors.value.email;});
     const passError = computed(() => { return !!errors.value.password;});
 
+    //login user--------------------------------------------
     const { handleSubmit, errors, resetForm } = useForm();
 
     const onSubmit = handleSubmit( async () => {
-
         try {
             const response = await $fetch<{ error: number; data: DataUser; message: string }>(`${apiUrl}auth/login`, {
                 method: 'POST',
                 body: formData.value,
                 headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user?.value?.accessToken || ''}`
                 }
             });
 
             if (response.data) {
-                authStore.setUser(response.data); // Cập nhật store
+                setUser(response.data); // Cập nhật store
+                router.push("/");
             }
             
             signIn.toggleOpenSignIn();
@@ -89,13 +92,12 @@
 
         } catch(e: any) {
             notify({
-                message: 'Error',
+                message: 'The email account is not registered!',
                 type: 'error',
-                time: 1000
+                time: 2000
             });
             console.error('form contac: ', e);
         }
-        
     });
 </script>
 

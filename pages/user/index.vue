@@ -58,10 +58,12 @@
     const stateName = computed(() => stateStore.states.find((state) => state.code === authStore.userInfo?.state)?.name);
     const cityName = computed(() => stateStore.cities.find((city) => city.id === authStore.userInfo?.cityId)?.name);
 
-    onMounted(async () => {
+    const fetchInfomationUser = async () => {
         await authStore.getInfoUser();
         await stateStore.fetchStates();  
         await stateStore.fetchCities(authStore.userInfo?.state || '');
-    });
+    }
+
+    fetchInfomationUser();
 </script>
 

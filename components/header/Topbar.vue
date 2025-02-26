@@ -32,7 +32,7 @@
         <!-- edit profile -->
         <ModalPages v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
             <template #body>
-                <ModalPopupEditProfile ref="modalPopupEditProfileRef"/>
+                <ModalPopupEditProfile ref="modalPopupEditProfileRef" :userData="authStore.userInfo"/>
             </template>
             <template #actions>
                 <button @click.prevent="modalPopupEditProfileRef?.submitForm()" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
     import type { ModalPopupChangePass, ModalPopupEditProfile } from '.nuxt/components';
+    import type { UserInfo } from 'types/userTypes';
 
     const modalPopupChangePassRef = ref<InstanceType<typeof ModalPopupChangePass> | null>(null);
     const modalPopupEditProfileRef = ref<InstanceType<typeof ModalPopupEditProfile> | null>(null);
@@ -94,15 +95,15 @@
     const router = useRouter();
     const authStore = useAuthStore();
 
-    onMounted(() => {
-        authStore.restoreUser();
-    });
-
     const logOutUser = () => {
         authStore.logOut();
         router.push('/');
     }
 
+    onMounted( async () => {
+        authStore.restoreUser();
+        await authStore.getInfoUser();
+    });
 </script>
 
 <style lang="css" scoped>

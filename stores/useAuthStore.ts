@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
-        async getInfoUser():Promise<void> {
+        async getInfoUser() {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
                 const token = useCookie('token').value;

@@ -51,7 +51,13 @@
 
     onMounted(async () => {
         await stateStore.fetchStates();
+
     });
+
+
+
+
+
 
     //submit
     const emit = defineEmits();
@@ -60,6 +66,8 @@
         //emit('submitEvent');
         alert(123)
     });
-    defineExpose({submitForm:onSubmit});
+
+
+    
 
 </script>

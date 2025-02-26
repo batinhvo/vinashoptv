@@ -45,6 +45,8 @@
   </template>
   
 <script setup lang="ts">
+
+  definePageMeta({middleware: 'auth-middle'})
   const confPassword = ref();
   const angree = ref(true);
 

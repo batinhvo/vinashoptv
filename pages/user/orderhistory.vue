@@ -74,6 +74,8 @@
 </template>
 
 <script setup lang="ts">
+    definePageMeta({middleware: 'auth-middle'})
+
     const isOpenDetails = ref(false);
     const OpenDetails = () => {
         isOpenDetails.value = !isOpenDetails.value;

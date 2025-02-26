@@ -1,68 +1,88 @@
-export const useAuthStore = () => {
-    interface DataUser {
-        accessToken: string,
-        name: string,
-        refreshToken: string,
-    }
+import type { DataUser, InputDataLogin, UserInfo } from "types/userTypes";
 
-    // Hàm gọi API để xác thực accessToken
-    // const config = useRuntimeConfig();
-    // const apiUrl = config.public.apiBaseUrl;
-    // const verifyToken = async (token: string): Promise<boolean> => {
-    //     try {
-    //         const response = await fetch(`${apiUrl}auth/login`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         });
-    //         const data = await response.json();
-    //         return data.valid; // Giả sử API trả về { valid: true } nếu token hợp lệ
-    //     } catch (error) {
-    //         return false;
-    //     }
-    // };
+export const useAuthStore = defineStore('auth', {
 
-    // Kiểm tra nếu đang chạy trên client
-    const getUserFromLocalStorage = () => {
-        if (process.client) {
-            const storedUser = localStorage.getItem('user');
-            return storedUser ? JSON.parse(storedUser) : null;
-        }
-        return null;
-    };
+    state: () => ({
+        authenticated: false,
+        user: null as string | null,
+        userInfo: null as UserInfo | null,
+    }),
 
-    const user = useState<DataUser | null>('user', () => getUserFromLocalStorage());
+    actions: {
+        async authenticateUser({email, password}: InputDataLogin) {
+            try {
+                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const userResponse = await $fetch<{ error: number; data: DataUser; message: string }>(`${apiUrl}auth/login`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: {
+                        email, password,
+                    }
+                });
 
-    // Cập nhật localStorage khi user thay đổi
-    watch(user, (newUser) => {
-        if (process.client) {
-            if (newUser) {
-                localStorage.setItem('user', JSON.stringify(newUser));
+                if (userResponse.data) {
+                    const tokenAccess = useCookie('token');
+                    tokenAccess.value = userResponse.data.accessToken;
+                    
+                    localStorage.setItem('user', JSON.stringify(userResponse.data.name));
+                    
+                    this.user = userResponse.data.name;
+                    this.authenticated = true;
+                }
+            } catch (e: any) {
+                console.error("Login failed: ", e);
+            }; 
+        },
+
+        logOut() {
+            const tokenAccess = useCookie('token'); // useCookie new hook in nuxt 3
+            tokenAccess.value = null; // clear the token cookie
+            localStorage.removeItem('user');
+
+            this.authenticated = false; // set authenticated  state value to false
+            this.user = null;
+        },
+
+        restoreUser() {
+            const token = useCookie('token');
+            const userData = localStorage.getItem('user');
+
+            if (token && userData) {
+                try {
+                    this.user = JSON.parse(userData);
+                    this.authenticated = true;
+                } catch (error) {
+                    console.error('Error parsing user data:', error);
+                    this.authenticated = false;
+                    this.user = null;
+                }
             } else {
-                localStorage.removeItem('user');
+                this.authenticated = false;
+                this.user = null;
+            }
+        },
+
+        async getInfoUser():Promise<void> {
+            try {
+                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const token = useCookie('token').value;
+
+                const infoUserResponse = await $fetch<{error: number; data: UserInfo; message: string }>(`${apiUrl}user/info`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type" : "application/json",
+                        "Authorization" : `Bearer ${token || ""}`,
+                    },
+                });
+
+                if (infoUserResponse.data) {
+                    this.userInfo = infoUserResponse.data;
+                }
+            } catch (e: any) {
+                console.error('Error get info user: ', e)
             }
         }
-    });
-
-    // Hàm đăng nhập (set user)
-    const setUser = (newUser: DataUser | null) => {
-        user.value = newUser;
-    };
-
-    // Hàm đăng xuất
-    const logout = () => {
-        user.value = null;
-    };
-
-    // Kiểm tra xem user đã đăng nhập chưa
-    const isAuthenticated = computed(() => !!user.value);
-
-    return {
-        user,
-        setUser,
-        logout,
-        isAuthenticated,
-    };
-};
+    },
+});

@@ -11,35 +11,35 @@
             <h1 class="text-4xl font-normal pb-10 text-center">My Profile</h1>
             <div class="bg-zinc-100 border border-gray-300 shadow-lg p-2 md:p-5 mt-5 lg:mx-40 xl:mx-60">
                 <table class="w-full border border-gray-300 ">                    
-                    <tbody class="bg-white shadow-inner">         
+                    <tbody class="bg-white shadow-inner" v-if="authStore.authenticated">         
                         <tr class="h-5"><td></td><td></td></tr>                
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">Name :</td>
-                            <td class="pl-6">Ba Tinh Vo</td>                                                                              
+                            <td class="pl-6">{{authStore.userInfo?.firstName + " " + authStore.userInfo?.lastName }}</td>                                                                              
                         </tr>      
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">Phone :</td>
-                            <td class="pl-6">8523697412</td>                                                                              
+                            <td class="pl-6">{{ authStore.userInfo?.phone }}</td>                                                                              
                         </tr>    
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">Email :</td>
-                            <td class="pl-6">info@gmail.com</td>                                                                              
+                            <td class="pl-6">{{ authStore.userInfo?.email }}</td>                                                                              
                         </tr>       
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">State :</td>
-                            <td class="pl-6">Texas</td>                                                                              
+                            <td class="pl-6">{{ stateName }}</td>                                                                              
                         </tr>    
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">City :</td>
-                            <td class="pl-6">Houston</td>                                                                              
+                            <td class="pl-6">{{ cityName }}</td>                                                                              
                         </tr>    
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">Postcode/Zip :</td>
-                            <td class="pl-6">78012</td>                                                                              
+                            <td class="pl-6">{{ authStore.userInfo?.zip }}</td>                                                                              
                         </tr>  
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">Street address :</td>
-                            <td class="pl-6">9999 Bellaire Blvd., Suite 1111, Houston, TX 77036</td>                                                                                                          
+                            <td class="pl-6">{{ authStore.userInfo?.address }}</td>                                                                                                          
                         </tr>  
                         <tr class="h-5"><td></td><td></td></tr>  
                     </tbody>
@@ -50,38 +50,18 @@
 </template>
 
 <script setup lang="ts">
-    const isOpenDetails = ref(false);
+    definePageMeta({middleware: 'auth-middle'});
 
-    const OpenDetails = () => {
-        isOpenDetails.value = !isOpenDetails.value;
-    }
+    const authStore = useAuthStore();
+    const stateStore = useStateStore();
 
-    const activeDropdownId = ref('');
-    const phoneOfSelected = ref('Shipping');
-    const statusSelected = ref('Pending');
+    const stateName = computed(() => stateStore.states.find((state) => state.code === authStore.userInfo?.state)?.name);
+    const cityName = computed(() => stateStore.cities.find((city) => city.id === authStore.userInfo?.cityId)?.name);
 
-    const PhoneOpt = ['Shipping', 'Billing'];
-    const statusOpt = ['All', 'Unable', 'Pending', 'Shipped', 'Cancelled', 'Returned'];
-
-    function setActiveDropdownId(id: string) {
-        activeDropdownId.value = id;
-    }
-    function setPhoneOf(PhoneOpt: string) {
-        phoneOfSelected.value = PhoneOpt;
-    }
-    function setStatus(statusOpt: string) {
-        statusSelected.value = statusOpt;
-    }
+    onMounted(async () => {
+        await authStore.getInfoUser();
+        await stateStore.fetchStates();  
+        await stateStore.fetchCities(authStore.userInfo?.state || '');
+    });
 </script>
 
-<style lang="css" scoped>
-    input[type="number"]::-webkit-inner-spin-button, 
-    input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    input[type="number"] {
-        -moz-appearance: textfield; /* Ẩn trên Firefox */
-        appearance: none;
-    }
-</style>

@@ -4,7 +4,7 @@ interface State {
 }
 
 interface City {
-    id: bigint;
+    id: number;
     name: string;
 }
 

@@ -9,15 +9,15 @@
                 <span class="text-gray-5">|</span>
                 <div class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-user text-lg mr-1"></i>
-                    <div v-if="isAuthenticated" class="relative group cursor-pointer">                       
-                        {{ user?.name }}
+                    <div v-if="authStore.authenticated" class="relative group cursor-pointer">                       
+                        {{ authStore.user }}
                         <div class="w-40 absolute z-50 py-3 hidden group-hover:block">
                             <div class="bg-white border border-gray-200 shadow-xl py-3">                               
                                 <NuxtLink to="/user" class="block py-1.5 px-5 hover:bg-zinc-200">Profile</NuxtLink>                                    
                                 <button @click.prevent="openEditProfile" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Edit Profile</button>
                                 <button @click.prevent="openChangePass" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Change Password</button>
                                 <NuxtLink to="/user/orderhistory" class="block py-1.5 px-5 hover:bg-zinc-200">Your Orders</NuxtLink>
-                                <button @click="userLogout" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
+                                <button @click="logOutUser" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
                             </div>
                         </div>
                     </div>
@@ -89,13 +89,19 @@
         }
     }
 
-    const router = useRouter();
-    const userLogout = () => {
-        logout();
-        router.push('/');
-    };
+    //-----------------------------------------------------------------------//
 
-    const { user, isAuthenticated, logout } = useAuthStore();
+    const router = useRouter();
+    const authStore = useAuthStore();
+
+    onMounted(() => {
+        authStore.restoreUser();
+    });
+
+    const logOutUser = () => {
+        authStore.logOut();
+        router.push('/');
+    }
 
 </script>
 

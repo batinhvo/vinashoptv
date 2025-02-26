@@ -1,10 +1,10 @@
 <template>
     <div class="ml-auto">
-        <button v-if="user" type="button" @click="toggleOpenChoice" class="py-2 px-2 text-black flex items-center justify-center text-font-22" :class=" isOpenChoice ? 'bg-white border border-gray-300 rounded-md' : ''">
+        <button  type="button" @click="toggleOpenChoice" class="py-2 px-2 text-black flex items-center justify-center text-font-22" :class=" isOpenChoice ? 'bg-white border border-gray-300 rounded-md' : ''">
             <i class="ec ec-user"></i> 
         </button>
 
-        <button v-else type="button" @click="toggleOpenSignIn" class="py-2 px-2 text-black flex items-center justify-center text-font-22">
+        <button  type="button" @click="toggleOpenSignIn" class="py-2 px-2 text-black flex items-center justify-center text-font-22">
             <i class="ec ec-user"></i> 
         </button>
     </div>
@@ -15,7 +15,7 @@
             <button @click.prevent="openEditProfile" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Edit Profile</button>
             <button @click.prevent="openChangePass" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Change Password</button>
             <NuxtLink to="/user/orderhistory" @click.prevent="toggleOpenChoice" class="block py-1.5 px-5 hover:bg-zinc-200">Your Orders</NuxtLink>
-            <button @click="logout" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
+            <button @click="" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
         </div>
     </div>
 
@@ -80,7 +80,7 @@
 
 
     //signed
-    const {user, logout} = useAuthStore(); 
+    // const {user, logout} = useAuthStore(); 
 
     const isOpenChoice = ref(false);
     function toggleOpenChoice() {

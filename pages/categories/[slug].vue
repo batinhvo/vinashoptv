@@ -35,6 +35,7 @@
 
 <script setup lang="ts">
     import { type Products } from "types/productTypes";
+    definePageMeta({middleware: 'auth-middle'})
 
     //----------------------------API------------------------------------//
     const route = useRoute();

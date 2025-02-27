@@ -27,8 +27,11 @@ export const useAuthStore = defineStore('auth', {
                 }
 
                 if (userResponse.data) {
-                    const tokenAccess = useCookie('token');
+                    const tokenAccess = useCookie('tokenAccess');
                     tokenAccess.value = userResponse.data.accessToken;
+
+                    const tokenRefresh = useCookie('tokenRefresh');
+                    tokenRefresh.value = userResponse.data.refreshToken;
                     
                     localStorage.setItem('user', JSON.stringify(userResponse.data.name));
                     
@@ -42,8 +45,11 @@ export const useAuthStore = defineStore('auth', {
         },
 
         logOut() {
-            const tokenAccess = useCookie('token'); // useCookie new hook in nuxt 3
+            const tokenAccess = useCookie('tokenAccess'); // useCookie new hook in nuxt 3
             tokenAccess.value = null; // clear the token cookie
+            const tokenRefresh = useCookie('tokenRefresh'); 
+            tokenRefresh.value = null;
+            
             localStorage.removeItem('user');
 
             this.authenticated = false; // set authenticated  state value to false
@@ -51,7 +57,7 @@ export const useAuthStore = defineStore('auth', {
         },
 
         restoreUser() {
-            const token = useCookie('token');
+            const token = useCookie('tokenAccess');
             const userData = localStorage.getItem('user');
 
             if (token && userData) {
@@ -69,12 +75,36 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
+        async refreshAccessToken() {
+            const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+            const tokenRefresh = useCookie('tokenRefresh');
+            
+            if (!tokenRefresh.value) return null;
+
+            try {
+                const data  = await $fetch(`${apiUrl}user/info`, {
+                    method: 'POST',
+                    body: { refreshToken: tokenRefresh.value },
+                    headers: {
+                        "Content-Type" : "application/json",
+                        "Authorization" : `Bearer ${tokenRefresh.value || ""}`,
+                    },
+                });
+
+                if (data) {
+                    console.log(data);
+                }
+            } catch (error: any) {
+                console.error('Failed to refresh token', error);
+            }
+        },
+
         async getInfoUser() {
             if(!this.authenticated) return
 
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
-                const token = useCookie('token').value;
+                const token = useCookie('tokenAccess').value;
 
                 const infoUserResponse = await $fetch<{error: number; data: UserInfo; message: string }>(`${apiUrl}user/info`, {
                     method: 'GET',
@@ -95,7 +125,7 @@ export const useAuthStore = defineStore('auth', {
         async updateProfileUser({address, cityId, firstName, lastName, phone, state, zip}: DataProfileUser) {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
-                const token = useCookie('token').value;
+                const token = useCookie('tokenAccess').value;
 
                 const profileResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth`, {
                     method: 'PATCH',
@@ -119,7 +149,7 @@ export const useAuthStore = defineStore('auth', {
         async updatePasswordUser({currentPassword, newPassword}: PassUser) {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
-                const token = useCookie('token').value;
+                const token = useCookie('tokenAccess').value;
 
                 console.log(currentPassword, newPassword)
 
@@ -138,6 +168,8 @@ export const useAuthStore = defineStore('auth', {
             } catch (e: any) {
                 console.error('Error update password user: ', e);
             }
-        }
+        },
+
+
     },
 });

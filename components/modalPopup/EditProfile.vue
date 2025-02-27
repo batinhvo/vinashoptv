@@ -5,9 +5,9 @@
             <InputField v-model="formData.lastName" rules="required" name="lastName" label="Last Name" :widthfull=false :isStrong=false />
             <InputField v-model="formData.email" rules="required|email" name="email" label="Email Address" type="email" :widthfull=false :isStrong=false />
             <InputField v-model="formData.phone" rules="required|phone" name="phone" type="number" label="Phone Number" :widthfull=false :isStrong=false />
-            <InputSelective v-model="formData.state" name="state" label="State" rules="required" :widthfull=true :isStrong=false :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
-            <InputSelective v-model="formData.cityId" name="cityId" label="City" rules="required" :options="cityOpt" :isStrong=false placeholder="Select City" @selected="cityOnSelected" />  
-            <InputField v-model="formData.zip" rules="required" name="zip" label="Postcode/Zip" type="number" :widthfull=false :isStrong=false />
+            <InputSelective v-model="formData.state" name="state" label="State" :widthfull=true :isStrong=false :options="stateOpt" :placeholder="statePlaceholder" @selected="stateOnSelected" />
+            <InputSelective v-model="formData.cityId" name="cityId" label="City" :options="cityOpt" :isStrong=false :placeholder="cityPlaceholder" @selected="cityOnSelected" />  
+            <InputField v-model="formData.zip" name="zip" label="Postcode/Zip" type="number" :widthfull=false :isStrong=false />
             <InputField v-model="formData.address" rules="required" name="address" label="Street Address" :widthfull=true :isStrong=false />
         </div>
     </form>
@@ -18,33 +18,41 @@
 
     const info = defineProps<{
         userData: UserInfo,
+        triggerSubmitProfile: boolean,
     }>();
 
     const formData = ref ({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        state: '',
-        cityId: 0,
-        zip: 0,
-        address: '',
+        address: '', cityId: 0, firstName: '', lastName: '', email: '', phone: '', state: '', zip: 0, 
     });
 
+    const notify = useNotify();
     const stateStore = useStateStore();
+    const authStore = useAuthStore();
 
     const stateOpt = computed(() => stateStore.states.map((state) => state.name)); // khi giá trị thay đổi thì computed tự động cập nhật lại
     const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
 
     const newStateSelect = ref<string>('');
+    const statePlaceholder = ref('Select State');
+    const cityPlaceholder = ref('Select City');
 
     const stateOnSelected = (value: string) => {
         newStateSelect.value = value;
-
-        console.log(newStateSelect.value);
+        formData.value.state = stateStore.states.find((sta) => sta.name === value)?.code || '';
+        cityPlaceholder.value = 'Select City';
     }
+    
     const cityOnSelected = (value: string) => {
-        console.log('Selected value:', value)
+        formData.value.cityId = stateStore.cities.find((city) => city.name === value)?.id || 0;
+    }
+
+    const getNameState = async (valueState: string, valueCity: number) => {
+        if (valueState) await stateStore.fetchCities(valueState); 
+        formData.value.state = valueState;
+        formData.value.cityId = valueCity;
+
+        statePlaceholder.value = stateStore.states.find((state) => state.code === valueState)?.name || 'Select State';
+        cityPlaceholder.value = stateStore.cities.find((city) => city.id === valueCity)?.name || 'Select City';
     }
 
     watch(newStateSelect, async (newState) => {
@@ -57,17 +65,9 @@
     });
 
     watchEffect(() => {
-        if (info.userData && stateStore.states.length > 0) { 
-            // Chỉ gán khi stateStore đã có dữ liệu
+        if (info.userData) { 
             formData.value = { ...info.userData };
-
-            if (info.userData.state) {
-                // Chuyển từ code → name
-                const selectedState = stateStore.states.find((sta) => sta.code === info.userData.state);
-                newStateSelect.value = selectedState ? selectedState.name : '';
-
-                stateOnSelected(newStateSelect.value);
-            }
+            getNameState(info.userData.state, info.userData.cityId);
         }
     });
 
@@ -77,12 +77,30 @@
 
     //----------------------------------------------------------------------
 
-    //submit
-    const emit = defineEmits();
+    // submit
+    const emit = defineEmits()
     const { handleSubmit } = useForm();
-    const onSubmit = handleSubmit(() => {
-        //emit('submitEvent');
-        alert(123)
+    const onSubmit = handleSubmit( async () => {
+        try {
+            await authStore.updateProfileUser(formData.value);
+            notify({
+                message: 'Your profile has been updated successfully!',
+                type: 'success',
+                time: 2000,
+            });
+        } catch (error) {
+            notify({
+                message: 'Failed to update profile. Please try again!',
+                type: 'error',
+                time: 2000,
+            });
+        }
+    });
+
+    watch(() => info.triggerSubmitProfile, (newValue) => {
+        if (newValue) {
+            onSubmit()
+        }
     });
 
 </script>

@@ -1,7 +1,7 @@
 <template>
     <form @submit.prevent="onSubmit">
         <div class="flex flex-wrap mt-6 w-96 bg-zinc-100 border border-zinc-200 py-3"> 
-            <InputField v-model="formData.password" rules="required|minLength:8" name="password" label="Current Password" type="password" :widthfull="true" :isStrong="false" placeholder="********"/>
+            <InputField v-model="formData.currentPassword" rules="required|minLength:8" name="password" label="Current Password" type="password" :widthfull="true" :isStrong="false" placeholder="********"/>
             <InputField v-model="formData.newPassword" rules="required|minLength:8" name="newPassword" label="New Password" type="password" :widthfull="true" :isStrong="false" placeholder="********"/>   
             <InputField v-model="formData.confPassword" rules="required|confirmed:@newPassword" name="ConfPassword" label="Confirm Password" :widthfull="true" :isStrong="false" type="password" placeholder="********"/>             
         </div>    
@@ -11,16 +11,43 @@
 <script setup lang="ts">
 
     const formData = ref({
-        password: '',
+        currentPassword: '',
         newPassword: '',
         confPassword: '',
     });
 
+    const info = defineProps<{
+        triggerSubmitChangePass: boolean,
+    }>();
+
+    const notify = useNotify();
+    const authStore = useAuthStore();
     const { handleSubmit } = useForm();
-    const onSubmit = handleSubmit(() => {
-        alert(123)
+    const emit = defineEmits(['submitSuccess']);
+
+    const onSubmit = handleSubmit( async () => {
+        try {
+            authStore.updatePasswordUser(formData.value);    
+            emit('submitSuccess');
+            authStore.logOut();     
+            notify({
+                message: 'Your password has been updated successfully. Please log in again!',
+                type: 'success',
+                time: 3000,
+            });   
+        } catch (error) {
+            notify({
+                message: 'Failed to update password. Please try again!',
+                type: 'error',
+                time: 2000,
+            });
+        }
     });
 
-    defineExpose({submitForm:onSubmit});
+    watch(() => info.triggerSubmitChangePass, (newValue) => {
+        if (newValue) {
+            onSubmit();
+        }
+    }, { immediate: true });
 
 </script>

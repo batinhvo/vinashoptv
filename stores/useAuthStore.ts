@@ -1,4 +1,4 @@
-import type { DataUser, InputDataLogin, UserInfo } from "types/userTypes";
+import type { DataProfileUser, DataUser, InputDataLogin, PassUser, UserInfo } from "types/userTypes";
 
 export const useAuthStore = defineStore('auth', {
 
@@ -22,6 +22,10 @@ export const useAuthStore = defineStore('auth', {
                     }
                 });
 
+                if (userResponse.error) {
+                    return Promise.reject(userResponse.message);
+                }
+
                 if (userResponse.data) {
                     const tokenAccess = useCookie('token');
                     tokenAccess.value = userResponse.data.accessToken;
@@ -33,6 +37,7 @@ export const useAuthStore = defineStore('auth', {
                 }
             } catch (e: any) {
                 console.error("Login failed: ", e);
+                return Promise.reject(e?.response._data?.message || 'Something went wrong')
             }; 
         },
 
@@ -65,6 +70,8 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async getInfoUser() {
+            if(!this.authenticated) return
+
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
                 const token = useCookie('token').value;
@@ -82,6 +89,54 @@ export const useAuthStore = defineStore('auth', {
                 }
             } catch (e: any) {
                 console.error('Error get info user: ', e)
+            }
+        },
+
+        async updateProfileUser({address, cityId, firstName, lastName, phone, state, zip}: DataProfileUser) {
+            try {
+                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const token = useCookie('token').value;
+
+                const profileResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth`, {
+                    method: 'PATCH',
+                    headers: {
+                        "Content-Type" : "application/json",
+                        "Authorization" : `Bearer ${token || ""}`,
+                    },
+                    body: { address, cityId, firstName, lastName, phone, state, zip },
+                });
+                
+                if (profileResponse.error === 1) {
+                   console.error("Error update profile user: ", profileResponse.message);
+                   return Promise.reject(profileResponse.message);
+                }
+            } catch (e: any) {
+                console.error('Error update profile user: ', e);
+                return Promise.reject(e?.response._data?.message || 'Something went wrong')
+            }
+        },
+
+        async updatePasswordUser({currentPassword, newPassword}: PassUser) {
+            try {
+                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const token = useCookie('token').value;
+
+                console.log(currentPassword, newPassword)
+
+                const changePassResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth/change-password`, {
+                    method: 'PATCH',
+                    headers: {
+                        "Content-Type" : "application/json",
+                        "Authorization" : `Bearer ${token || ""}`,
+                    },
+                    body: { currentPassword, newPassword },
+                });
+  
+                if (changePassResponse.error) {
+                   console.error("Error update passowrd user: ", changePassResponse.message);
+                }
+            } catch (e: any) {
+                console.error('Error update password user: ', e);
             }
         }
     },

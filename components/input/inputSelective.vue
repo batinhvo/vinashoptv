@@ -1,13 +1,11 @@
 <template>
     <div :class="['relative w-full mb-6 xl:px-2', widthfull ? '' : 'xl:w-1/2']">
-        <label :for="name" class="font-bold ml-3 block mb-2.5">{{ label }} <span v-if="isStrong" class="text-red-500">*</span></label>
+        <label :for="name" class="font-bold ml-3 block mb-2.5">
+            {{ label }} <span v-if="isStrong" class="text-red-500">*</span>
+        </label>
+
         <!-- VeeValidate Form -->
-        <Field
-            :name="name"
-            :rules="rules"
-            v-model="selectedValue"
-            v-slot="{ field }"
-        >
+        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{ field }">
             <!-- Dropdown Button -->
             <button type="button" @click="toggleDropdown"
             class="w-full bg-white border border-gray-300 rounded-full px-4 py-3 text-left shadow-sm focus:outline-none"
@@ -17,7 +15,7 @@
                     <i class="fa fa-angle-down text-[9px] text-neutral-500 pl-1.5"></i>
                 </span>
             </button>
-    
+
             <!-- Dropdown Menu -->
             <ul v-if="isOpen" class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
                 <li

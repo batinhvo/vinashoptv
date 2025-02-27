@@ -41,33 +41,34 @@
                     <div class="w-1/4 lg:w-1/5">Total</div>
                 </div>
 
-                <div class="border border-gray-300 flex flex-wrap text-center py-3 items-center">
+                <div v-for="order in orderStore.orderData" :key="order.id">
+                    <div class="border border-gray-300 flex flex-wrap text-center py-3 items-center">
                     <div class="w-1/4 lg:w-1/5 border-r border-gray-200">
-                        <span>#7518</span><br>
+                        <span>#{{ order.id }}</span><br>
                         <span>(12/30/2024 18:51)</span>
                     </div>
-                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">Ba Tinh Vo</div>
-                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">Pending</div>
-                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">$13.5567</div>
-                    <div class="lg:w-1/5 lg:block hidden">
+                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">{{ order.billingFirstName + ' ' + order.billingLastName }}</div>
+                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">{{ order.status }}</div>
+                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">${{ order.grandTotal }}</div>
+                        <div class="lg:w-1/5 lg:block hidden">
+                            <button @click.prevent="OpenDetails" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
+                                More Details
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="w-full text-center border border-gray-300 py-3 lg:hidden">
                         <button @click.prevent="OpenDetails" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
                             More Details
                         </button>
                     </div>
-                </div>
 
-                <div class="w-full text-center border border-gray-300 py-3 lg:hidden">
-                    <button @click.prevent="OpenDetails" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
-                        More Details
-                    </button>
+                    <div class="bg-white" :class="[isOpenDetails ? 'overflow-visible' : 'hidden']">
+                        <div class="text-center border border-gray-300">
+                            <BodyOrderBillingInfo :order="order" />
+                        </div>
+                    </div>          
                 </div>
-
-                <div class="bg-white" :class="[isOpenDetails ? 'overflow-visible' : 'hidden']">
-                    <div class="text-center border border-gray-300">
-                        <BodyOrderBillingInfo />
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -99,6 +100,17 @@
     const { handleSubmit, resetForm } = useForm();
     const onSubmit = handleSubmit(() => {
         alert(123)
+    });
+
+    //------------------------------------------------------------------------------//
+
+    const authStore = useAuthStore();
+    const orderStore = useOrderStore();
+
+    onMounted( async () => {
+        if (authStore.authenticated) {
+            await orderStore.getDataOrderHistory();
+        }
     });
 
 </script>

@@ -32,21 +32,20 @@
         <!-- edit profile -->
         <ModalPages v-if="showModalProfile" title="Edit Profile" @close="showModalProfile = false">
             <template #body>
-                <ModalPopupEditProfile ref="modalPopupEditProfileRef" :userData="authStore.userInfo"/>
+                <ModalPopupEditProfile :triggerSubmitProfile="triggerSubmitProfile" :userData="authStore.userInfo" />
             </template>
             <template #actions>
-                <button @click.prevent="modalPopupEditProfileRef?.submitForm()" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
+                <button @click.prevent="handleUpdateProfile" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Update Profile</button>
             </template>
         </ModalPages>
 
-
         <!-- edit password -->
-        <ModalPages v-if="showchangePass" title="Change Password" @close="showchangePass = false">
+        <ModalPages v-if="showChangePass" title="Change Password" @close="showChangePass = false">
             <template #body>
-                <ModalPopupChangePass ref="modalPopupChangePassRef"/>
+                <ModalPopupChangePass :triggerSubmitChangePass="triggerSubmitChangePass"  @submitSuccess="showChangePass = false" />
             </template>
             <template #actions>
-                <button @click.prevent="modalPopupChangePassRef?.submitForm()" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
+                <button @click.prevent="handleChangePass" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
             </template>
         </ModalPages>
 
@@ -63,14 +62,27 @@
 </template>
 
 <script setup lang="ts">
-    import type { ModalPopupChangePass, ModalPopupEditProfile } from '.nuxt/components';
-    import type { UserInfo } from 'types/userTypes';
+    const triggerSubmitProfile = ref(false);
+    const triggerSubmitChangePass = ref(false);
 
-    const modalPopupChangePassRef = ref<InstanceType<typeof ModalPopupChangePass> | null>(null);
-    const modalPopupEditProfileRef = ref<InstanceType<typeof ModalPopupEditProfile> | null>(null);
+    const handleUpdateProfile = () => {
+        triggerSubmitProfile.value = true
+        // Reset sau 100ms để lần sau click còn hoạt động
+        setTimeout(() => {
+            triggerSubmitProfile.value = false
+        }, 100)
+    };
 
-    const showchangePass = ref(false);
-    const openChangePass = () => { showchangePass.value = true };
+    const handleChangePass = () => {
+        triggerSubmitChangePass.value = true
+        // Reset sau 100ms để lần sau click còn hoạt động
+        setTimeout(() => {
+            triggerSubmitChangePass.value = false
+        }, 100)
+    };
+
+    const showChangePass = ref(false);
+    const openChangePass = () => { showChangePass.value = true };
 
     const showModalProfile = ref(false);
     const openEditProfile = () => { showModalProfile.value = true };

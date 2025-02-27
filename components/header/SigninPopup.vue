@@ -43,18 +43,11 @@
 <script setup lang="ts">
     import { useForm, ErrorMessage } from 'vee-validate';
 
-    interface DataUser {
-        accessToken: string,
-        name: string,
-        refreshToken: string,
-    }
-
     const signIn = defineProps<{
         toggleOpenSignIn: () => void,
     }>();
 
-    const { authenticateUser }  = useAuthStore(); // Sử dụng store
-    const authenticated = storeToRefs(useAuthStore());
+    const authStore = useAuthStore(); // Sử dụng store
 
     const router = useRouter();
     const notify = useNotify();
@@ -72,21 +65,19 @@
     const { handleSubmit, errors, resetForm } = useForm();
 
     const onSubmit = handleSubmit( async () => {
-
         try {
-            await authenticateUser(formData.value);
+            await authStore.authenticateUser(formData.value);
             router.push('/');
             resetForm();
             signIn.toggleOpenSignIn();
 
         } catch(e: any) {
             notify({
-                message: 'Wrong email or password',
+                message: 'Wrong email or password!',
                 type: 'error',
                 time: 2000,
             });
         }
-        
     });
 </script>
 

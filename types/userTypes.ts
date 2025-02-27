@@ -4,6 +4,22 @@ export interface DataUser {
     refreshToken: string,
 }
 
+export interface DataProfileUser {
+    address: string,
+    cityId: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    state: string,
+    zip: number,
+}
+
+export interface PassUser {
+    currentPassword: string, 
+    newPassword: string
+}
+
 export interface InputDataLogin {
     email: string,
     password: string,

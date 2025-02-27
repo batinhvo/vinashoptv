@@ -1,11 +1,14 @@
 export default defineNuxtRouteMiddleware((to) => {
+
+    const notify = useNotify();
     const authStore = useAuthStore();
     const tokenAccess = useCookie('token');
     const userData = import.meta.client ? localStorage.getItem('user') : null;
 
     if (tokenAccess.value && userData) {
         authStore.authenticated = true;
-        //authStore.user = import.meta.client ? JSON.parse(userData) : null; // Gán lại user từ localStorage
+    } else {
+        authStore.authenticated = false;
     }
 
     // check if value exists
@@ -14,9 +17,14 @@ export default defineNuxtRouteMiddleware((to) => {
     }
 
     // if token doesn't exist redirect to log in
-    if (!tokenAccess.value && to?.name !== 'login') {
-        //abortNavigation();
-        //return navigateTo('/login');
+    if (!tokenAccess.value) {
+        authStore.authenticated = false;
+        notify({
+            message: 'Please login',
+            type: 'error',
+            time: 2000,
+        });
+        authStore.logOut();
     }
 
 });

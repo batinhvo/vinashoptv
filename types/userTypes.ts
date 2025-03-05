@@ -4,6 +4,11 @@ export interface DataUser {
     refreshToken: string,
 }
 
+export interface DataRefresh {
+    accessToken: string,
+    refreshToken: string,
+}
+
 export interface DataProfileUser {
     address: string,
     cityId: number,

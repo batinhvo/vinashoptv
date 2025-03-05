@@ -1,52 +1,37 @@
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
 
-    const notify = useNotify();
     const authStore = useAuthStore();
-    const tokenAccess = useCookie('tokenAccess');
-    const tokenRefresh = useCookie('tokenRefresh');
-    const userData = import.meta.client ? localStorage.getItem('user') : null;
 
-    if(!userData) {
+    const tokenAccess = useCookie('tokenAccess', { sameSite: 'strict' });
+    const tokenRefresh = useCookie('tokenRefresh', { sameSite: 'strict' });
+
+    let userData = null;
+    if (import.meta.client) {
+        userData = localStorage.getItem('user');
+    }
+
+    if (!userData) {
         authStore.authenticated = false;
         return;
     }
 
-    const isTokenExpired = (token: string) => {
+    if (authStore.refreshing && tokenRefresh.value) {
         try {
-            const payload = JSON.parse(atob(token.split('.')[1])); // Decode token
-            return payload.exp * 1000 < Date.now();
-        } catch (error) {
-            return true; // Nếu lỗi xảy ra, xem như token không hợp lệ
-        }
-    };
+            const dataToken = await authStore.refreshAccessToken(tokenRefresh.value);
 
-    // Kiểm tra tokenAccess có hết hạn không
-    if (tokenAccess.value && !isTokenExpired(tokenAccess.value)) {
-        authStore.authenticated = true;
-        return;
+            if (dataToken) {
+                tokenAccess.value = dataToken.newAccessToken;
+                tokenRefresh.value = dataToken.newRefreshToken;
+                authStore.authenticated = true;
+                authStore.refreshing = false;
+                return;
+            }
+
+        } catch (error) {
+            authStore.refreshing = false;
+            console.error('[Auth Middleware] Error refreshing token:', error);          
+        } 
     }
 
-    // Nếu accessToken hết hạn nhưng còn refreshToken => gửi request lấy token mới
-    if (tokenRefresh.value && !isTokenExpired(tokenRefresh.value)) {
-        try {
-            const newAccessToken = authStore.refreshAccessToken();
-            // if (newAccessToken) {
-            //     // tokenAccess.value = newAccessToken; // Cập nhật token mới
-            //     // authStore.authenticated = true;
-            //     // return;
-            // }
-        } catch (error) {
-            console.error('Failed to refresh token', error);
-        }
-    }
-
-    // Nếu refreshToken cũng hết hạn, bắt buộc đăng nhập lại
-    authStore.authenticated = false;
-    notify({
-        message: 'Your session has expired, please log in again!',
-        type: 'error',
-        time: 3000,
-    });
-    authStore.logOut();
-
+    console.log(authStore.refreshing)
 });

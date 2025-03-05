@@ -1,9 +1,11 @@
-import type { DataProfileUser, DataUser, InputDataLogin, PassUser, UserInfo } from "types/userTypes";
+import type { DataProfileUser, DataRefresh, DataUser, InputDataLogin, PassUser, UserInfo } from "types/userTypes";
+const notify = useNotify();
 
 export const useAuthStore = defineStore('auth', {
-
+    
     state: () => ({
         authenticated: false,
+        refreshing: false,
         user: null as string | null,
         userInfo: null as UserInfo | null,
     }),
@@ -75,27 +77,34 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
-        async refreshAccessToken() {
-            const apiUrl = useRuntimeConfig().public.apiBaseUrl;
-            const tokenRefresh = useCookie('tokenRefresh');
+        async refreshAccessToken(refreshToken: string) {
+            const apiUrl = useRuntimeConfig().public.apiBaseUrl;           
             
-            if (!tokenRefresh.value) return null;
-
             try {
-                const data  = await $fetch(`${apiUrl}user/info`, {
+                const data  = await $fetch<{error: number; data: DataRefresh; message: string;}>(`${apiUrl}auth/refresh-token`, {
                     method: 'POST',
-                    body: { refreshToken: tokenRefresh.value },
-                    headers: {
-                        "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${tokenRefresh.value || ""}`,
-                    },
+                    body: { refreshToken }
                 });
+    
+                return {
+                    newAccessToken: data.data.accessToken,           
+                    newRefreshToken: data.data.refreshToken
+                };
 
-                if (data) {
-                    console.log(data);
+            } catch (e :any) {
+
+                if (e?.response?.status === 401) {
+                    this.refreshing = true;
+                } else if (e?.response?.status === 500) {
+                    this.authenticated = false;
+                    notify({
+                        message: 'Your session has expired, please log in again!',
+                        type: 'error',
+                        time: 3000,
+                    });
+                    this.logOut();
+                    navigateTo('/');
                 }
-            } catch (error: any) {
-                console.error('Failed to refresh token', error);
             }
         },
 
@@ -118,7 +127,12 @@ export const useAuthStore = defineStore('auth', {
                     this.userInfo = infoUserResponse.data;
                 }
             } catch (e: any) {
-                console.error('Error get info user: ', e)
+                console.error('Error get info user: ', e);
+
+                if(e?.response?.status === 401) {
+                    this.refreshing = true;
+                }
+
             }
         },
 

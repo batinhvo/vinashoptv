@@ -55,13 +55,24 @@
     const authStore = useAuthStore();
     const stateStore = useStateStore();
 
-    const stateName = stateStore.states.find((state) => state.code === authStore.userInfo?.state)?.name;   
-    const cityName = stateStore.cities.find((city) => city.id === authStore.userInfo?.cityId)?.name;  
+    const cityName = ref('');
+    const stateName = ref('');
 
     onMounted(async () => {
-        await authStore.getInfoUser();
-        await stateStore.fetchStates();
-        await stateStore.fetchCities(authStore.userInfo?.state || '');
+        try {
+            await authStore.getInfoUser();
+            await stateStore.fetchStates();
+
+            stateName.value = stateStore.states.find(state => state.code === authStore.userInfo?.state)?.name || '';
+
+            if (authStore.userInfo?.state) {
+                await stateStore.fetchCities(authStore.userInfo?.state);
+            }
+
+            cityName.value = stateStore.cities.find(city => city.id === authStore.userInfo?.cityId)?.name || '';
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     });
 </script>
 

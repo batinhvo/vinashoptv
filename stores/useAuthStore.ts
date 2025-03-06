@@ -5,7 +5,6 @@ export const useAuthStore = defineStore('auth', {
     
     state: () => ({
         authenticated: false,
-        refreshing: false,
         user: null as string | null,
         userInfo: null as UserInfo | null,
     }),
@@ -24,15 +23,13 @@ export const useAuthStore = defineStore('auth', {
                     }
                 });
 
-                if (userResponse.error) {
-                    return Promise.reject(userResponse.message);
-                }
+                if (userResponse.error) return Promise.reject(userResponse.message);
 
                 if (userResponse.data) {
                     const tokenAccess = useCookie('tokenAccess');
-                    tokenAccess.value = userResponse.data.accessToken;
-
                     const tokenRefresh = useCookie('tokenRefresh');
+
+                    tokenAccess.value = userResponse.data.accessToken;
                     tokenRefresh.value = userResponse.data.refreshToken;
                     
                     localStorage.setItem('user', JSON.stringify(userResponse.data.name));
@@ -47,14 +44,12 @@ export const useAuthStore = defineStore('auth', {
         },
 
         logOut() {
-            const tokenAccess = useCookie('tokenAccess'); // useCookie new hook in nuxt 3
-            tokenAccess.value = null; // clear the token cookie
-            const tokenRefresh = useCookie('tokenRefresh'); 
-            tokenRefresh.value = null;
+            useCookie('tokenAccess').value = null;
+            useCookie('tokenRefresh').value = null; 
             
             localStorage.removeItem('user');
 
-            this.authenticated = false; // set authenticated  state value to false
+            this.authenticated = false; 
             this.user = null;
         },
 
@@ -78,7 +73,7 @@ export const useAuthStore = defineStore('auth', {
         }, 
 
         async getInfoUser() {
-            if(!this.authenticated) return
+            if (!this.authenticated || !useCookie('tokenAccess').value) return;
 
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
@@ -98,30 +93,39 @@ export const useAuthStore = defineStore('auth', {
             } catch (e: any) {
 
                 if(e?.response?.status === 401) {
-                    this.refreshAccessToken();
+                    await this.refreshAccessToken();
                 }
 
             }
         },
 
         async refreshAccessToken() {
-            const apiUrl = useRuntimeConfig().public.apiBaseUrl;      
-            const tokenAccess = useCookie('tokenAccess');     
-            const tokenRefresh = useCookie('tokenRefresh');
+            const apiUrl = useRuntimeConfig().public.apiBaseUrl;         
+            const tokenRefresh = useCookie('tokenRefresh').value;
+
+            if (!tokenRefresh) {
+                this.authenticated = false;
+                this.logOut();
+                return navigateTo('/');
+            }
             
             try {
+
+                console.log("Sending refresh token:", tokenRefresh);
+
                 const data  = await $fetch<{error: number; data: DataRefresh; message: string;}>(`${apiUrl}auth/refresh-token`, {
                     method: 'POST',
                     body: { tokenRefresh }
                 });
     
-                if (data) {
-                    tokenAccess.value = data.data.accessToken;
-                    tokenRefresh.value = data.data.refreshToken;
-                    this.authenticated = true;                                      
-                }
+                if (data.error) throw new Error(data.message);
 
+                useCookie('tokenAccess').value = data.data.accessToken;
+                useCookie('tokenRefresh').value = data.data.refreshToken;
+                this.authenticated = true;
+                    
             } catch (e :any) {
+                console.error("Token refresh failed:", e);
                 if (e?.response?.status === 500) {
                     this.authenticated = false;
                     notify({
@@ -138,13 +142,15 @@ export const useAuthStore = defineStore('auth', {
         async updateProfileUser({address, cityId, country, firstName, lastName, phone, state, zip}: DataProfileUser) {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
-                const token = useCookie('tokenAccess');
+                const token = useCookie('tokenAccess').value;
 
-                const profileResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth`, {
+                if (!token) throw new Error("No token available");
+
+                await $fetch<{error: number; message: string}>(`${apiUrl}auth`, {
                     method: 'PATCH',
                     headers: {
                         "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token.value || ""}`,
+                        "Authorization" : `Bearer ${token || ""}`,
                     },
                     body: { address, cityId, country, firstName, lastName, phone, state, zip },
                 });
@@ -160,6 +166,8 @@ export const useAuthStore = defineStore('auth', {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
                 const token = useCookie('tokenAccess').value;
 
+                if (!token) throw new Error("No token available");
+
                 const changePassResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth/change-password`, {
                     method: 'PATCH',
                     headers: {
@@ -169,14 +177,10 @@ export const useAuthStore = defineStore('auth', {
                     body: { currentPassword, newPassword },
                 });
   
-                if (changePassResponse.error) {
-                   console.error("Error update passowrd user: ", changePassResponse.message);
-                }
+                if (changePassResponse.error) throw new Error(changePassResponse.message);
             } catch (e: any) {
-                console.error('Error update password user: ', e);
+                console.error('Error updating password: ', e);
             }
         },
-
-
     },
 });

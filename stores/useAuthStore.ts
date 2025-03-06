@@ -75,38 +75,7 @@ export const useAuthStore = defineStore('auth', {
                 this.authenticated = false;
                 this.user = null;
             }
-        },
-
-        async refreshAccessToken(refreshToken: string) {
-            const apiUrl = useRuntimeConfig().public.apiBaseUrl;           
-            
-            try {
-                const data  = await $fetch<{error: number; data: DataRefresh; message: string;}>(`${apiUrl}auth/refresh-token`, {
-                    method: 'POST',
-                    body: { refreshToken }
-                });
-    
-                return {
-                    newAccessToken: data.data.accessToken,           
-                    newRefreshToken: data.data.refreshToken
-                };
-
-            } catch (e :any) {
-
-                if (e?.response?.status === 401) {
-                    this.refreshing = true;
-                } else if (e?.response?.status === 500) {
-                    this.authenticated = false;
-                    notify({
-                        message: 'Your session has expired, please log in again!',
-                        type: 'error',
-                        time: 3000,
-                    });
-                    this.logOut();
-                    navigateTo('/');
-                }
-            }
-        },
+        }, 
 
         async getInfoUser() {
             if(!this.authenticated) return
@@ -127,33 +96,59 @@ export const useAuthStore = defineStore('auth', {
                     this.userInfo = infoUserResponse.data;
                 }
             } catch (e: any) {
-                console.error('Error get info user: ', e);
 
                 if(e?.response?.status === 401) {
-                    this.refreshing = true;
+                    this.refreshAccessToken();
                 }
 
             }
         },
 
-        async updateProfileUser({address, cityId, firstName, lastName, phone, state, zip}: DataProfileUser) {
+        async refreshAccessToken() {
+            const apiUrl = useRuntimeConfig().public.apiBaseUrl;      
+            const tokenAccess = useCookie('tokenAccess');     
+            const tokenRefresh = useCookie('tokenRefresh');
+            
+            try {
+                const data  = await $fetch<{error: number; data: DataRefresh; message: string;}>(`${apiUrl}auth/refresh-token`, {
+                    method: 'POST',
+                    body: { tokenRefresh }
+                });
+    
+                if (data) {
+                    tokenAccess.value = data.data.accessToken;
+                    tokenRefresh.value = data.data.refreshToken;
+                    this.authenticated = true;                                      
+                }
+
+            } catch (e :any) {
+                if (e?.response?.status === 500) {
+                    this.authenticated = false;
+                    notify({
+                        message: 'Your session has expired, please log in again!',
+                        type: 'error',
+                        time: 3000,
+                    });
+                    this.logOut();
+                    navigateTo('/');
+                }
+            }
+        },
+
+        async updateProfileUser({address, cityId, country, firstName, lastName, phone, state, zip}: DataProfileUser) {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
-                const token = useCookie('tokenAccess').value;
+                const token = useCookie('tokenAccess');
 
                 const profileResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth`, {
                     method: 'PATCH',
                     headers: {
                         "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token || ""}`,
+                        "Authorization" : `Bearer ${token.value || ""}`,
                     },
-                    body: { address, cityId, firstName, lastName, phone, state, zip },
+                    body: { address, cityId, country, firstName, lastName, phone, state, zip },
                 });
                 
-                if (profileResponse.error === 1) {
-                   console.error("Error update profile user: ", profileResponse.message);
-                   return Promise.reject(profileResponse.message);
-                }
             } catch (e: any) {
                 console.error('Error update profile user: ', e);
                 return Promise.reject(e?.response._data?.message || 'Something went wrong')
@@ -164,8 +159,6 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
                 const token = useCookie('tokenAccess').value;
-
-                console.log(currentPassword, newPassword)
 
                 const changePassResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth/change-password`, {
                     method: 'PATCH',

@@ -4,7 +4,7 @@
             <InputField v-model="formData.firstName" rules="required" name="firstName" label="Fist Name" :widthfull=false :isStrong=false />
             <InputField v-model="formData.lastName" rules="required" name="lastName" label="Last Name" :widthfull=false :isStrong=false />
             <InputField v-model="formData.email" rules="required|email" name="email" label="Email Address" type="email" :widthfull=false :isStrong=false />
-            <InputField v-model="formData.phone" rules="required|phone" name="phone" type="number" label="Phone Number" :widthfull=false :isStrong=false />
+            <InputField v-model="formData.phone" rules="required|phone" name="phone" label="Phone Number" :widthfull=false :isStrong=false />
             <InputSelective v-model="formData.state" name="state" label="State" :widthfull=true :isStrong=false :options="stateOpt" :placeholder="statePlaceholder" @selected="stateOnSelected" />
             <InputSelective v-model="formData.cityId" name="cityId" label="City" :options="cityOpt" :isStrong=false :placeholder="cityPlaceholder" @selected="cityOnSelected" />  
             <InputField v-model="formData.zip" name="zip" label="Postcode/Zip" type="number" :widthfull=false :isStrong=false />
@@ -22,7 +22,7 @@
     }>();
 
     const formData = ref ({
-        address: '', cityId: 0, firstName: '', lastName: '', email: '', phone: '', state: '', zip: 0, 
+        address: '', cityId: 0, country: 'US', firstName: '', lastName: '', email: '', phone: '', state: '', zip: 0, 
     });
 
     const notify = useNotify();

@@ -242,8 +242,6 @@
         alert(123)
     });
 
-    definePageMeta({middleware: 'auth-middle'})
-
     //--------------------------------API-------------------------------------//
 
     const stateStore = useStateStore();

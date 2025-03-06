@@ -67,7 +67,6 @@
 </template>
 
 <script setup lang="ts">
-  definePageMeta({middleware: 'auth-middle'})
 
   const formDataContact = ref({
     content: '',

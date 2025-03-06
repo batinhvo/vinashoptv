@@ -19,5 +19,5 @@
 <script setup lang="ts">
   const showSubcribe = ref(false);
 
-  definePageMeta({middleware: 'auth-middle'})
+
 </script>

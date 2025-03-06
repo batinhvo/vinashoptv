@@ -9,7 +9,7 @@
                 <li class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" @click="setSort('Default Sorting')">Default Sorting</li>
                 <li class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" @click="setSort('Sort by Price: Low to Hight')">Sort by Price: Low to Hight</li>
                 <li class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" @click="setSort('Sort by Price: Hight to Low')">Sort by Price: Hight to Low</li>
-                <li class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" @click="setSort('Sort by Lates')">Sort by Lates</li>         
+                <li class="px-4 py-1 hover:bg-gray-100 rounded cursor-pointer" @click="setSort('Sort by Latest')">Sort by Latest</li>         
             </ul>
         </div>
     </div>
@@ -40,15 +40,15 @@
                 break;
             case 'Sort by Price: Low to Hight':
                 sortBy.value = 'price';
-                descending.value = 1;
+                descending.value = 0;
                 sortQuery = 'price_from_low';
                 break;
             case 'Sort by Price: Hight to Low':
                 sortBy.value = 'price';
-                descending.value = 0;
+                descending.value = 1;
                 sortQuery = 'price_from_high';
                 break;
-            case 'Sort by Lates':
+            case 'Sort by Latest':
                 sortBy.value = 'createdAt';
                 descending.value = 1;
                 sortQuery = 'latest';

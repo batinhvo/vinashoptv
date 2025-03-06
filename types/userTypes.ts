@@ -12,6 +12,7 @@ export interface DataRefresh {
 export interface DataProfileUser {
     address: string,
     cityId: number,
+    country: string,
     firstName: string,
     lastName: string,
     email: string,

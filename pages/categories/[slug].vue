@@ -22,11 +22,17 @@
                 <div class="w-full xl:w-4/5 px-4">          
                     <div class="flex justify-between mb-4 mt-4 lg:mt-0">
                         <h3 class="text-2xl">{{ cateTitle }}</h3>
-                        <p>Showing 1-{{ totalProducts < 8 ? totalProducts : 8 }} of {{ totalProducts }} results</p>
+                        <p>Showing {{ fromShow }}-{{ toShow }} of {{ totalProducts }} results</p>
                     </div>
                     <BodyProductSelectSort @updateParams="updateProductsFromSort"/>
                     <BodyProductDisplay :dataProduct="productListData"/>
-                    <BodyProductPagination :dataTotalPro="totalProducts"/>
+                    <BodyProductPagination v-if="totalProducts > 0" 
+                        :dataTotalPro="totalProducts" 
+                        :updateSort="isUpdateSort" 
+                        @updatePages="updatePages" 
+                        @updateRange="rangeChange" 
+                        @resetUpdateSort="isUpdateSort = false"
+                    />
                 </div>              
             </div>            
         </div>
@@ -35,7 +41,6 @@
 
 <script setup lang="ts">
     import { type Products } from "types/productTypes";
-    //definePageMeta({middleware: 'auth-middle'})
 
     //----------------------------API------------------------------------//
     const route = useRoute();
@@ -47,7 +52,10 @@
     const slug = route.params.slug as string;
     const Imgsource = ref<string>("");
     const totalProducts = ref(0);
+    const isUpdateSort = ref(false);
     const cateTitle = ref('');
+    const fromShow = ref(1);
+    const toShow = ref(1);
     
     const params = ref({
         categoryId: 0,
@@ -58,9 +66,11 @@
     });
 
     const updateProductsFromSort = async (sortBy: string, descending: number) => {
+        isUpdateSort.value = true;
+
         params.value.sortBy = sortBy;
         params.value.descending = descending;
-
+        params.value.page = 1;
         updateProducts();
     }
 
@@ -70,7 +80,25 @@
         totalProducts.value = productStore.productTotal || 0;
     };
 
-    const fetchData = async () => {
+    const updatePages = async (page: number) => {
+        params.value.page = page;
+        updateProducts();
+
+        const isMobile = window.innerWidth <= 768;
+        const scrollTop = isMobile ? 0 : 600;
+
+        window.scrollTo({
+            top: scrollTop,
+            behavior: 'smooth'
+        });
+    };
+
+    const rangeChange = ({ from, to }: { from: number; to: number }) => {
+        fromShow.value = from;
+        toShow.value = to; 
+    }
+
+    (async () => {
         await cateStore.fetchCategories();
 
         const category = cateStore.dataCatePro.find((cate) => cate.slug === slug);
@@ -85,10 +113,8 @@
                 Imgsource.value = "/images/banner/bg-banner-01.jpg";
             }       
         }
-
         updateProducts();
-    };
+    })();
 
-    fetchData();
 </script>
 

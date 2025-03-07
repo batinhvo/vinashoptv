@@ -19,11 +19,21 @@
 <script setup lang="ts">
   const showSubcribe = ref(false);
   const authStore = useAuthStore();
-  const orderStore = useOrderStore();
 
-  if(authStore.authenticated) {
-    await orderStore.getDataOrderHistory();
-    console.log(orderStore.orderData)
-  }
+  onMounted(() => {
+    if(authStore.authenticated) {
+      const lastVisit  = localStorage.getItem('lastVisitDate');
+      const today = new Date().toDateString();
 
+      if (lastVisit !== today) {
+        showSubcribe.value = true;
+        localStorage.setItem('lastVisitDate', today);
+      } else {
+        showSubcribe.value = false;
+      }
+    } else {
+      showSubcribe.value = false;
+    }
+    
+  });
 </script>

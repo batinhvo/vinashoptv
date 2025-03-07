@@ -37,7 +37,6 @@ export const useAuthStore = defineStore('auth', {
                     this.user = userResponse.data.name;
                     this.authenticated = true;
 
-                    console.log("mới nhận: ", tokenRefresh.value)
                 }
             } catch (e: any) {
                 console.error("Login failed: ", e);

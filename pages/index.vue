@@ -18,6 +18,12 @@
 
 <script setup lang="ts">
   const showSubcribe = ref(false);
+  const authStore = useAuthStore();
+  const orderStore = useOrderStore();
 
+  if(authStore.authenticated) {
+    await orderStore.getDataOrderHistory();
+    console.log(orderStore.orderData)
+  }
 
 </script>

@@ -19,9 +19,11 @@
                                     <sup>$</sup><span>{{ slide.price }}</span><sup>00</sup>
                                 </div>
                             </div>
-                            <button class="in-top-3 btn btn-primary bg-primary py-2 px-5 lg:px-12 rounded-lg text-base text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
-                                Start Buying
-                            </button>
+                            <NuxtLink :to="`/product/${dataLinkPro}`">
+                                <button class="in-top-3 btn btn-primary bg-primary py-2 px-5 lg:px-12 rounded-lg text-base text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
+                                    Start Buying
+                                </button>
+                            </NuxtLink>                           
                         </div>                       
                     </div>
 
@@ -71,6 +73,16 @@
     const handleSlideChange = (swiper: any) => {
         currentSlideIndex.value = swiper.realIndex;
     };
+
+
+    //-----------------------------------------------------//
+    const productStore = useProductStore();
+
+    const params = ref("39");
+    const dataLinkPro = ref("");
+
+    await productStore.fetchProductDetails(params.value);
+    dataLinkPro.value = productStore.productDetails?.slug || '';
     
 </script>
   

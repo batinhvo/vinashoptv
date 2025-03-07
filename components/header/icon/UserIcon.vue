@@ -15,7 +15,7 @@
             <button @click.prevent="openEditProfile(); isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Edit Profile</button>
             <button @click.prevent="openChangePass(); isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Change Password</button>
             <NuxtLink to="/user/orderhistory" @click.prevent="toggleOpenChoice" class="block py-1.5 px-5 hover:bg-zinc-200">Your Orders</NuxtLink>
-            <button @click="logOutUser(); isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
+            <button @click="authStore.logOut; isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
         </div>
     </div>
 
@@ -40,24 +40,34 @@
 
 
     <!-- edit password -->
-    <ModalPages v-if="showchangePass" title="Change Password" @close="showchangePass = false">
+    <ModalPages v-if="showChangePass" title="Change Password" @close="showChangePass = false">
         <template #body>
-            <ModalPopupChangePass/>
+            <ModalPopupChangePass :triggerSubmitChangePass="triggerSubmitChangePass"  @submitSuccess="showChangePass = false" />
         </template>
         <template #actions>
-            <button class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
+            <button @click.prevent="handleChangePass" class="my-3 mr-5 bg-[#26d000] text-black px-5 py-2 rounded-full shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">Apply</button>
         </template>
     </ModalPages>
 </template>
 
 <script setup lang="ts">
 
-    const triggerSubmitProfile = ref(false);
+const triggerSubmitProfile = ref(false);
+    const triggerSubmitChangePass = ref(false);
+
     const handleUpdateProfile = () => {
         triggerSubmitProfile.value = true
         // Reset sau 100ms để lần sau click còn hoạt động
         setTimeout(() => {
             triggerSubmitProfile.value = false
+        }, 100)
+    };
+
+    const handleChangePass = () => {
+        triggerSubmitChangePass.value = true
+        // Reset sau 100ms để lần sau click còn hoạt động
+        setTimeout(() => {
+            triggerSubmitChangePass.value = false
         }, 100)
     };
 
@@ -68,8 +78,8 @@
     }
 
     //show modal
-    const showchangePass = ref(false);
-    const openChangePass = () => { showchangePass.value = true };
+    const showChangePass = ref(false);
+    const openChangePass = () => { showChangePass.value = true };
 
     const showModalProfile = ref(false);
     const openEditProfile = () => { showModalProfile.value = true };
@@ -91,18 +101,10 @@
     }
 
     //------------------------------------------------------------------------------------//
-
-    const router = useRouter();
     const authStore = useAuthStore();
 
-    const logOutUser = () => {
-        authStore.logOut();
-        router.push('/');
-    }
-
     onMounted( async () => {
-        authStore.restoreUser();
-        await authStore.getInfoUser();
+        authStore.restoreUser();       
     });
 </script>
 

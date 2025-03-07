@@ -11,7 +11,7 @@ export const useOrderStore = defineStore('order', {
         async getDataOrderHistory() {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;
-                const token = useCookie('token').value;
+                const token = useCookie('tokenAccess').value;
 
                 const dataOrderResponse = await $fetch<{error: number; data: { list: OrderHistory[], count: number } }>(`${apiUrl}invoices?page=1&perPage=8&status=pending`, {
                     method: 'GET',

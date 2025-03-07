@@ -11,7 +11,7 @@
             <h1 class="text-4xl font-normal pb-10 text-center">My Profile</h1>
             <div class="bg-zinc-100 border border-gray-300 shadow-lg p-2 md:p-5 mt-5 lg:mx-40 xl:mx-60">
                 <table class="w-full border border-gray-300 ">                    
-                    <tbody class="bg-white shadow-inner" v-if="authStore.authenticated">         
+                    <tbody class="bg-white shadow-inner" v-if="authStore.authenticated && authStore.userInfo">         
                         <tr class="h-5"><td></td><td></td></tr>                
                         <tr class="h-10">                           
                             <td class="w-2/5 text-right pr-6 font-bold">Name :</td>

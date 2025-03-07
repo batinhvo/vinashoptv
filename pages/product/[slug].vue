@@ -40,8 +40,7 @@
 </template>
 
 <script setup lang="ts">
-    import type { ProductDetails, Variant } from "types/productDetailTypes";
-    //definePageMeta({middleware: 'auth-middle'})
+    import type { ProductDetails, Variant } from "types/productTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -49,7 +48,7 @@
 
     const route = useRoute();
     const cateStore = useCateStore();
-    const productDetailStore = useProductDetailStore();
+    const productStore = useProductStore();
 
     const slug = route.params.slug as string | '';
     const dataDetails = ref<ProductDetails | null>(null);
@@ -90,8 +89,8 @@
     }
 
     const fetchDataProduct = async () => {
-        await productDetailStore.fetchProductDetails(slug);
-        dataDetails.value = productDetailStore.productDetails;
+        await productStore.fetchProductDetails(slug);
+        dataDetails.value = productStore.productDetails;
 
         cateTitle.value = cateStore.dataCatePro.find((cate) => cate.id === dataDetails.value?.categoryId)?.name || '';
         cateSlug.value = cateStore.dataCatePro.find((cate) => cate.id === dataDetails.value?.categoryId)?.slug || '';

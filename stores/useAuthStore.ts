@@ -36,6 +36,8 @@ export const useAuthStore = defineStore('auth', {
                     
                     this.user = userResponse.data.name;
                     this.authenticated = true;
+
+                    console.log("mới nhận: ", tokenRefresh.value)
                 }
             } catch (e: any) {
                 console.error("Login failed: ", e);
@@ -51,6 +53,8 @@ export const useAuthStore = defineStore('auth', {
 
             this.authenticated = false; 
             this.user = null;
+
+            navigateTo('/');
         },
 
         restoreUser() {
@@ -101,21 +105,16 @@ export const useAuthStore = defineStore('auth', {
 
         async refreshAccessToken() {
             const apiUrl = useRuntimeConfig().public.apiBaseUrl;         
-            const tokenRefresh = useCookie('tokenRefresh').value;
-
-            if (!tokenRefresh) {
-                this.authenticated = false;
-                this.logOut();
-                return navigateTo('/');
-            }
+            const tokenRefresh = useCookie('tokenRefresh');
             
             try {
 
-                console.log("Sending refresh token:", tokenRefresh);
-
                 const data  = await $fetch<{error: number; data: DataRefresh; message: string;}>(`${apiUrl}auth/refresh-token`, {
                     method: 'POST',
-                    body: { tokenRefresh }
+                    headers: {
+                        "Content-Type" : "application/json",
+                    },
+                    body: JSON.stringify({ refreshToken: tokenRefresh.value })
                 });
     
                 if (data.error) throw new Error(data.message);
@@ -126,15 +125,14 @@ export const useAuthStore = defineStore('auth', {
                     
             } catch (e :any) {
                 console.error("Token refresh failed:", e);
-                if (e?.response?.status === 500) {
+                if (e?.response?.status === 500 || e?.response?.status === 400) {
                     this.authenticated = false;
                     notify({
                         message: 'Your session has expired, please log in again!',
                         type: 'error',
                         time: 3000,
                     });
-                    this.logOut();
-                    navigateTo('/');
+                    this.logOut();                   
                 }
             }
         },

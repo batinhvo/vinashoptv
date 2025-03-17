@@ -17,7 +17,7 @@
     import type { UserInfo } from 'types/userTypes';
 
     const info = defineProps<{
-        userData: UserInfo,
+        userData: UserInfo | null,
         triggerSubmitProfile: boolean,
     }>();
 

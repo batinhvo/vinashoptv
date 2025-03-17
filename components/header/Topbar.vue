@@ -3,6 +3,10 @@
         <div class="container flex justify-between items-center">
             <NuxtLink to="/" class="text-gray-110 text-font-13 hover:text-black">Welcome to Vinashop</NuxtLink>
             <div class="flex items-center space-x-4">
+                <button @click="onShowSubcribe" class="text-green-334 text-font-13 hover:text-black flex items-center">
+                    <i class="ec ec-blog-likes text-lg mr-1"></i> Subscribe
+                </button>
+                <span class="text-gray-5">|</span>
                 <NuxtLink to="/contact" class="text-green-334 text-font-13 hover:text-black flex items-center">
                     <i class="ec ec-map-pointer text-lg mr-1"></i> Store Locator
                 </NuxtLink>
@@ -108,7 +112,13 @@
         }
     }
 
+    const setShowSubcribe = inject<((value: boolean) => void) | null>("setShowSubcribe", null);
+    const onShowSubcribe = () => { 
+        setShowSubcribe?.(true); 
+    };
+
     //-----------------------------------------------------------------------//
+    
     const authStore = useAuthStore();
 
     onMounted( async () => {

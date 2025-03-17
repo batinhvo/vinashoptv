@@ -7,14 +7,19 @@
         </div>
         <div class="pt-5">
             <form action="">
-                <InputField name="subcribe" v-model="subcribe" rules="required|email" :widthfull=true :is-strong="false" />
+                <InputField name="subcribe" v-model="subcribe" rules="required|email" widthfull :is-strong="false" />              
             </form>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+    const authStore = useAuthStore();
+    
     const subcribe = ref('');
+    subcribe.value = authStore.userInfo?.email || 'aaa';
+
+    console.log(authStore.userInfo)
 
     const { handleSubmit, resetForm  } = useForm();
 </script>

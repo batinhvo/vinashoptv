@@ -9,7 +9,8 @@
         </div>
         <div class="text-xs">{{ products?.totalOutFake }}</div>
     </div>
-    <div class="mt-5 line-clamp-4 text-justify">{{ products?.summary }}</div>
+    <div class="mt-5 line-clamp-4 text-justify"  v-html="changeCharacter(products?.summary || '')">      
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -18,6 +19,12 @@
     //xử lý giá
     const formatPrice = (price: number): string => {
         return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
+    };
+
+    const changeCharacter = (value: string): string => {
+        return value
+        .replace(/\n+/g, '<br>')     // Gộp tất cả \n liên tiếp thành 1 <br>
+        .replace(/(<br>\s*){2,}/g, '<br>'); // Gộp nhiều <br> liên tiếp thành 1
     };
 
     defineProps<{

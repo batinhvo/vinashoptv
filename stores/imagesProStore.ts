@@ -1,8 +1,11 @@
+import type { subImgData } from "types/productTypes";
+
 export const useImagesProduct = defineStore('imagesProduct', () => {
 
     const config = useRuntimeConfig();
     const apiUrl = config.public.apiBaseUrl;
     const dataImgCache = ref<{ [key: string]: string }>({}); // Cache hình ảnh theo imgName
+    const subDataImg = ref<subImgData[]>([]);
 
     const fetchImagesProduct =  async (imgName: string):Promise<string | undefined> => {
 
@@ -29,7 +32,28 @@ export const useImagesProduct = defineStore('imagesProduct', () => {
         }
     };
 
-    return { fetchImagesProduct };
+    const fetchSubImagesProduct = async (idPro : number):Promise<subImgData[] | undefined> => {
+
+        if (!idPro) return undefined;
+        try {
+            const subImage = await $fetch<{ error: number; data: subImgData[] }>(
+                `${apiUrl}media?ownerId=${idPro}&ownerType=product`
+            );
+
+            if (subImage.error !== 0) {
+                console.error('Error fetching sub image product');
+                return undefined;
+            }
+
+            subDataImg.value = subImage.data;          
+
+        } catch(e) {
+            console.error('Exception in fetch sub image product:', e);
+            return undefined;
+        }
+    }
+
+    return { fetchImagesProduct, fetchSubImagesProduct, subDataImg};
 });
 
 

@@ -16,7 +16,7 @@
                             Quick View
                         </button>                                              
                         <NuxtLink v-if="pro.slug"
-                        :to="`/product/${pro.slug}`"
+                        :to="`/product/${pro.slug}`" 
                         class="btn text-black bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300 mt-6"
                         >
                             See Details

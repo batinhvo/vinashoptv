@@ -70,3 +70,14 @@ export type ProductDetails = {
     variants: Variant[],
     skus: Skus[],
 };
+
+export type subImgData = {
+    id: number,
+    createdBy: number,
+    path: string,
+    createdAt: number,
+    ownerId: number,
+    ownerType: string,
+    ownerCategoryId: number,
+    sort: number,
+};

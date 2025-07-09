@@ -3,18 +3,19 @@
         <!-- Info -->
         <div class="border-b border-gray-300 pb-2">
             <span>Availability: </span>
-            <span class="text-[#5cb85c] font-bold">{{ data.dataPro.totalOutFake }} in stock</span>
+            <span v-if="isOutOfStock" class="text-gray-500 font-bold">Out of stock</span>
+            <span v-else class="text-[#5cb85c] font-bold">{{ stockData == 0 ? data.dataPro.stock : stockData }} in stock</span>
         </div>
 
         <!-- Price -->
         <div v-if="dataSkusfilter" class="flex items-end my-5">                           
             <div class="text-4xl"
-            :class="[dataSkusfilter.salePrice && (dataSkusfilter.salePrice !== dataSkusfilter.price) ? 'text-red-500' : '']">
-                ${{ formatPrice(dataSkusfilter.price) }}
+            :class="{ 'text-red-500': dataSkusfilter.salePrice && dataSkusfilter.salePrice !== dataSkusfilter.price }">
+                ${{ formatPrice(dataSkusfilter.salePrice) }}
             </div>      
             <div v-if="dataSkusfilter.salePrice && (dataSkusfilter.salePrice !== dataSkusfilter.price)" 
             class="text-lg line-through pl-3">
-                ${{ formatPrice(dataSkusfilter.salePrice) }}
+                ${{ formatPrice(dataSkusfilter.price) }}
             </div>                     
         </div>
         <div v-else class="flex items-end my-5">                           
@@ -22,19 +23,21 @@
         </div>
 
         <!-- Type -->
-        <div v-for="vari in dataVariant" :key="vari.id" class="flex flex-wrap mb-4">
-            <div class="w-1/3">
-                <span class="font-bold">{{ vari.name }}</span>
-            </div>
-            <div class="w-2/3">
-                <button
-                    v-for="varOpt in vari.options" :key="varOpt.id"
-                    class="border border-gray-200 py-1 px-2 hover:shadow-inner hover:border-[#5cb85c] lg:hover:text-[#228322]"
-                    :class="[selectedOptions[vari.name]?.val === varOpt.name ? 'bg-[#5cb85c] text-white' : '']"
-                    @click="selectOption(vari.name, varOpt.name, varOpt.id)">
-                    {{ varOpt.name }}
-                </button>
-            </div>
+        <div v-for="vari in dataVariant" :key="vari.id">
+            <div class="flex flex-wrap mb-4" v-if="vari.name !== 'default'">
+                <div class="w-1/3" >
+                    <span class="font-bold">{{ vari.name }}</span>
+                </div>
+                <div class="w-2/3">
+                    <button
+                        v-for="varOpt in vari.options" :key="varOpt.id"
+                        class="border m-0.5 border-gray-200 py-1 px-2 hover:shadow-inner hover:border-[#5cb85c] lg:hover:text-[#228322]"
+                        :class="[selectedOptions[vari.name]?.val === varOpt.name ? 'bg-[#5cb85c] text-white' : '']"
+                        @click="selectOption(vari.name, varOpt.name, varOpt.id)">
+                        {{ varOpt.name }}
+                    </button>
+                </div>       
+            </div>            
         </div>
 
         <!-- Quantity -->
@@ -51,27 +54,31 @@
                     <span class="text-xs">
                         <i class="fa fa-plus pb-1 text-gray-500" aria-hidden="true"></i>
                     </span>
-                </button>
+                </button>               
             </div>
         </div>
 
         <!-- button -->
         <div class="mt-2" v-if="isShowButton">
-            <button type="submit" class="btn bg-primary text-white py-2.5 w-full mt-4 rounded-full font-bold shadow-sm hover:bg-gray-700 hover:shadow-xl hover:-translate-y-1 duration-300">
+            <button type="button" class="btn bg-primary text-white py-2.5 w-full mt-4 rounded-full font-bold shadow-sm hover:bg-gray-700 hover:shadow-xl hover:-translate-y-1 duration-300">
                 <span class="text-xl"><i class="ec ec-add-to-cart mr-2"></i></span>                              
                 Add to Cart
             </button>
-            <button type="submit" class="btn bg-gray-700 text-white py-3 w-full mt-4 rounded-full font-bold shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300">
-                Buy Now
+            
+            <button type="button" class="btn bg-gray-700 text-white py-3 w-full mt-4 rounded-full font-bold shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300">
+                Buy Now 
             </button>
+            
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import type { ProductDetails, Variant, Skus } from "types/productDetailTypes";
+    import type { ProductDetails, Variant, Skus } from "types/productTypes";
 
     const isShowButton = ref(false);
+    const isOutOfStock = ref(false);
+    const stockData = ref(0);
     // quantity
     const quantity = ref(1);
     const increment = () => { quantity.value++ };
@@ -82,8 +89,7 @@
         return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
     };
 
-    // ---------------------------------------------------------//
-    
+    // ---------------------------------------------------------//  
     
     const dataSkus = ref<Skus[]>([]);
     const dataSkusfilter = ref<Skus | null>(null);
@@ -104,15 +110,31 @@
         ChoiceList.value = Object.values(selectedOptions.value).map((val) => val.id).join(',');
     };
 
+    watchEffect(() => {
+        if (data.dataVariant?.some(vari => vari.name == 'default')) {
+            isShowButton.value = true;
+            dataSkusfilter.value = dataSkus.value[0];          
+        }       
+    });
+
     watch(ChoiceList, (newVal) => {
         dataSkusfilter.value = dataSkus.value.find((sku) => sku.variantOptionIds === newVal) || null;
         if(dataSkusfilter.value) {
             isShowButton.value = true;
+            isOutOfStock.value = false;
+            stockData.value = dataSkusfilter.value.stock;
             emit('updateSlideImages', dataSkusfilter.value.variantOptionIds);
         } else {
             isShowButton.value = false;
+            isOutOfStock.value = true;
         }
     });
+
+
+    // handle Buy Now
+    const handleBuyNowButton = () => {
+            
+    }
 
 </script> 
 

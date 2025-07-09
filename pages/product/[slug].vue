@@ -23,11 +23,9 @@
 
                 <div class="w-full md:w-1/2 lg:w-1/3 xl:w-4/12 px-4 mt-8 md:mt-0">
                     <div class="text-xs mb-2">{{ cateTitle }}</div>
-                    <div class="text-2xl">{{ dataDetails.title }}</div>
-                    <div class="text-right mb-2 pr-3">Sold: {{ dataDetails.totalOutFake }}</div>
-                    <p class="text-justify">
-                        {{ dataDetails.summary }}
-                    </p>
+                    <div class="text-2xl mb-2">{{ dataDetails.title }}</div>
+                    <div class="text-right mb-2 pr-3">Sold: {{ dataDetails.totalOutFake }}</div>                                         
+                    <div class="text-justify" v-html="changeCharacter(dataDetails.summary)" ></div>                   
                 </div>
 
                 <div class="w-full md:w-full lg:w-1/3 xl:w-3/12 px-4 mt-8 xl:mt-0">
@@ -40,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-    import type { ProductDetails, Variant } from "types/productTypes";
+    import type { ProductDetails, subImgData, Variant } from "types/productTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -49,28 +47,48 @@
     const route = useRoute();
     const cateStore = useCateStore();
     const productStore = useProductStore();
+    const imagesProStore = useImagesProduct();
 
     const slug = route.params.slug as string | '';
     const dataDetails = ref<ProductDetails | null>(null);
     const dataVariant = ref<Variant[]>([]);
+    const dataSubImgs = ref<subImgData[]>([]);
     const cateTitle = ref('');
     const cateSlug = ref('');
+    const proId = ref(0);
     const imageChoice = ref(0);
     const listImages = ref<{ id: number; media: string }[]>([]);
+
     
-    const getImages = () => {
-        if (dataDetails.value) {
-            listImages.value = [{ id: dataDetails.value.id, media: dataDetails.value.media }];
-        }
+    // const getImages = () => {
+    //     if (dataDetails.value) {
+    //         listImages.value = [{ id: dataDetails.value.id, media: dataDetails.value.media }];
+    //     }
+    //     const mediaList = dataVariant.value.flatMap(variant => variant.options
+    //     .map(option => ({ id: option.id, media: option.media }))
+    //     .filter(item => item.media !== ""));       
+    //     if(mediaList) {
+    //         listImages.value.push(...mediaList);
+    //     }
+    // }
 
-        const mediaList = dataVariant.value.flatMap(variant => variant.options
-        .map(option => ({ id: option.id, media: option.media }))
-        .filter(item => item.media !== ""));
+    const getImages = async (value: number) => {
+        await imagesProStore.fetchSubImagesProduct(value);
+       
+        if (imagesProStore.subDataImg) dataSubImgs.value = imagesProStore.subDataImg;
+        
+        const listSubImages = dataSubImgs.value.map(data => ({ id: data.id, media: data.path }));
 
-        if(mediaList) {
-            listImages.value.push(...mediaList);
-        }
+        if(listSubImages) {
+            listImages.value.push(...listSubImages);
+        }        
     }
+
+    const changeCharacter = (value: string): string => {
+        return value
+        .replace(/\n+/g, '<br>')     // Gộp tất cả \n liên tiếp thành 1 <br>
+        .replace(/(<br>\s*){2,}/g, '<br>'); // Gộp nhiều <br> liên tiếp thành 1
+    };
 
     const updateSlideImages = (variantOptionIds: string) => {
         const optId = variantOptionIds.split(",").map(Number); // Chuyển thành số
@@ -92,11 +110,15 @@
         await productStore.fetchProductDetails(slug);
         dataDetails.value = productStore.productDetails;
 
-        cateTitle.value = cateStore.dataCatePro.find((cate) => cate.id === dataDetails.value?.categoryId)?.name || '';
-        cateSlug.value = cateStore.dataCatePro.find((cate) => cate.id === dataDetails.value?.categoryId)?.slug || '';
-
+        const foundCate = cateStore.dataCatePro.find(cate => cate.id === dataDetails.value?.categoryId);
+        cateTitle.value = foundCate?.name || '';
+        cateSlug.value = foundCate?.slug || '';
+        proId.value = dataDetails.value?.id || 0;
         dataVariant.value = dataDetails.value?.variants || [];
-        getImages();
+        
+        if (proId.value) {
+            await getImages(proId.value);
+        }
     }
 
     fetchDataProduct();

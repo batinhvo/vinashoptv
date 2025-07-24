@@ -68,24 +68,24 @@
                                         </tr>
                                     </thead>
                                     <tbody class="border-t border-gray-300">                
-                                        <tr v-for="(product, index) in products" :key="product.id">
+                                        <tr v-for="(pro, index) in cartStore.cartPro" :key="index">
                                             <td class="py-4 border-t border-gray-300">
-                                                <p class="mb-1">{{ product.name }}</p>
+                                                <p class="mb-1">{{ pro.title + ' - ' + pro.type }}</p>
                                                 <!-- Quantity -->                       
                                                 <div class="flex border border-zinc-300 rounded-full bg-white pl-5 pr-3 py-1">                           
-                                                    <input v-model="product.quantity" class="w-full focus:outline-none" type="number" name="quantity">
-                                                    <button   @click.prevent="decrement(index)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">
+                                                    <input v-model="pro.quantity" class="w-full focus:outline-none" type="number" name="quantity">
+                                                    <button @click.prevent="decrement(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">
                                                         <span class="text-xs">
                                                             <i class="fa fa-minus pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
-                                                    <button @click.prevent="increment(index)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">                                    
+                                                    <button @click.prevent="increment(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">                                    
                                                         <span class="text-xs">
                                                             <i class="fa fa-plus pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
                                                 </div>             
-                                                <div class="flex items-center mt-3">
+                                                <!-- <div class="flex items-center mt-3">
                                                     <p class="font-bold">Gift:</p>
                                                     <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">Assanta Hair Color # 5</p>
                                                     <button class="w-7 h-7 text-center hover:bg-gray-300 rounded-full ml-5">
@@ -93,10 +93,10 @@
                                                             <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
-                                                </div>                          
+                                                </div> -->
                                             </td>
                                             <td class="pl-4 xl:pl-8 py-4 content-baseline text-right">
-                                                ${{ product.price }}.00
+                                                ${{ formatPrice(pro.price * pro.quantity) }}
                                                 <button class="w-7 h-7 text-center hover:bg-gray-300 hover:border rounded-full">
                                                     <span class="text-xs">
                                                         <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>
@@ -198,6 +198,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ProductDetails, Products } from 'types/productTypes';
+
     const formData = ref({
         firstName: '',
         lastName: '',
@@ -245,6 +247,8 @@
     //--------------------------------API-------------------------------------//
 
     const stateStore = useStateStore();
+    const productStore = useProductStore();
+    const cartStore = useCartStore();
 
     const stateOpt = computed(() => stateStore.states.map((state) => state.name));
     const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
@@ -283,24 +287,33 @@
     }
     };
 
-    //----------------------------INVOICE FORM-----------------------------------//
-    const products = ref([
-        { id: '01', name: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g - default', price: 139, quantity: 1 },
-        { id: '02', name: 'Assanta Hair Color # 4 Minute 60g (Light Chestnut) 2 tubes x 60g - default', price: 99, quantity: 1 }
-    ]);
+    //----------------------------INVOICE FORM-----------------------------------//.
+
+    // handle price total
+    const formatPrice = (value: number) => {
+        return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(value);
+    };
 
     // quantity
-    const increment = (index: number) => {
-        products.value[index].quantity++;
+    const increment = (item: any) => {
+        item.quantity++;
     };
-    const decrement = (index: number) => {
-        if (products.value[index].quantity > 1) {  
-            products.value[index].quantity--;
-        }
+    const decrement = (item: any) => {
+        if (item.quantity > 1) item.quantity--;
     };
 
     const selectedPayment = ref<string | null>(null);
 
+    //----------------------------HANDLE BUY-----------------------------------//
+
+    //buy now 
+    onMounted(() => {
+        cartStore.loadCheckoutData()
+    })
+    
 </script>
 
 <style lang="css" scoped>

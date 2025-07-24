@@ -31,7 +31,7 @@
                 <div class="w-2/3">
                     <button
                         v-for="varOpt in vari.options" :key="varOpt.id"
-                        class="border m-0.5 border-gray-200 py-1 px-2 hover:shadow-inner hover:border-[#5cb85c] lg:hover:text-[#228322]"
+                        class="border m-0.5 border-gray-200 py-1 px-2 text-left hover:shadow-inner hover:border-[#5cb85c] lg:hover:text-[#228322]"
                         :class="[selectedOptions[vari.name]?.val === varOpt.name ? 'bg-[#5cb85c] text-white' : '']"
                         @click="selectOption(vari.name, varOpt.name, varOpt.id)">
                         {{ varOpt.name }}
@@ -60,12 +60,15 @@
 
         <!-- button -->
         <div class="mt-2" v-if="isShowButton">
-            <button type="button" class="btn bg-primary text-white py-2.5 w-full mt-4 rounded-full font-bold shadow-sm hover:bg-gray-700 hover:shadow-xl hover:-translate-y-1 duration-300">
+        
+            <button type="button" class="btn bg-primary text-white py-2.5 w-full mt-4 rounded-full font-bold shadow-sm hover:bg-gray-700 hover:shadow-xl hover:-translate-y-1 duration-300"          
+            @click="handleAddTocartButton">
                 <span class="text-xl"><i class="ec ec-add-to-cart mr-2"></i></span>                              
                 Add to Cart
             </button>
             
-            <button type="button" class="btn bg-gray-700 text-white py-3 w-full mt-4 rounded-full font-bold shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300">
+            <button type="button" class="btn bg-gray-700 text-white py-3 w-full mt-4 rounded-full font-bold shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300"
+            @click="handleBuyNowButton">
                 Buy Now 
             </button>
             
@@ -76,40 +79,78 @@
 <script setup lang="ts">
     import type { ProductDetails, Variant, Skus } from "types/productTypes";
 
-    const isShowButton = ref(false);
-    const isOutOfStock = ref(false);
-    const stockData = ref(0);
-    // quantity
-    const quantity = ref(1);
-    const increment = () => { quantity.value++ };
-    const decrement = () => { 
-        if (quantity.value > 1) quantity.value--;
-    };
-    const formatPrice = (price: number): string => {
-        return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
-    };
+    const route = useRoute();
+    const router = useRouter();
+    const cartStore = useCartStore();
 
-    // ---------------------------------------------------------//  
-    
-    const dataSkus = ref<Skus[]>([]);
-    const dataSkusfilter = ref<Skus | null>(null);
-    const selectedOptions = ref<Record<string, { val: string; id: number }>>({});
-    const ChoiceList = ref<string>('');
-
-    const emit = defineEmits(['updateSlideImages']);
-
+    // --- Props & Emits --- //
     const data = defineProps<{
         dataPro?: ProductDetails;
         dataVariant?: Variant[];
     }>();
 
-    dataSkus.value = data.dataPro?.skus || [];
+    const emit = defineEmits(['updateSlideImages']);
+
+    // --- Ref --- //
+    const slug = route.params.slug as string | '';
+
+    const isShowButton = ref(false);
+    const isOutOfStock = ref(false);
+    const stockData = ref(0);
+    const idSkus = ref(0);
+
+    const quantity = ref(1);
+    const dataSkus = ref<Skus[]>([]);
+    const dataSkusfilter = ref<Skus | null>(null);
+
+    const selectedOptions = ref<Record<string, { val: string; id: number }>>({});
+    const ChoiceList = ref<string>('');
+    
+    // --- Computeds --- //
+    // const isOverStock = computed(() => quantity.value > stockData.value);
+    // const isAllVariantsSelected = computed(() => {
+    //     return Object.keys(selectedOptions.value).length === (data.dataVariant?.length || 0);
+    // });
+
+    // --- Methods --- //
+    const increment = () => { quantity.value++ };
+    const decrement = () => { if (quantity.value > 1) quantity.value-- };
+
+    const formatPrice = (price: number): string => {
+        return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
+    };
 
     const selectOption = (key: string, val: string, id: number) => {
         selectedOptions.value = { ...selectedOptions.value, [key]: {val, id} };
         ChoiceList.value = Object.values(selectedOptions.value).map((val) => val.id).join(',');
     };
 
+    const updateSelectedSku = (variantOptionIds: string) => {
+        const foundSku = dataSkus.value.find((sku) => sku.variantOptionIds === variantOptionIds) || null;
+        dataSkusfilter.value = foundSku;
+
+        if (foundSku) {
+            isShowButton.value = true;
+            isOutOfStock.value = false;
+            stockData.value = foundSku.stock;
+            emit('updateSlideImages', foundSku.variantOptionIds);
+            idSkus.value = Number(foundSku.variantOptionIds);
+        } else {
+            isShowButton.value = false;
+            isOutOfStock.value = true;
+        }
+    };
+
+    const handleBuyNowButton = () => {
+        cartStore.getDataBuyNow(slug, idSkus.value, quantity.value);
+        router.push('/checkout');
+    }
+
+    const handleAddTocartButton = () => {
+        cartStore.getDataAddCart(slug, idSkus.value, quantity.value);      
+    }
+
+    // --- Watcherd --- //
     watchEffect(() => {
         if (data.dataVariant?.some(vari => vari.name == 'default')) {
             isShowButton.value = true;
@@ -118,24 +159,15 @@
     });
 
     watch(ChoiceList, (newVal) => {
-        dataSkusfilter.value = dataSkus.value.find((sku) => sku.variantOptionIds === newVal) || null;
-        if(dataSkusfilter.value) {
-            isShowButton.value = true;
-            isOutOfStock.value = false;
-            stockData.value = dataSkusfilter.value.stock;
-            emit('updateSlideImages', dataSkusfilter.value.variantOptionIds);
-        } else {
-            isShowButton.value = false;
-            isOutOfStock.value = true;
-        }
+        updateSelectedSku(newVal);
     });
 
-
-    // handle Buy Now
-    const handleBuyNowButton = () => {
-            
-    }
-
+    // --- Init SKUs --- //
+    onMounted(() => {
+        if (data.dataPro?.skus) {
+            dataSkus.value = data.dataPro.skus;
+        }
+    });
 </script> 
 
 <style lang="css" scoped>

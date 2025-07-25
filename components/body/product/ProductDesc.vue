@@ -17,7 +17,7 @@
             </div>
 
             <!-- content -->
-            <div class="border border-gray-200 rounded-xl p-4 xl:p-12 ">
+            <div class="border border-green-200 rounded-2xl p-4 xl:p-12 bg-[#def5dd] shadow-xl">
                 <div v-if="activeTab === 'about'">
                     <div v-html="contentPro"></div>
                 </div>

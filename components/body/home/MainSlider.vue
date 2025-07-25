@@ -8,7 +8,7 @@
         class="container min-h-[420px]">
             <swiper-slide v-for="(slide, index) in slides" :key="index">       
                 <div class="flex flex-wrap py-8 lg:py-4">
-                    <div class="w-1/2 lg:w-3/5 mt-5 px-4 content" :class="{ active: currentSlideIndex === index }">
+                    <div class="w-2/5 lg:w-3/5 mt-5 px-4 content" :class="{ active: currentSlideIndex === index }">
                         <div class="text-left xl:ml-96 max-w-[500px]">
                             <div class="text-2xl md:text-6xl my-2 font-light in-top">{{ slide.title }}</div>
                             <div  v-if="slide.subtitle" class="text-2xl font-light mb-3 in-top-2">{{ slide.subtitle }}</div>
@@ -16,7 +16,7 @@
                             <div class="mb-4 in-top-3">
                                 <span class="font-normal in-top-3 leading-none md:leading-loose">FROM</span>
                                 <div class="text-3xl md:text-5xl font-bold leading-[3.5rem]">
-                                    <sup>$</sup><span>{{ slide.price }}</span><sup>00</sup>
+                                    <sup>$</sup><span>{{ slide.price }}</span><sup>{{ slide.sub }}</sup>
                                 </div>
                             </div>
                             <NuxtLink :to="`/product/${dataLinkPro}`">
@@ -27,10 +27,10 @@
                         </div>                       
                     </div>
 
-                    <div class="w-1/2 lg:w-2/5 px-4">
+                    <div class="w-3/5 lg:w-2/5 px-4">
                         <NuxtImg 
                             :src="slide.image" 
-                            class="zoom-in-image w-[240px]" 
+                            class="zoom-in-image w-[320px]" 
                             :class="{'active-image': currentSlideIndex === index, 'inactive-image': currentSlideIndex !== index}"
                             :key="currentSlideIndex === index ? 'active-' + index : 'inactive-' + index" 
                             :alt="slide.alt" />
@@ -51,20 +51,22 @@
     // Dữ liệu các slide
     const slides = ref([
         {
-            title: 'CORDYCEPS SPECIAL',
+            title: 'King\'s Golden Oils',
             subtitle: '',
-            description: 'BUY 2 GET 1 FREE',
-            price: 199,
-            image: '/images/banner/banner-01.png',
-            alt: 'Cordyceps-promotion-image',
+            description: 'Made in USA',
+            price: 55,
+            sub: "95",
+            image: '/images/banner/banner-03.png',
+            alt: 'king-golden-oils-promotion-image',
         },
         {
-            title: 'MORINGA 950',
-            subtitle: 'Made in USA - 90 Capsules - 1100 mg',
-            description: '100% PURE, POTENT, NATURAL & ORGANIC',
-            price: 30,
-            image: '/images/banner/banner-02.png',
-            alt: 'Moringa-promotion-image',
+            title: 'Premium Yuki Collagen',
+            subtitle: '(30 sticks)',
+            description: 'Made in Japan',
+            price: 145,
+            sub: "00",
+            image: '/images/banner/banner-04.png',
+            alt: 'Premium-Yuki-Collagen-promotion-image',
         },
     ]);     
 

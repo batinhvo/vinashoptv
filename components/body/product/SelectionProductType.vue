@@ -1,5 +1,5 @@
 <template>
-    <div class="p-8 border-2 border-neutral-300 rounded-2xl" v-if="data.dataPro">
+    <div class="p-8 bg-[#def5dd] border-2 border-gray-200 rounded-2xl" v-if="data.dataPro">
         <!-- Info -->
         <div class="border-b border-gray-300 pb-2">
             <span>Availability: </span>
@@ -31,7 +31,7 @@
                 <div class="w-2/3">
                     <button
                         v-for="varOpt in vari.options" :key="varOpt.id"
-                        class="border m-0.5 border-gray-200 py-1 px-2 text-left hover:shadow-inner hover:border-[#5cb85c] lg:hover:text-[#228322]"
+                        class="border m-0.5 border-[#bed2bd] shadow-sm py-1 px-2 text-left hover:shadow-inner hover:border-[#5cb85c] lg:hover:text-[#228322]"
                         :class="[selectedOptions[vari.name]?.val === varOpt.name ? 'bg-[#5cb85c] text-white' : '']"
                         @click="selectOption(vari.name, varOpt.name, varOpt.id)">
                         {{ varOpt.name }}
@@ -41,7 +41,7 @@
         </div>
 
         <!-- Quantity -->
-        <div class="mt-6 flex flex-wrap">
+        <div class="mt-6 flex flex-wrap" v-if="isShowButton">
             <div class="font-bold w-1/3">Quantity</div>
             <div class="flex w-2/3">
                 <button  @click.prevent="decrement" class="w-10 h-7 text-center hover:bg-gray-300 bg-gray-100 border border-zinc-300 rounded-l-full">

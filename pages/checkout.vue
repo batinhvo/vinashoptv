@@ -70,7 +70,7 @@
                                     <tbody class="border-t border-gray-300">                
                                         <tr v-for="(pro, index) in cartStore.cartPro" :key="index">
                                             <td class="py-4 border-t border-gray-300">
-                                                <p class="mb-1">{{ pro.title + ' - ' + pro.type }}</p>
+                                                <p class="mb-1">{{ pro.title + (pro.type ? ' - ' + pro.type : '') }}</p>
                                                 <!-- Quantity -->                       
                                                 <div class="flex border border-zinc-300 rounded-full bg-white pl-5 pr-3 py-1">                           
                                                     <input v-model="pro.quantity" class="w-full focus:outline-none" type="number" name="quantity">

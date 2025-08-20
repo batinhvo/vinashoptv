@@ -67,19 +67,19 @@
                                             <th class="text-right pl-8 pb-4"> Total</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="border-t border-gray-300">                
-                                        <tr v-for="(pro, index) in cartStore.cartPro" :key="index">
+                                    <tbody class="border-t border-gray-300">                                             
+                                        <tr v-for="(pro, index) in cartStore.dataShow" :key="index">
                                             <td class="py-4 border-t border-gray-300">
                                                 <p class="mb-1">{{ pro.title + (pro.type ? ' - ' + pro.type : '') }}</p>
                                                 <!-- Quantity -->                       
                                                 <div class="flex border border-zinc-300 rounded-full bg-white pl-5 pr-3 py-1">                           
-                                                    <input v-model="pro.quantity" class="w-full focus:outline-none" type="number" name="quantity">
-                                                    <button @click.prevent="decrement(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">
+                                                    <input v-model.number="pro.quantity" class="w-full focus:outline-none" type="number" name="quantity">
+                                                    <button @click.prevent="cartStore.decrement(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">
                                                         <span class="text-xs">
                                                             <i class="fa fa-minus pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
-                                                    <button @click.prevent="increment(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">                                    
+                                                    <button @click.prevent="cartStore.increment(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">                                    
                                                         <span class="text-xs">
                                                             <i class="fa fa-plus pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
@@ -97,7 +97,7 @@
                                             </td>
                                             <td class="pl-4 xl:pl-8 py-4 content-baseline text-right">
                                                 ${{ formatPrice(pro.price * pro.quantity) }}
-                                                <button class="w-7 h-7 text-center hover:bg-gray-300 hover:border rounded-full">
+                                                <button @click.prevent="cartStore.removeItem(index)" class="w-7 h-7 text-center hover:bg-gray-300 hover:border rounded-full">
                                                     <span class="text-xs">
                                                         <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>
                                                     </span>
@@ -124,11 +124,11 @@
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Subtotal</th>
-                                            <td class="text-right py-3">$100.00</td>
+                                            <td class="text-right py-3">${{ formatPrice(cartStore.cartTotal) }}</td>
                                         </tr>
-                                        <tr class="border-t border-gray-300">
+                                        <tr class="border-t border-gray-300" v-for="(w, index) in cartStore.dataWeights">
                                             <th class="text-left py-3">Shipping & Handling</th>
-                                            <td class="text-right py-3">$9.00</td>
+                                            <td class="text-right py-3">${{ w.fee }}</td>
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Discount</th>
@@ -198,7 +198,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ProductDetails, Products } from 'types/productTypes';
 
     const formData = ref({
         firstName: '',
@@ -247,7 +246,6 @@ import type { ProductDetails, Products } from 'types/productTypes';
     //--------------------------------API-------------------------------------//
 
     const stateStore = useStateStore();
-    const productStore = useProductStore();
     const cartStore = useCartStore();
 
     const stateOpt = computed(() => stateStore.states.map((state) => state.name));
@@ -273,6 +271,13 @@ import type { ProductDetails, Products } from 'types/productTypes';
 
     onMounted(async () => {
         await stateStore.fetchStates();
+        await cartStore.fetchWeights();
+    });
+
+    onMounted( () => {
+        cartStore.loadCheckoutData()
+        cartStore.loadCartFromStorage()
+        cartStore.clearBuyNowOnReload()
     });
 
 
@@ -297,22 +302,12 @@ import type { ProductDetails, Products } from 'types/productTypes';
         }).format(value);
     };
 
-    // quantity
-    const increment = (item: any) => {
-        item.quantity++;
-    };
-    const decrement = (item: any) => {
-        if (item.quantity > 1) item.quantity--;
-    };
+    
 
     const selectedPayment = ref<string | null>(null);
 
     //----------------------------HANDLE BUY-----------------------------------//
 
-    //buy now 
-    onMounted(() => {
-        cartStore.loadCheckoutData()
-    })
     
 </script>
 

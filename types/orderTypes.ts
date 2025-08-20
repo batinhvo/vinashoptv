@@ -40,3 +40,19 @@ export interface OrderHistory {
     userNote: string,
     shippingFeeCalculatedBy: string,
 }
+
+export interface CartItem {
+    title: string,
+    type?: string,
+    price: number,
+    quantity: number,
+    weight?: number,
+}
+
+export type Weights = {
+    id: number,
+    name: string,
+    zoneFrom: number,
+    zoneTo: number,
+    fee: number,
+}

@@ -46,7 +46,7 @@ export interface CartItem {
     type?: string,
     price: number,
     quantity: number,
-    weight?: number,
+    weight: number,
 }
 
 export type Weights = {

@@ -5,56 +5,76 @@ const notify = useNotify();
 export const useCartStore = defineStore('cart', () => {
     const config = useRuntimeConfig();
     const apiUrl = config.public.apiBaseUrl;
-    const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
+    const error = ref<number>(0); 
 
+    // state
     const addCartItems = ref<CartItem[]>([])
     const buyNowItem = ref<CartItem | null>(null)
     const dataWeights = ref<Weights[]>([])
 
     const productStore = useProductStore()
 
-    // Tổng số lượng sản phẩm trong giỏ
+    //****************************** GET ******************************//
+
     const cartCount = computed(() => addCartItems.value.length)
 
-    //**************************** GET *********************************//
+    const dataShow = computed<CartItem[]>(() => {
+        return buyNowItem.value ? [buyNowItem.value] : addCartItems.value
+    })
 
-    const fetchWeights =  async () => {
+    const cartTotal = computed(() => {
+        return dataShow.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    })
+
+    const weightsTotal = computed(() => {
+        return dataShow.value.reduce((sum, item) => sum + item.weight * item.quantity, 0)
+    })
+
+    const shippingFee = computed(() => {
+        if (!dataWeights.value.length) return 0
+        const weight = weightsTotal.value
+        const found = dataWeights.value.find(w => weight <= w.zoneTo)
+
+        return found ? found.fee : dataWeights.value.at(-1)?.fee || 0
+    })
+
+    const orderTotal = computed(() => {
+        return cartTotal.value + shippingFee.value
+    })
+   
+
+
+    //******************************************************** ACTIONS ********************************************************//
+
+    // WEIGHTS
+    const fetchWeights = async () => {
         try {
-            const data = await $fetch<{ error: number; data: Weights[]; message: string }>(`${apiUrl}weights`);
-            if (data) {
-                dataWeights.value = data.data || [];              
-            }
+            const data = await $fetch<{ error: number; data: Weights[]; message: string }>(`${apiUrl}weights`)
+            dataWeights.value = data?.data || []
         } catch (err) {
-            error.value = 1;
-            console.error('Error fetching products:', err);
+            error.value = 1
+            console.error("Error fetching products:", err)
         }
-    };
+    }
 
-
-    //**************************************** BUY NOW - ADD CART *******************************************//
-
-    // -------------------------BUY NOW------------------------ //
+    // BUY NOW
     const getDataBuyNow = (slugPro: string, idSkus: number, quantity: number) => {       
         buyNowItem.value = null;
-
         const checkoutData = { slugPro, idSkus, quantity }
         sessionStorage.setItem('checkout_data', JSON.stringify(checkoutData))
-
         notify({ message: 'Buy now item added!', type: 'success', time: 3000 })
     }
 
-    // Fetch sản phẩm từ slug + thêm vào giỏ hàng
+    // FETCH PRODUCTS
     const loadCheckoutData = async () => {
         const raw = sessionStorage.getItem('checkout_data')
         const checkoutData = raw ? JSON.parse(raw) : null
-
         if (!checkoutData || !checkoutData.slugPro) return
 
         const { slugPro, idSkus, quantity = 1 } = checkoutData
-
         await productStore.fetchProductDetails(slugPro)
         const dataDetails = productStore.productDetails
-
+       
         if (dataDetails) {
             buyNowItem.value = {
                 title: dataDetails.title,
@@ -66,45 +86,33 @@ export const useCartStore = defineStore('cart', () => {
         }
     }
 
-    // -----------------------ADD TO CART------------------------------ //
+    // ADD TO CART
     const getDataAddCart = async (slugPro: string, idSkus:number, quantity: number) => {
         await productStore.fetchProductDetails(slugPro)
         const details = productStore.productDetails;
-
         if(!details) return;
 
-        const existing = addCartItems.value.find(item => item.title === details.title)
-
+        const typeName = details.variants.map(item => item.options.find(opt => opt.id === idSkus)?.name).join(', ')
+        const existing = addCartItems.value.find(item => item.title === details.title && item.type === typeName)
+        
         if(existing) {
-            existing.quantity += quantity;
+            existing.quantity += quantity
         } else {
             addCartItems.value.push({
                 title: details.title,
-                type: details.variants.map(item => item.options.find(opt => opt.id === idSkus)?.name).join(', '),
+                type: typeName,
                 price: details.minPrice,
                 quantity,
                 weight: Number(details.skus.map(k => k.weight)),
-            });
+            })
+
         }
 
         notify({ message: 'Added to cart!', type: 'success', time: 3000 })
     }
 
 
-    // ******************** // ********************  UI  ******************** // ********************
-
-    //show screen
-    const dataShow = computed<CartItem[]>(() => {
-        if (buyNowItem.value) {
-            return [buyNowItem.value]
-        }
-            return addCartItems.value
-    })
-
-    // Lưu cartPro vào localStorage khi thay đổi
-    watch(addCartItems, (val) => {
-        localStorage.setItem('cart_data', JSON.stringify(val))
-    }, { deep: true })
+    // ******************** // ******************** // ********************  UI  ******************** // ******************** // ******************** //
 
     // Khi store khởi tạo → load cart từ localStorage
     const loadCartFromStorage = () => {
@@ -143,39 +151,45 @@ export const useCartStore = defineStore('cart', () => {
     const decrement = (item: CartItem) => {
         if (buyNowItem.value && buyNowItem.value.title === item.title) {
             if (buyNowItem.value.quantity > 1) {
-            buyNowItem.value.quantity--
+                buyNowItem.value.quantity--
             }
         } else {
             const target = addCartItems.value.find(p => p.title === item.title && p.type === item.type)
             if (target && target.quantity > 1) {
-            target.quantity--
+                target.quantity--
             }
         }
     }
 
-    // Tổng giá trị giỏ hàng / checkout
-    const cartTotal = computed(() => {
-        return dataShow.value.reduce((sum, item) => {
-            return sum + item.price * item.quantity
-        }, 0)
-    })
+    // Lưu cartPro vào localStorage khi thay đổi
+    watch(addCartItems, (val) => {
+        localStorage.setItem('cart_data', JSON.stringify(val))
+    }, { deep: true })
 
     return {
-        addCartItems,
-        cartCount,
-        buyNowItem,  
-        dataShow,
-        cartTotal,
-        dataWeights,
-        getDataBuyNow,
-        getDataAddCart,
-        loadCheckoutData,
-        increment,
-        decrement,
-        removeItem,
-        loadCartFromStorage,
-        clearBuyNowOnReload,
-        fetchWeights   
-    }
+    // state
+    addCartItems,
+    buyNowItem,
+    dataWeights,
+
+    // getters
+    cartCount,
+    dataShow,
+    cartTotal,
+    weightsTotal,
+    shippingFee,
+    orderTotal,
+
+    // actions
+    fetchWeights,
+    getDataBuyNow,
+    loadCheckoutData,
+    getDataAddCart,
+    loadCartFromStorage,
+    clearBuyNowOnReload,
+    removeItem,
+    increment,
+    decrement,
+  }
   
 });

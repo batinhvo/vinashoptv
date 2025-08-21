@@ -126,9 +126,9 @@
                                             <th class="text-left py-3">Subtotal</th>
                                             <td class="text-right py-3">${{ formatPrice(cartStore.cartTotal) }}</td>
                                         </tr>
-                                        <tr class="border-t border-gray-300" v-for="(w, index) in cartStore.dataWeights">
+                                        <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Shipping & Handling</th>
-                                            <td class="text-right py-3">${{ w.fee }}</td>
+                                            <td class="text-right py-3">${{ cartStore.shippingFee }}</td>
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Discount</th>
@@ -140,7 +140,7 @@
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Total</th>
-                                            <th class="text-right py-3">$999.00</th>
+                                            <th class="text-right py-3">${{ cartStore.orderTotal }}</th>
                                         </tr>              
                                     </tfoot>
                                 </table>
@@ -277,7 +277,7 @@
     onMounted( () => {
         cartStore.loadCheckoutData()
         cartStore.loadCartFromStorage()
-        cartStore.clearBuyNowOnReload()
+        // cartStore.clearBuyNowOnReload()
     });
 
 

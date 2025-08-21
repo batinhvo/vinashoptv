@@ -15,7 +15,7 @@
                             </div>
                             <div class="w-80">
                                 <div class="text-font-13">Customer Service 24/7!</div>
-                                <a class="text-xl font-normal" href="tel:+1(855) 855-5888">(855) 855-5888</a>
+                                <a class="text-xl font-normal hover:text-black" href="tel:+1(855) 855-5888">(855) 855-5888</a>
                             </div>
                         </div>
                         <div class="mb-4 flex items-center">
@@ -24,7 +24,7 @@
                             </div>
                             <div class="w-80">
                                 <div class="text-font-13">Live show (Mon - Wed - Fri: 3:00pm - 4:00pm CST)</div>
-                                <a class="text-xl font-normal" href="tel:+1(855) 558-8000">(855) 558-8000</a>
+                                <a class="text-xl font-normal hover:text-black" href="tel:+1(855) 558-8000">(855) 558-8000</a>
                             </div>
                         </div>
                         <div class="mb-4 flex items-center">
@@ -33,7 +33,7 @@
                             </div>
                             <div class="w-80">
                                 <div class="text-font-13">Radio show: (Tue 5:30pm - 6:00pm CST)</div>
-                                <a class="text-xl font-normal" href="tel:+1(713) 931-1560">(713) 931-1560</a>
+                                <a class="text-xl font-normal hover:text-black" href="tel:+1(713) 931-1560">(713) 931-1560</a>
                             </div>
                         </div>
                     </div>        
@@ -41,8 +41,8 @@
                         <h6 class="mb-1 font-bold text-base">E-Mail</h6>
                         <div class="mb-4 flex items-center">
                             <div class="text-2xl">
-                                <i class="ec ec-newsletter text-primary"></i>
-                                <span class="text-font-15">info@vinashoptv.com</span>
+                                <i class="ec ec-newsletter text-primary"></i>                               
+                                <a class="text-font-15 hover:text-black" href="mailto:info@vinashoptv.com">info@vinashoptv.com</a>
                             </div>
                         </div>
                         <div class="my-6">

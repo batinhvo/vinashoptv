@@ -1,18 +1,20 @@
-import type { CartItem, Weights } from "types/orderTypes";
-const notify = useNotify();
-
+import type { CartItem, Discounts, Weights } from "types/orderTypes";
+const notify = useNotify()
 
 export const useCartStore = defineStore('cart', () => {
-    const config = useRuntimeConfig();
-    const apiUrl = config.public.apiBaseUrl;
-    const error = ref<number>(0); 
+    const config = useRuntimeConfig()
+    const apiUrl = config.public.apiBaseUrl
+    const error = ref<number>(0)
 
     // state
     const addCartItems = ref<CartItem[]>([])
     const buyNowItem = ref<CartItem | null>(null)
     const dataWeights = ref<Weights[]>([])
+    const dataDiscounts = ref<Discounts | null>(null)
+    const discountValue = ref<number>(0)
 
     const productStore = useProductStore()
+    const authStore = useAuthStore()
 
     //****************************** GET ******************************//
 
@@ -20,15 +22,15 @@ export const useCartStore = defineStore('cart', () => {
 
     const dataShow = computed<CartItem[]>(() => {
         return buyNowItem.value ? [buyNowItem.value] : addCartItems.value
-    })
+    });
 
-    const cartTotal = computed(() => {
+    const subTotal = computed(() => {
         return dataShow.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    })
+    });
 
     const weightsTotal = computed(() => {
         return dataShow.value.reduce((sum, item) => sum + item.weight * item.quantity, 0)
-    })
+    });
 
     const shippingFee = computed(() => {
         if (!dataWeights.value.length) return 0
@@ -36,15 +38,102 @@ export const useCartStore = defineStore('cart', () => {
         const found = dataWeights.value.find(w => weight <= w.zoneTo)
 
         return found ? found.fee : dataWeights.value.at(-1)?.fee || 0
-    })
+    });
 
     const orderTotal = computed(() => {
-        return cartTotal.value + shippingFee.value
-    })
+        return subTotal.value + shippingFee.value - discountValue.value;
+    });
    
 
 
     //******************************************************** ACTIONS ********************************************************//
+
+    //UPDATE DATA CART
+    const updateDataCart = async () => {
+        const token = useCookie('tokenAccess').value;
+
+        const skuIdList = addCartItems.value.map(item => ({
+            skuId: item.skuId,
+            quantity: item.quantity
+        }))
+        
+        try {
+            await $fetch<{ error: number; data: number }>(`${apiUrl}carts`, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type" : "application/json",
+                    "Authorization" : `Bearer ${token || ""}`,
+                },
+                body: {
+                   skuIdList: JSON.stringify(skuIdList)
+                }
+            });
+            
+        } catch (err) {
+            console.error("Error posting cart:", err)
+        }
+        
+    }
+
+    //POST DATA CART
+    const addDataCart = async () => {
+        const token = useCookie('tokenAccess').value;
+
+        //if (!authStore.authenticated || !token) return;
+
+        const skuIdList = addCartItems.value.map(item => ({
+            skuId: item.skuId,
+            quantity: item.quantity
+        }))
+        
+        try {
+            const cartResponse = await $fetch<{ error: number; data: number }>(`${apiUrl}carts`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type" : "application/json",
+                    "Authorization" : `Bearer ${token || ""}`,
+                },
+                body: {
+                    skuIdList: JSON.stringify(skuIdList)
+                }
+            });
+
+        } catch (err) {
+            console.error("Error posting cart:", err)
+        }
+        
+    }
+
+    //DISCOUNT
+    const fetchDiscounts = async (subtotal : number) => {
+        try {
+            const dataDis = await $fetch<{ error: number; data: Discounts; message: string }>(`${apiUrl}discounts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: {
+                    subtotal,
+                }
+            })
+
+            const dis = dataDis.data
+
+            if (dis?.discountBasedOn === 'percent') {
+                discountValue.value = (dis.discountValue / 100) * subTotal.value
+            } else if (dis?.discountBasedOn === 'value') {
+                discountValue.value = dis.discountValue
+            } else {
+                discountValue.value = 0
+            }
+
+            return discountValue;
+
+        } catch (err) {
+            error.value = 1
+            console.error("Error fetching discounts:", err)
+        }
+    }
 
     // WEIGHTS
     const fetchWeights = async () => {
@@ -53,7 +142,7 @@ export const useCartStore = defineStore('cart', () => {
             dataWeights.value = data?.data || []
         } catch (err) {
             error.value = 1
-            console.error("Error fetching products:", err)
+            console.error("Error fetching weights:", err)
         }
     }
 
@@ -77,6 +166,7 @@ export const useCartStore = defineStore('cart', () => {
        
         if (dataDetails) {
             buyNowItem.value = {
+                skuId: Number(dataDetails.skus.map(k => k.id)),
                 title: dataDetails.title,
                 price: dataDetails.minPrice,
                 type: dataDetails.variants.map(item => item.options.find(opt => opt.id === idSkus)?.name).join(', '),
@@ -99,6 +189,7 @@ export const useCartStore = defineStore('cart', () => {
             existing.quantity += quantity
         } else {
             addCartItems.value.push({
+                skuId: Number(details.skus.map(k => k.id)),
                 title: details.title,
                 type: typeName,
                 price: details.minPrice,
@@ -106,6 +197,10 @@ export const useCartStore = defineStore('cart', () => {
                 weight: Number(details.skus.map(k => k.weight)),
             })
 
+        }
+
+        if (authStore.authenticated && useCookie('tokenAccess').value && addCartItems.value.length == 0) {
+            await addDataCart()         
         }
 
         notify({ message: 'Added to cart!', type: 'success', time: 3000 })
@@ -162,9 +257,22 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     // Lưu cartPro vào localStorage khi thay đổi
-    watch(addCartItems, (val) => {
+    watch(addCartItems, async (val)=> {
         localStorage.setItem('cart_data', JSON.stringify(val))
+
+        if (authStore.authenticated && useCookie('tokenAccess').value && addCartItems.value.length > 1) {
+            await updateDataCart()         
+        }
     }, { deep: true })
+
+    // Check discounts
+    watch(subTotal, (newSubtotal) => {
+        if (newSubtotal > 0) {
+            fetchDiscounts(newSubtotal)
+        } else {
+            dataDiscounts.value = null
+        }
+    })
 
     return {
     // state
@@ -175,13 +283,15 @@ export const useCartStore = defineStore('cart', () => {
     // getters
     cartCount,
     dataShow,
-    cartTotal,
+    subTotal,
     weightsTotal,
     shippingFee,
     orderTotal,
+    discountValue,
 
     // actions
     fetchWeights,
+    fetchDiscounts,
     getDataBuyNow,
     loadCheckoutData,
     getDataAddCart,

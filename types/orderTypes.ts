@@ -42,6 +42,7 @@ export interface OrderHistory {
 }
 
 export interface CartItem {
+    skuId: number,
     title: string,
     type?: string,
     price: number,
@@ -55,4 +56,15 @@ export type Weights = {
     zoneFrom: number,
     zoneTo: number,
     fee: number,
+}
+
+export type Discounts = {
+    id: number,
+    name: string,
+    status: string,
+    startAt: Date,
+    endAt: Date,
+    discountBasedOn: string,
+    discountValue: number,
+    minSubtotal: number,
 }

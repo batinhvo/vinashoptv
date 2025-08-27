@@ -8,7 +8,7 @@
           </ul>
         </div>
 
-        <div class="container my-10">
+        <div v-if="cartStore.dataShow.length != 0" class="container my-10">
             <h1 class="text-center text-4xl font-normal pb-10">Checkout</h1>
             <form @submit.prevent="onSubmit">
                 <div class="flex flex-wrap">
@@ -19,7 +19,7 @@
                         </div>      
                                         
                         <div class="flex flex-wrap">
-                            <InputField name="firstName" label="First Name" rules="required" v-model="formData.firstName" placeholder="enter your first name" />
+                            <InputField v-model="formData.firstName" name="firstName" label="First Name" rules="required" placeholder="enter your first name" />
                             <InputField name="lastName" label="Last Name" rules="required" v-model="formData.lastName" placeholder="enter your last name" />
                             <InputSelective name="state" label="State" v-model="formData.state" rules="required" :widthfull=true :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
                             <InputSelective name="city" label="City" v-model="formData.city" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
@@ -124,15 +124,15 @@
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Subtotal</th>
-                                            <td class="text-right py-3">${{ formatPrice(cartStore.cartTotal) }}</td>
+                                            <td class="text-right py-3">${{ formatPrice(cartStore.subTotal) }}</td>
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Shipping & Handling</th>
-                                            <td class="text-right py-3">${{ cartStore.shippingFee }}</td>
+                                            <td class="text-right py-3">${{ formatPrice(cartStore.shippingFee) }}</td>
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Discount</th>
-                                            <td class="text-right py-3">-$9.00</td>
+                                            <td class="text-right py-3">-${{ formatPrice(cartStore.discountValue) }}</td>
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Tax</th>
@@ -140,7 +140,7 @@
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Total</th>
-                                            <th class="text-right py-3">${{ cartStore.orderTotal }}</th>
+                                            <th class="text-right py-3">${{ formatPrice(cartStore.orderTotal) }}</th>
                                         </tr>              
                                     </tfoot>
                                 </table>
@@ -193,6 +193,14 @@
                     </div>
                 </div>
             </form>
+        </div>
+
+        <div v-else class="container my-10 text-center">
+            <!-- <i class="text-[200px] fa-solid fa-basket-shopping"></i> -->
+            
+            <div class="text-5xl pb-5 font-bold text-[#00890c]">(-_-!)</div>
+            <div class="text-2xl font-bold">~ YOUR CART IS EMPTY ~</div>
+            
         </div>
     </div>
 </template>
@@ -247,6 +255,7 @@
 
     const stateStore = useStateStore();
     const cartStore = useCartStore();
+    const authStore = useAuthStore();
 
     const stateOpt = computed(() => stateStore.states.map((state) => state.name));
     const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
@@ -269,6 +278,14 @@
         }
     });
 
+    watchEffect(() => {
+        if (authStore.userInfo) { 
+            formData.value.firstName = authStore.userInfo.firstName;
+            formData.value.address = authStore.userInfo.address;
+            //getNameState(info.userData.state, info.userData.cityId);
+        }
+    });
+
     onMounted(async () => {
         await stateStore.fetchStates();
         await cartStore.fetchWeights();
@@ -277,6 +294,7 @@
     onMounted( () => {
         cartStore.loadCheckoutData()
         cartStore.loadCartFromStorage()
+        
         // cartStore.clearBuyNowOnReload()
     });
 

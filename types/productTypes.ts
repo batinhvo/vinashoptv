@@ -1,4 +1,4 @@
-export interface Products {
+export interface Product {
     id: number;
     useTax: string;
     tax: string;
@@ -47,7 +47,7 @@ export type Skus = {
     variantOptionIds: string,
 };
 
-export type ProductDetails = {
+export type ProductDetail = {
     id: number,
     useTax: string,
     tax: number,
@@ -70,6 +70,14 @@ export type ProductDetails = {
     variants: Variant[],
     skus: Skus[],
 };
+
+export type skusProduct = {
+    id: number,
+    price: number,
+    productId: number,
+    salePrice: number,
+    weight: number,
+}
 
 export type subImgData = {
     id: number,

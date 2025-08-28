@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-    import { type Products } from "types/productTypes";
+    import { type Product } from "types/productTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -48,7 +48,7 @@
 
     const productStore = useProductStore();
 
-    const productListData = ref<Products[]>([]);
+    const productListData = ref<Product[]>([]);
     const totalProducts = ref(0);
 
     const isUpdateSort = ref(false);
@@ -73,7 +73,7 @@
 
     const fetchDataProductSaleOff = async () => {        
         await productStore.fetchProducts(params);
-        productListData.value = productStore?.products || [];
+        productListData.value = productStore?.productList || [];
         totalProducts.value = productStore.productTotal || 0;
     }
     

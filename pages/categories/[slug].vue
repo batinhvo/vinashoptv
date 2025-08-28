@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-    import { type Products } from "types/productTypes";
+    import { type Product } from "types/productTypes";
 
     //----------------------------API------------------------------------//
     const route = useRoute();
@@ -48,7 +48,7 @@
     const productStore = useProductStore();
     const imageProductStore = useImagesProduct();
 
-    const productListData = ref<Products[]>([]);
+    const productListData = ref<Product[]>([]);
     const slug = route.params.slug as string;
     const Imgsource = ref<string>("");
     const totalProducts = ref(0);
@@ -76,7 +76,7 @@
 
     const updateProducts = async () => {
         await productStore.fetchProducts(params);
-        productListData.value = productStore?.products || []; 
+        productListData.value = productStore?.productList || []; 
         totalProducts.value = productStore.productTotal || 0;
     };
 

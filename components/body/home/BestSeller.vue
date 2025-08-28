@@ -38,5 +38,5 @@
 
     await productStore.fetchProducts(params);
 
-    const products = computed(() => productStore.products.slice(0, 4));
+    const products = computed(() => productStore.productList.slice(0, 4));
 </script>

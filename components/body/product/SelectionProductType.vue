@@ -77,22 +77,20 @@
 </template>
 
 <script setup lang="ts">
-    import type { ProductDetails, Variant, Skus } from "types/productTypes";
+    import type { ProductDetail, Variant, Skus } from "types/productTypes";
 
-    const route = useRoute();
     const router = useRouter();
     const cartStore = useCartStore();
 
     // --- Props & Emits --- //
     const data = defineProps<{
-        dataPro?: ProductDetails;
+        dataPro?: ProductDetail;
         dataVariant?: Variant[];
     }>();
 
     const emit = defineEmits(['updateSlideImages']);
 
     // --- Ref --- //
-    const slug = route.params.slug as string | '';
 
     const isShowButton = ref(false);
     const isOutOfStock = ref(false);
@@ -104,7 +102,7 @@
     const dataSkusfilter = ref<Skus | null>(null);
 
     const selectedOptions = ref<Record<string, { val: string; id: number }>>({});
-    const ChoiceList = ref<string>('');
+    const choiceList = ref<string>('');
     
     // --- Computeds --- //
     // const isOverStock = computed(() => quantity.value > stockData.value);
@@ -122,12 +120,14 @@
 
     const selectOption = (key: string, val: string, id: number) => {
         selectedOptions.value = { ...selectedOptions.value, [key]: {val, id} };
-        ChoiceList.value = Object.values(selectedOptions.value).map((val) => val.id).join(',');
+        choiceList.value = Object.values(selectedOptions.value).map((val) => val.id).join(',');
     };
 
     const updateSelectedSku = (variantOptionIds: string) => {
         const foundSku = dataSkus.value.find((sku) => sku.variantOptionIds === variantOptionIds) || null;
         dataSkusfilter.value = foundSku;
+
+        console.log("foundSku: " , foundSku)
 
         if (foundSku) {
             isShowButton.value = true;
@@ -135,6 +135,8 @@
             stockData.value = foundSku.stock;
             emit('updateSlideImages', foundSku.variantOptionIds);
             idSkus.value = Number(foundSku.variantOptionIds);
+
+            console.log("pro: " + idSkus.value)
         } else {
             isShowButton.value = false;
             isOutOfStock.value = true;
@@ -142,12 +144,12 @@
     };
 
     const handleBuyNowButton = () => {
-        cartStore.getDataBuyNow(slug, idSkus.value, quantity.value);
+        cartStore.getDataBuyNow(idSkus.value, quantity.value);
         router.push('/checkout');
     }
 
     const handleAddTocartButton = () => {
-        cartStore.getDataAddCart(slug, idSkus.value, quantity.value);      
+        cartStore.getDataAddCart(idSkus.value, quantity.value);      
     }
 
     // --- Watcherd --- //
@@ -158,7 +160,7 @@
         }       
     });
 
-    watch(ChoiceList, (newVal) => {
+    watch(choiceList, (newVal) => {
         updateSelectedSku(newVal);
     });
 

@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-    import type { ProductDetails, subImgData, Variant } from "types/productTypes";
+    import type { ProductDetail, subImgData, Variant } from "types/productTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -50,7 +50,7 @@
     const imagesProStore = useImagesProduct();
 
     const slug = route.params.slug as string | '';
-    const dataDetails = ref<ProductDetails | null>(null);
+    const dataDetails = ref<ProductDetail | null>(null);
     const dataVariant = ref<Variant[]>([]);
     const dataSubImgs = ref<subImgData[]>([]);
     const cateTitle = ref('');
@@ -108,7 +108,7 @@
 
     const fetchDataProduct = async () => {
         await productStore.fetchProductDetails(slug);
-        dataDetails.value = productStore.productDetails;
+        dataDetails.value = productStore.productDetail;
 
         const foundCate = cateStore.dataCatePro.find(cate => cate.id === dataDetails.value?.categoryId);
         cateTitle.value = foundCate?.name || '';

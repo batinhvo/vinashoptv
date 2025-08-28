@@ -46,12 +46,12 @@
 </template>
 
 <script setup lang="ts">
-    import { type Products } from 'types/productTypes';
+    import { type Product } from 'types/productTypes';
 
     //show modal
     const showQuickView = ref(false);
-    const productData = ref<Products | null>(null);
-    const openShowQuickView = (proData: Products) => {
+    const productData = ref<Product | null>(null);
+    const openShowQuickView = (proData: Product) => {
         productData.value = proData;
         showQuickView.value = true;
     };
@@ -62,7 +62,7 @@
     };
 
     const data = defineProps<{
-        dataProduct?: Products[];
+        dataProduct?: Product[];
     }>();
 
     //-------------------------API----------------------------//

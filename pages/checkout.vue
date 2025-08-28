@@ -294,6 +294,10 @@
     onMounted( () => {
         cartStore.loadCheckoutData()
         cartStore.loadCartFromStorage()
+
+        if(authStore.authenticated) {
+            cartStore.fetchDataCart()
+        }
         
         // cartStore.clearBuyNowOnReload()
     });

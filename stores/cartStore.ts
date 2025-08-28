@@ -1,4 +1,5 @@
 import type { CartItem, Discounts, Weights } from "types/orderTypes";
+import type { ProductDetail, skusProduct } from "types/productTypes";
 const notify = useNotify()
 
 export const useCartStore = defineStore('cart', () => {
@@ -12,6 +13,9 @@ export const useCartStore = defineStore('cart', () => {
     const dataWeights = ref<Weights[]>([])
     const dataDiscounts = ref<Discounts | null>(null)
     const discountValue = ref<number>(0)
+    const isCartCreated = ref(false)
+    const dataSkusDetails = ref<skusProduct | null>(null)
+    const dataVariant = ref<[]>([])
 
     const productStore = useProductStore()
     const authStore = useAuthStore()
@@ -48,38 +52,130 @@ export const useCartStore = defineStore('cart', () => {
 
     //******************************************************** ACTIONS ********************************************************//
 
-    //UPDATE DATA CART
-    const updateDataCart = async () => {
+    // GET DATA CART
+    const fetchDataCart = async () => {
         const token = useCookie('tokenAccess').value;
+        if (authStore.authenticated && token) {
+            try {
+                const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                })
 
-        const skuIdList = addCartItems.value.map(item => ({
-            skuId: item.skuId,
-            quantity: item.quantity
-        }))
-        
-        try {
-            await $fetch<{ error: number; data: number }>(`${apiUrl}carts`, {
-                method: 'PUT',
-                headers: {
-                    "Content-Type" : "application/json",
-                    "Authorization" : `Bearer ${token || ""}`,
-                },
-                body: {
-                   skuIdList: JSON.stringify(skuIdList)
-                }
-            });
-            
-        } catch (err) {
-            console.error("Error posting cart:", err)
+                if (dataCartResponse.data) {            
+                    const serverCart = JSON.parse(dataCartResponse.data)
+
+                    //if (Array.isArray(serverCart) && serverCart.length > 0) { //check cart có rỗng không
+                        addCartItems.value = [];
+
+                        for (const i of serverCart) {
+                            const id = i.skuId;
+                            const quantity = i.quantity || 1;
+
+                            await getDataAddCart(id, quantity);                      
+                        }
+                        
+                    //} else {                 
+                        
+                    //}
+                } 
+            } catch (err) {
+                console.error("Error fetching cart:", err)
+            }
+        } else {
+            const localCart = localStorage.getItem('cart_data')
+            addCartItems.value = localCart ? JSON.parse(localCart) : [];
         }
+               
         
+    }
+
+    // ADD TO CART
+    const getDataAddCart = async (idSkus:number, quantity: number) => {
+
+        await productStore.fetchProductDetailSkus(idSkus)
+        const dataSkusDetails = productStore.productDetailSkus;
+
+        if(!dataSkusDetails) return;
+
+        const idPro = Number(dataSkusDetails?.productId);
+        await productStore.fetchProductWithId(idPro);
+        const dataProduct = productStore.product
+
+        if(!dataProduct) return;
+
+        await fetchVariant(idSkus);
+        const dataVar = dataVariant.value.join(', ');
+        const existing = addCartItems.value.find(item => item.skuId === idSkus && item.type === dataVar)
+        
+        if(existing) {
+            existing.quantity += quantity
+        } else {
+            addCartItems.value.push({
+                skuId: idSkus,
+                title: dataProduct.title,
+                type: dataVar,
+                price: Number(dataSkusDetails?.price) || 0,
+                quantity,
+                weight: Number(dataSkusDetails?.weight) || 0,
+            })
+        }
+
+        if (authStore.authenticated && useCookie('tokenAccess').value) {
+            addDataCart();
+        }
+
+        notify({ message: 'Added to cart!', type: 'success', time: 3000 });
+    }
+
+    // BUY NOW
+    const getDataBuyNow = (idSkus: number, quantity: number) => {       
+        buyNowItem.value = null;
+        const checkoutData = { idSkus, quantity }
+
+        console.log("1 " + idSkus)
+        sessionStorage.setItem('checkout_data', JSON.stringify(checkoutData))
+        notify({ message: 'Buy now item added!', type: 'success', time: 3000 })
+    }
+
+    // LOAD PRODUCTS CHECKOUT
+    const loadCheckoutData = async () => {
+        const raw = sessionStorage.getItem('checkout_data');
+        const checkoutData = raw ? JSON.parse(raw) : null;
+        if (!checkoutData) return
+
+        const { idSkus, quantity = 1 } = checkoutData;
+
+        console.log(checkoutData)
+
+        await productStore.fetchProductDetailSkus(idSkus);
+        const dataSkus = productStore.productDetailSkus;
+
+        const idPro = dataSkus?.id;        
+        if (idPro) await productStore.fetchProducts(idPro);
+        const dataProduct = productStore.product;
+
+        await fetchVariant(idSkus);
+       
+        if (dataProduct) {
+            buyNowItem.value = {
+                skuId: Number(dataSkus?.id),
+                title: dataProduct.title,
+                price: Number(dataSkus?.price) || 0,
+                type: dataVariant.value.join(', '),
+                quantity,
+                weight: Number(dataSkus?.weight) || 0,
+            }
+        }
     }
 
     //POST DATA CART
     const addDataCart = async () => {
         const token = useCookie('tokenAccess').value;
-
-        //if (!authStore.authenticated || !token) return;
+        if (!authStore.authenticated || !token) return;
 
         const skuIdList = addCartItems.value.map(item => ({
             skuId: item.skuId,
@@ -87,16 +183,32 @@ export const useCartStore = defineStore('cart', () => {
         }))
         
         try {
-            const cartResponse = await $fetch<{ error: number; data: number }>(`${apiUrl}carts`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type" : "application/json",
-                    "Authorization" : `Bearer ${token || ""}`,
-                },
-                body: {
-                    skuIdList: JSON.stringify(skuIdList)
-                }
-            });
+            
+            if (addCartItems.value.length === 1) {
+                // Nếu giỏ hàng rỗng -> POST
+                await $fetch<{ error: number; data: any }>(`${apiUrl}carts`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: { 
+                        skuIdList: JSON.stringify(skuIdList) 
+                    },
+                })
+            } else {
+                // Nếu giỏ hàng đã có sản phẩm -> PUT
+                await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: { 
+                        skuIdList: JSON.stringify(skuIdList) 
+                    },
+                })
+            }
 
         } catch (err) {
             console.error("Error posting cart:", err)
@@ -135,6 +247,19 @@ export const useCartStore = defineStore('cart', () => {
         }
     }
 
+    // VARIANT-OPTIONS
+    const fetchVariant = async (idSkus : number) => {
+        try {
+            const data = await $fetch<{ error: number; data:[] }>(`${apiUrl}skus/${idSkus}/variant-options`)
+            dataVariant.value = data?.data || []
+
+            return dataVariant;
+        } catch (err) {
+            error.value = 1
+            console.error("Error fetching variant options:", err)
+        }
+    }
+
     // WEIGHTS
     const fetchWeights = async () => {
         try {
@@ -145,67 +270,6 @@ export const useCartStore = defineStore('cart', () => {
             console.error("Error fetching weights:", err)
         }
     }
-
-    // BUY NOW
-    const getDataBuyNow = (slugPro: string, idSkus: number, quantity: number) => {       
-        buyNowItem.value = null;
-        const checkoutData = { slugPro, idSkus, quantity }
-        sessionStorage.setItem('checkout_data', JSON.stringify(checkoutData))
-        notify({ message: 'Buy now item added!', type: 'success', time: 3000 })
-    }
-
-    // FETCH PRODUCTS
-    const loadCheckoutData = async () => {
-        const raw = sessionStorage.getItem('checkout_data')
-        const checkoutData = raw ? JSON.parse(raw) : null
-        if (!checkoutData || !checkoutData.slugPro) return
-
-        const { slugPro, idSkus, quantity = 1 } = checkoutData
-        await productStore.fetchProductDetails(slugPro)
-        const dataDetails = productStore.productDetails
-       
-        if (dataDetails) {
-            buyNowItem.value = {
-                skuId: Number(dataDetails.skus.map(k => k.id)),
-                title: dataDetails.title,
-                price: dataDetails.minPrice,
-                type: dataDetails.variants.map(item => item.options.find(opt => opt.id === idSkus)?.name).join(', '),
-                quantity,
-                weight: Number(dataDetails.skus.map(k => k.weight)),
-            }
-        }
-    }
-
-    // ADD TO CART
-    const getDataAddCart = async (slugPro: string, idSkus:number, quantity: number) => {
-        await productStore.fetchProductDetails(slugPro)
-        const details = productStore.productDetails;
-        if(!details) return;
-
-        const typeName = details.variants.map(item => item.options.find(opt => opt.id === idSkus)?.name).join(', ')
-        const existing = addCartItems.value.find(item => item.title === details.title && item.type === typeName)
-        
-        if(existing) {
-            existing.quantity += quantity
-        } else {
-            addCartItems.value.push({
-                skuId: Number(details.skus.map(k => k.id)),
-                title: details.title,
-                type: typeName,
-                price: details.minPrice,
-                quantity,
-                weight: Number(details.skus.map(k => k.weight)),
-            })
-
-        }
-
-        if (authStore.authenticated && useCookie('tokenAccess').value && addCartItems.value.length == 0) {
-            await addDataCart()         
-        }
-
-        notify({ message: 'Added to cart!', type: 'success', time: 3000 })
-    }
-
 
     // ******************** // ******************** // ********************  UI  ******************** // ******************** // ******************** //
 
@@ -258,11 +322,11 @@ export const useCartStore = defineStore('cart', () => {
 
     // Lưu cartPro vào localStorage khi thay đổi
     watch(addCartItems, async (val)=> {
-        localStorage.setItem('cart_data', JSON.stringify(val))
-
-        if (authStore.authenticated && useCookie('tokenAccess').value && addCartItems.value.length > 1) {
-            await updateDataCart()         
+        localStorage.setItem('cart_data', JSON.stringify(val));
+        if (authStore.authenticated && useCookie('tokenAccess').value) {
+            addDataCart();
         }
+
     }, { deep: true })
 
     // Check discounts
@@ -290,6 +354,7 @@ export const useCartStore = defineStore('cart', () => {
     discountValue,
 
     // actions
+    fetchDataCart,
     fetchWeights,
     fetchDiscounts,
     getDataBuyNow,

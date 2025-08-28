@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-    import { type Products } from "types/productTypes";
+    import { type Product } from "types/productTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -66,11 +66,11 @@
         sortBy: 'createdAt',
     });
 
-    const productListData = ref<Products[]>([]);
+    const productListData = ref<Product[]>([]);
 
     const updateProducts = async () => {
         await productStore.fetchProducts(params);
-        productListData.value = productStore?.products || []; 
+        productListData.value = productStore?.productList || []; 
     };
 
     //sort products by price

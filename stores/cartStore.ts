@@ -13,7 +13,7 @@ export const useCartStore = defineStore('cart', () => {
     const dataDiscount = ref<Discount | null>(null)
     const discountValue = ref<number>(0)
     const dataVariant = ref<String[]>([])
-    const dataPromotion = ref<Promotion | null>(null)
+    const dataPromotion = ref<Record<number, Promotion[]>>({})
     const productStore = useProductStore()
     const authStore = useAuthStore()
 
@@ -66,11 +66,9 @@ export const useCartStore = defineStore('cart', () => {
                     addCartItems.value = [];    
                     const serverCart = JSON.parse(dataCartResponse.data);
                    
-                    for (const i of serverCart) {
-                        const id = i.skuId;
-                        const quantity = i.quantity || 1;
-                        await addProductToCart(id, quantity);                      
-                    }
+                    await Promise.all(
+                        serverCart.map((i: any) => addProductToCart(i.skuId, i.quantity || 1))
+                    );
                 } 
 
             } catch (err) {
@@ -238,7 +236,7 @@ export const useCartStore = defineStore('cart', () => {
     const fetchPromotion = async (idSkus: number) => {
         const skuId = idSkus; 
         try {
-            const promotionRes = await $fetch<{ error: number; data: Promotion; message: string }>(`${apiUrl}promotions`, {
+            const promotionRes = await $fetch<{ error: number; data: Promotion[] ; message: string }>(`${apiUrl}promotions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -248,10 +246,9 @@ export const useCartStore = defineStore('cart', () => {
                 }
             })
 
-            dataPromotion.value = promotionRes?.data || '';
-
-            return dataPromotion;
-
+            dataPromotion.value[idSkus] = promotionRes?.data || [];
+            console.log("Promotion data:", dataPromotion.value[idSkus]);
+            return dataPromotion.value[idSkus];
         } catch (err) {
             error.value = 1
             console.error("Error fetching discounts:", err)

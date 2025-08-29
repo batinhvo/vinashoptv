@@ -68,37 +68,37 @@
                                         </tr>
                                     </thead>
                                     <tbody class="border-t border-gray-300">                                             
-                                        <tr v-for="(pro, index) in cartStore.dataShow" :key="index">
+                                        <tr v-for="(product, index) in cartStore.dataShow" :key="index">
                                             <td class="py-4 border-t border-gray-300">
-                                                <p class="mb-1">{{ pro.title + (pro.type ? ' - ' + pro.type : '') }}</p>
+                                                <p class="mb-1">{{ [product.title, product.type].filter(Boolean).join(' - ') }}</p>
                                                 <!-- Quantity -->                       
                                                 <div class="flex border border-zinc-300 rounded-full bg-white pl-5 pr-3 py-1">                           
-                                                    <input v-model.number="pro.quantity" class="w-full focus:outline-none" type="number" name="quantity">
-                                                    <button @click.prevent="cartStore.decrement(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">
+                                                    <input v-model.number="product.quantity" class="w-full focus:outline-none" type="number" name="quantity">
+                                                    <button @click.prevent="cartStore.decrement(product)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">
                                                         <span class="text-xs">
                                                             <i class="fa fa-minus pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
-                                                    <button @click.prevent="cartStore.increment(pro)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">                                    
+                                                    <button @click.prevent="cartStore.increment(product)" class="w-9 h-7 text-center hover:bg-gray-300 border border-white rounded-full">                                    
                                                         <span class="text-xs">
                                                             <i class="fa fa-plus pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
                                                 </div>  
-                                                <div v-for="(promotion, index) in cartStore.dataPromotion" :key="index">         
-                                                    <div class="flex items-center mt-3" v-if="pro.skuId === promotion.id">
-                                                        <p class="font-bold">Gift:</p>
-                                                        <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">{{ cartStore.dataPromotion?.skuNameIn }} x {{ cartStore.dataPromotion.quantityOutMax }}</p>
-                                                        <button class="w-7 h-7 text-center hover:bg-gray-300 rounded-full ml-5">
-                                                            <span class="text-xs">
-                                                                <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>  
+                                                    
+                                                <div class="flex items-center mt-3" v-for="promotion in cartStore.dataPromotion[product.skuId] || []" :key="promotion.skuIdIn" >
+                                                    <p class="font-bold">Gift:</p>
+                                                    <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">{{ promotion.skuNameIn }} x {{ promotion.quantityOutMax }}</p>
+                                                    <button class="w-7 h-7 text-center hover:bg-gray-300 rounded-full ml-5">
+                                                        <span class="text-xs">
+                                                            <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                                 
                                             </td>
                                             <td class="pl-4 xl:pl-8 py-4 content-baseline text-right">
-                                                ${{ formatPrice(pro.price * pro.quantity) }}
+                                                ${{ formatPrice(product.price * product.quantity) }}
                                                 <button @click.prevent="cartStore.removeItem(index)" class="w-7 h-7 text-center hover:bg-gray-300 hover:border rounded-full">
                                                     <span class="text-xs">
                                                         <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>

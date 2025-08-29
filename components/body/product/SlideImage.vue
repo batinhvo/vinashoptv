@@ -5,7 +5,7 @@
          @swiper="onMainSwiper"
         :lazy="true"
         :slides-per-view="1"
-        :loop="true"
+        :loop="dataImages.length > 1"
         :navigation="{
             nextEl: '.custom-next',
             prevEl: '.custom-prev',
@@ -31,7 +31,7 @@
         <swiper
         @swiper="onSwiper"
         :lazy="true"
-        :loop="true"
+        :loop="dataImages.length > 4"
         :space-between="10"
         :slides-per-view="4"
         :free-mode="true"

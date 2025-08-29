@@ -1,6 +1,5 @@
-import type { CartItem, Discounts, Weights } from "types/orderTypes";
-import type { ProductDetail, skusProduct } from "types/productTypes";
-const notify = useNotify()
+import type { CartItem, Discount, Promotion, Weight } from "types/orderTypes";
+const notify = useNotify();
 
 export const useCartStore = defineStore('cart', () => {
     const config = useRuntimeConfig()
@@ -10,15 +9,15 @@ export const useCartStore = defineStore('cart', () => {
     // state
     const addCartItems = ref<CartItem[]>([])
     const buyNowItem = ref<CartItem | null>(null)
-    const dataWeights = ref<Weights[]>([])
-    const dataDiscounts = ref<Discounts | null>(null)
+    const dataWeight = ref<Weight[]>([])
+    const dataDiscount = ref<Discount | null>(null)
     const discountValue = ref<number>(0)
-    const isCartCreated = ref(false)
-    const dataSkusDetails = ref<skusProduct | null>(null)
-    const dataVariant = ref<[]>([])
-
+    const dataVariant = ref<String[]>([])
+    const dataPromotion = ref<Promotion | null>(null)
     const productStore = useProductStore()
     const authStore = useAuthStore()
+
+    const token = useCookie('tokenAccess').value;
 
     //****************************** GET ******************************//
 
@@ -37,24 +36,22 @@ export const useCartStore = defineStore('cart', () => {
     });
 
     const shippingFee = computed(() => {
-        if (!dataWeights.value.length) return 0
-        const weight = weightsTotal.value
-        const found = dataWeights.value.find(w => weight <= w.zoneTo)
+        if (!dataWeight.value.length) return 0;
 
-        return found ? found.fee : dataWeights.value.at(-1)?.fee || 0
+        const weight = weightsTotal.value
+        const found = dataWeight.value.find(w => weight <= w.zoneTo)
+
+        return found ? found.fee : dataWeight.value.at(-1)?.fee || 0;
     });
 
     const orderTotal = computed(() => {
         return subTotal.value + shippingFee.value - discountValue.value;
     });
    
-
-
     //******************************************************** ACTIONS ********************************************************//
 
-    // GET DATA CART
+    // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
-        const token = useCookie('tokenAccess').value;
         if (authStore.authenticated && token) {
             try {
                 const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
@@ -65,128 +62,101 @@ export const useCartStore = defineStore('cart', () => {
                     },
                 })
 
-                if (dataCartResponse.data) {            
-                    const serverCart = JSON.parse(dataCartResponse.data)
-
-                    //if (Array.isArray(serverCart) && serverCart.length > 0) { //check cart có rỗng không
-                        addCartItems.value = [];
-
-                        for (const i of serverCart) {
-                            const id = i.skuId;
-                            const quantity = i.quantity || 1;
-
-                            await getDataAddCart(id, quantity);                      
-                        }
-                        
-                    //} else {                 
-                        
-                    //}
+                if (dataCartResponse.data) {  
+                    addCartItems.value = [];    
+                    const serverCart = JSON.parse(dataCartResponse.data);
+                   
+                    for (const i of serverCart) {
+                        const id = i.skuId;
+                        const quantity = i.quantity || 1;
+                        await addProductToCart(id, quantity);                      
+                    }
                 } 
+
             } catch (err) {
                 console.error("Error fetching cart:", err)
             }
+
         } else {
             const localCart = localStorage.getItem('cart_data')
             addCartItems.value = localCart ? JSON.parse(localCart) : [];
-        }
-               
-        
+        }   
     }
 
-    // ADD TO CART
-    const getDataAddCart = async (idSkus:number, quantity: number) => {
+    // ADD PRODUCT TO CART
+    const addProductToCart = async (idSkus:number, quantity: number) => {
+        const daPro = await getDataProduct(idSkus);
+        const existing = addCartItems.value.find(item => item.skuId === idSkus);
 
-        await productStore.fetchProductDetailSkus(idSkus)
-        const dataSkusDetails = productStore.productDetailSkus;
-
-        if(!dataSkusDetails) return;
-
-        const idPro = Number(dataSkusDetails?.productId);
-        await productStore.fetchProductWithId(idPro);
-        const dataProduct = productStore.product
-
-        if(!dataProduct) return;
-
-        await fetchVariant(idSkus);
-        const dataVar = dataVariant.value.join(', ');
-        const existing = addCartItems.value.find(item => item.skuId === idSkus && item.type === dataVar)
-        
         if(existing) {
-            existing.quantity += quantity
+            existing.quantity += quantity;
         } else {
             addCartItems.value.push({
                 skuId: idSkus,
-                title: dataProduct.title,
-                type: dataVar,
-                price: Number(dataSkusDetails?.price) || 0,
+                title: daPro.dataProduct?.title || '',
+                type: daPro.typeValue === 'default' ? '' : daPro.typeValue,
+                price: Number(daPro.dataSkus?.price) || 0,
                 quantity,
-                weight: Number(dataSkusDetails?.weight) || 0,
-            })
-        }
+                weight: Number(daPro.dataSkus?.weight) || 0,
+            });
+        }        
 
-        if (authStore.authenticated && useCookie('tokenAccess').value) {
-            addDataCart();
-        }
-
-        notify({ message: 'Added to cart!', type: 'success', time: 3000 });
+        await fetchPromotion(idSkus);
     }
 
-    // BUY NOW
+    // CLICK ADD TO CART
+    const getDataAddCart = async (idSkus:number, quantity: number) => {
+        await addProductToCart(idSkus, quantity);
+        if(token && authStore.authenticated) {
+            addDataCartToServer();
+        }
+         notify({ message: 'Added to cart!', type: 'success', time: 3000 });
+    }
+
+    // CLICK BUY NOW
     const getDataBuyNow = (idSkus: number, quantity: number) => {       
         buyNowItem.value = null;
-        const checkoutData = { idSkus, quantity }
-
-        console.log("1 " + idSkus)
+        const checkoutData = { idSkus, quantity };
         sessionStorage.setItem('checkout_data', JSON.stringify(checkoutData))
         notify({ message: 'Buy now item added!', type: 'success', time: 3000 })
     }
 
-    // LOAD PRODUCTS CHECKOUT
-    const loadCheckoutData = async () => {
+    // DATA CART BUY NOW
+    const dataCartBuyNow = async () => {
         const raw = sessionStorage.getItem('checkout_data');
         const checkoutData = raw ? JSON.parse(raw) : null;
         if (!checkoutData) return
 
         const { idSkus, quantity = 1 } = checkoutData;
-
-        console.log(checkoutData)
-
-        await productStore.fetchProductDetailSkus(idSkus);
-        const dataSkus = productStore.productDetailSkus;
-
-        const idPro = dataSkus?.id;        
-        if (idPro) await productStore.fetchProducts(idPro);
-        const dataProduct = productStore.product;
-
-        await fetchVariant(idSkus);
+        const daPro = await getDataProduct(idSkus);
        
-        if (dataProduct) {
+        if (daPro.dataProduct) {
             buyNowItem.value = {
-                skuId: Number(dataSkus?.id),
-                title: dataProduct.title,
-                price: Number(dataSkus?.price) || 0,
-                type: dataVariant.value.join(', '),
+                skuId: Number(daPro.dataProduct?.id),
+                title: daPro.dataProduct?.title,
+                price: Number(daPro.dataSkus?.price) || 0,
+                type: daPro.typeValue === 'default' ? '' : daPro.typeValue,
                 quantity,
-                weight: Number(dataSkus?.weight) || 0,
+                weight: Number(daPro.dataSkus?.weight) || 0,
             }
         }
     }
 
-    //POST DATA CART
-    const addDataCart = async () => {
-        const token = useCookie('tokenAccess').value;
-        if (!authStore.authenticated || !token) return;
+    //ADD DATA PRODUCT TO SERVER
+    const addDataCartToServer = async () => {
 
         const skuIdList = addCartItems.value.map(item => ({
             skuId: item.skuId,
             quantity: item.quantity
-        }))
-        
+        }));
+
+        const cartQty = addCartItems.value.length;
+
         try {
-            
-            if (addCartItems.value.length === 1) {
+
+            if (cartQty < 1) {
                 // Nếu giỏ hàng rỗng -> POST
-                await $fetch<{ error: number; data: any }>(`${apiUrl}carts`, {
+                await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -213,13 +183,30 @@ export const useCartStore = defineStore('cart', () => {
         } catch (err) {
             console.error("Error posting cart:", err)
         }
-        
+    
     }
 
+    //LOAD PRODUCT
+    const getDataProduct = async (idSkus : number) => {
+        await productStore.fetchProductDetailSkus(idSkus);
+        const dataSkus = productStore.productDetailSkus;
+
+        const idPro = Number(dataSkus?.productId);        
+        await productStore.fetchProductWithId(idPro);
+        const dataProduct = productStore.product;
+
+        await fetchVariant(idSkus);
+        const typeValue = dataVariant.value.join(', ');
+        
+        return { dataProduct, typeValue, dataSkus }
+    }
+
+    //*********************** - CHECK - ***********************//
+
     //DISCOUNT
-    const fetchDiscounts = async (subtotal : number) => {
+    const fetchDiscount = async (subtotal : number) => {
         try {
-            const dataDis = await $fetch<{ error: number; data: Discounts; message: string }>(`${apiUrl}discounts`, {
+            const dataDis = await $fetch<{ error: number; data: Discount; message: string }>(`${apiUrl}discounts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -229,7 +216,7 @@ export const useCartStore = defineStore('cart', () => {
                 }
             })
 
-            const dis = dataDis.data
+            const dis = dataDis.data;
 
             if (dis?.discountBasedOn === 'percent') {
                 discountValue.value = (dis.discountValue / 100) * subTotal.value
@@ -247,24 +234,49 @@ export const useCartStore = defineStore('cart', () => {
         }
     }
 
+    //PROMOTIONS
+    const fetchPromotion = async (idSkus: number) => {
+        const skuId = idSkus; 
+        try {
+            const promotionRes = await $fetch<{ error: number; data: Promotion; message: string }>(`${apiUrl}promotions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: {
+                    skuId,
+                }
+            })
+
+            dataPromotion.value = promotionRes?.data || '';
+
+            return dataPromotion;
+
+        } catch (err) {
+            error.value = 1
+            console.error("Error fetching discounts:", err)
+        }
+    }
+
     // VARIANT-OPTIONS
     const fetchVariant = async (idSkus : number) => {
         try {
-            const data = await $fetch<{ error: number; data:[] }>(`${apiUrl}skus/${idSkus}/variant-options`)
-            dataVariant.value = data?.data || []
+            const data = await $fetch<{ error: number; data: { name: string }[] }>(`${apiUrl}skus/${idSkus}/variant-options`)
+            dataVariant.value = data?.data.map(item => item.name) || [];
+            return dataVariant.value;
 
-            return dataVariant;
         } catch (err) {
             error.value = 1
             console.error("Error fetching variant options:", err)
+            return []
         }
     }
 
     // WEIGHTS
     const fetchWeights = async () => {
         try {
-            const data = await $fetch<{ error: number; data: Weights[]; message: string }>(`${apiUrl}weights`)
-            dataWeights.value = data?.data || []
+            const data = await $fetch<{ error: number; data: Weight[]; message: string }>(`${apiUrl}weights`)
+            dataWeight.value = data?.data || []
         } catch (err) {
             error.value = 1
             console.error("Error fetching weights:", err)
@@ -287,54 +299,63 @@ export const useCartStore = defineStore('cart', () => {
 
     //remove product cart
     const removeItem = (index: number) => {
-        if (buyNowItem.value && dataShow.value.length === 1) {
+        if (buyNowItem.value) {
             buyNowItem.value = null
-            sessionStorage.removeItem('checkout_data')
+            sessionStorage.removeItem('checkout_data');
         } else {
             addCartItems.value.splice(index, 1)
+
+            if (authStore.authenticated && token) {
+                addDataCartToServer();
+            }
         }
     }
 
-    // quantity
+    // quantity +
     const increment = (item: CartItem) => {
-        if (buyNowItem.value && buyNowItem.value.title === item.title) {
+        if (buyNowItem.value && buyNowItem.value.skuId === item.skuId) {
             // Trường hợp Buy Now
             buyNowItem.value.quantity++
         } else {
             // Trường hợp giỏ hàng
-            const target = addCartItems.value.find(p => p.title === item.title && p.type === item.type)
+            const target = addCartItems.value.find(qty => qty.skuId === item.skuId)
             if (target) target.quantity++
+        }
+        
+        if (authStore.authenticated && token) {
+            addDataCartToServer();
         }
     }
 
+    // quantity -
     const decrement = (item: CartItem) => {
-        if (buyNowItem.value && buyNowItem.value.title === item.title) {
+        if (buyNowItem.value && buyNowItem.value.skuId === item.skuId) {
             if (buyNowItem.value.quantity > 1) {
                 buyNowItem.value.quantity--
             }
         } else {
-            const target = addCartItems.value.find(p => p.title === item.title && p.type === item.type)
+            const target = addCartItems.value.find(qty => qty.skuId === item.skuId)
             if (target && target.quantity > 1) {
                 target.quantity--
             }
+        }
+
+        if (authStore.authenticated && token) {
+            addDataCartToServer();
         }
     }
 
     // Lưu cartPro vào localStorage khi thay đổi
     watch(addCartItems, async (val)=> {
-        localStorage.setItem('cart_data', JSON.stringify(val));
-        if (authStore.authenticated && useCookie('tokenAccess').value) {
-            addDataCart();
-        }
-
+        localStorage.setItem('cart_data', JSON.stringify(val));       
     }, { deep: true })
 
     // Check discounts
     watch(subTotal, (newSubtotal) => {
         if (newSubtotal > 0) {
-            fetchDiscounts(newSubtotal)
+            fetchDiscount(newSubtotal)
         } else {
-            dataDiscounts.value = null
+            dataDiscount.value = null
         }
     })
 
@@ -342,7 +363,7 @@ export const useCartStore = defineStore('cart', () => {
     // state
     addCartItems,
     buyNowItem,
-    dataWeights,
+    dataWeight,
 
     // getters
     cartCount,
@@ -352,13 +373,15 @@ export const useCartStore = defineStore('cart', () => {
     shippingFee,
     orderTotal,
     discountValue,
+    dataPromotion,
 
     // actions
     fetchDataCart,
     fetchWeights,
-    fetchDiscounts,
+    fetchDiscount,
+    fetchPromotion,
     getDataBuyNow,
-    loadCheckoutData,
+    dataCartBuyNow,
     getDataAddCart,
     loadCartFromStorage,
     clearBuyNowOnReload,

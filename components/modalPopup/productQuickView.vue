@@ -44,14 +44,14 @@
 </template>
 
 <script setup lang="ts">
-    import { type Products } from 'types/productTypes';
+    import { type Product } from 'types/productTypes';
 
     const closeModal = () => {
         document.body.classList.remove('overflow-hidden'); 
     }
 
     defineProps<{
-        products: Products | null;
+        products: Product | null;
         cateTitle?: string;
     }>();
 </script>

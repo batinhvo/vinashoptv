@@ -18,6 +18,7 @@
 <script setup lang="ts">
     const authStore = useAuthStore();
     const orderStore = useOrderStore();
+    const cartStore = useCartStore();
 
     const showSubcribe = ref(false);
 
@@ -33,6 +34,7 @@
             const today = new Date().toDateString();
 
             await orderStore.getDataOrderHistory();
+            await cartStore.fetchDataCart();
 
             if (lastVisit !== today) {
                 showSubcribe.value = true;

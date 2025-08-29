@@ -58,30 +58,33 @@
     const proId = ref(0);
     const imageChoice = ref(0);
     const listImages = ref<{ id: number; media: string }[]>([]);
-
     
-    // const getImages = () => {
-    //     if (dataDetails.value) {
-    //         listImages.value = [{ id: dataDetails.value.id, media: dataDetails.value.media }];
-    //     }
-    //     const mediaList = dataVariant.value.flatMap(variant => variant.options
-    //     .map(option => ({ id: option.id, media: option.media }))
-    //     .filter(item => item.media !== ""));       
-    //     if(mediaList) {
-    //         listImages.value.push(...mediaList);
-    //     }
-    // }
+    const getImagesVariant = () => {
+        const mediaList = dataVariant.value.flatMap(variant => variant.options
+        .map(option => ({ id: option.id, media: option.media }))
+        .filter(item => item.media !== ""));       
+
+        return mediaList;
+    }
 
     const getImages = async (value: number) => {
         await imagesProStore.fetchSubImagesProduct(value);
-       
-        if (imagesProStore.subDataImg) dataSubImgs.value = imagesProStore.subDataImg;
+
+        if (imagesProStore.subDataImg) {
+            dataSubImgs.value = imagesProStore.subDataImg;
+        }
         
         const listSubImages = dataSubImgs.value.map(data => ({ id: data.id, media: data.path }));
 
-        if(listSubImages) {
+        if(listSubImages.length) {
             listImages.value.push(...listSubImages);
-        }        
+        }     
+        
+        const mediaList = getImagesVariant();
+
+        if (mediaList.length) {
+            listImages.value.push(...mediaList);
+        }
     }
 
     const changeCharacter = (value: string): string => {
@@ -92,7 +95,7 @@
 
     const updateSlideImages = (variantOptionIds: string) => {
         const optId = variantOptionIds.split(",").map(Number); // Chuyển thành số
-
+        
         const selectedMedia = dataVariant.value.flatMap(
             variant => variant.options.filter(
                 option => optId.includes(option.id) && option.media)

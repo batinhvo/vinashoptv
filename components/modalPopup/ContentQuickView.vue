@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-    import { type Products } from 'types/productTypes';
+    import { type Product } from 'types/productTypes';
 
     //xử lý giá
     const formatPrice = (price: number): string => {
@@ -28,7 +28,7 @@
     };
 
     defineProps<{
-        products: Products | null;
+        products: Product | null;
         cateTitle?: string;
     }>();
 </script>

@@ -91,7 +91,6 @@
     const emit = defineEmits(['updateSlideImages']);
 
     // --- Ref --- //
-
     const isShowButton = ref(false);
     const isOutOfStock = ref(false);
     const stockData = ref(0);
@@ -127,20 +126,18 @@
         const foundSku = dataSkus.value.find((sku) => sku.variantOptionIds === variantOptionIds) || null;
         dataSkusfilter.value = foundSku;
 
-        console.log("foundSku: " , foundSku)
-
         if (foundSku) {
             isShowButton.value = true;
             isOutOfStock.value = false;
             stockData.value = foundSku.stock;
             emit('updateSlideImages', foundSku.variantOptionIds);
-            idSkus.value = Number(foundSku.variantOptionIds);
-
-            console.log("pro: " + idSkus.value)
+            idSkus.value = Number(dataSkusfilter.value?.id);
         } else {
             isShowButton.value = false;
             isOutOfStock.value = true;
         }
+
+        return idSkus
     };
 
     const handleBuyNowButton = () => {
@@ -154,9 +151,10 @@
 
     // --- Watcherd --- //
     watchEffect(() => {
-        if (data.dataVariant?.some(vari => vari.name == 'default')) {
+        if (data.dataVariant?.some(vari => vari.options.length == 1)) {
             isShowButton.value = true;
-            dataSkusfilter.value = dataSkus.value[0];          
+            dataSkusfilter.value = dataSkus.value[0];        
+            idSkus.value = Number(data.dataPro?.skus.map(k => k.id))
         }       
     });
 
@@ -164,7 +162,7 @@
         updateSelectedSku(newVal);
     });
 
-    // --- Init SKUs --- //
+    // --- Init SKUS --- //
     onMounted(() => {
         if (data.dataPro?.skus) {
             dataSkus.value = data.dataPro.skus;

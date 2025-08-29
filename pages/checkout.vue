@@ -84,16 +84,18 @@
                                                             <i class="fa fa-plus pb-1 text-gray-500" aria-hidden="true"></i>
                                                         </span>
                                                     </button>
-                                                </div>             
-                                                <!-- <div class="flex items-center mt-3">
-                                                    <p class="font-bold">Gift:</p>
-                                                    <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">Assanta Hair Color # 5</p>
-                                                    <button class="w-7 h-7 text-center hover:bg-gray-300 rounded-full ml-5">
-                                                        <span class="text-xs">
-                                                            <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>
-                                                        </span>
-                                                    </button>
-                                                </div> -->
+                                                </div>  
+                                                <div v-for="(promotion, index) in cartStore.dataPromotion" :key="index">         
+                                                    <div class="flex items-center mt-3" v-if="pro.skuId === promotion.id">
+                                                        <p class="font-bold">Gift:</p>
+                                                        <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">{{ cartStore.dataPromotion?.skuNameIn }} x {{ cartStore.dataPromotion.quantityOutMax }}</p>
+                                                        <button class="w-7 h-7 text-center hover:bg-gray-300 rounded-full ml-5">
+                                                            <span class="text-xs">
+                                                                <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>  
                                             </td>
                                             <td class="pl-4 xl:pl-8 py-4 content-baseline text-right">
                                                 ${{ formatPrice(pro.price * pro.quantity) }}
@@ -292,14 +294,9 @@
     });
 
     onMounted( () => {
-        cartStore.loadCheckoutData()
+        cartStore.dataCartBuyNow()
         cartStore.loadCartFromStorage()
-
-        if(authStore.authenticated) {
-            cartStore.fetchDataCart()
-        }
-        
-        // cartStore.clearBuyNowOnReload()
+        cartStore.clearBuyNowOnReload()
     });
 
 
@@ -323,8 +320,6 @@
             maximumFractionDigits: 2,
         }).format(value);
     };
-
-    
 
     const selectedPayment = ref<string | null>(null);
 

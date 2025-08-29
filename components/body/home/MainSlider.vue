@@ -84,7 +84,7 @@
     const dataLinkPro = ref("");
 
     await productStore.fetchProductDetails(params.value);
-    dataLinkPro.value = productStore.productDetails?.slug || '';
+    dataLinkPro.value = productStore.productDetail?.slug || '';
     
 </script>
   

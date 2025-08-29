@@ -50,7 +50,7 @@ export interface CartItem {
     weight: number,
 }
 
-export type Weights = {
+export type Weight = {
     id: number,
     name: string,
     zoneFrom: number,
@@ -58,7 +58,7 @@ export type Weights = {
     fee: number,
 }
 
-export type Discounts = {
+export type Discount = {
     id: number,
     name: string,
     status: string,
@@ -67,4 +67,19 @@ export type Discounts = {
     discountBasedOn: string,
     discountValue: number,
     minSubtotal: number,
+}
+
+export type Promotion = {
+    id: string,
+    name: string,
+    skuIdIn: number,
+    skuNameIn: string,
+    skuIdOut: number,
+    skuNameOut: string,
+    skuWeightOut: number,
+    status: string,
+    quantityIn: number,
+    quantityOutMax: number,
+    startAt: Date,
+    endArt: Date,      
 }

@@ -9,11 +9,14 @@ export const useCartStore = defineStore('cart', () => {
     // state
     const addCartItems = ref<CartItem[]>([])
     const buyNowItem = ref<CartItem | null>(null)
+
     const dataWeight = ref<Weight[]>([])
     const dataDiscount = ref<Discount | null>(null)
-    const discountValue = ref<number>(0)
     const dataVariant = ref<String[]>([])
-    const dataPromotion = ref<Record<number, Promotion[]>>({})
+    const dataPromotion = ref<Promotion | null>(null)
+    const listPromotion = ref<Promotion[]>([])
+    const discountValue = ref<number>(0)
+
     const productStore = useProductStore()
     const authStore = useAuthStore()
 
@@ -82,39 +85,40 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     // ADD PRODUCT TO CART
-    const addProductToCart = async (idSkus:number, quantity: number) => {
-        const daPro = await getDataProduct(idSkus);
-        const existing = addCartItems.value.find(item => item.skuId === idSkus);
+    const addProductToCart = async (idSku:number, quantity: number) => {
+        const product = await getDataProduct(idSku);
+        await fetchPromotion(idSku);
+        const existing = addCartItems.value.find(item => item.skuId === idSku);
+
+        const dataPromotion =  await checkPromotion(idSku, quantity);
 
         if(existing) {
             existing.quantity += quantity;
         } else {
             addCartItems.value.push({
-                skuId: idSkus,
-                title: daPro.dataProduct?.title || '',
-                type: daPro.typeValue === 'default' ? '' : daPro.typeValue,
-                price: Number(daPro.dataSkus?.price) || 0,
+                skuId: idSku,
+                title: product.dataProduct?.title || '',
+                type: product.typeValue === 'default' ? '' : product.typeValue,
+                price: Number(product.dataSkus?.price) || 0,
                 quantity,
-                weight: Number(daPro.dataSkus?.weight) || 0,
+                weight: Number(product.dataSkus?.weight) || 0,
+                namePromotion: dataPromotion?.skuNameIn || '',
+                qtyProductOfPromotion: dataPromotion?.quantityOutMax || 0,
             });
         }        
-
-        await fetchPromotion(idSkus);
     }
 
     // CLICK ADD TO CART
-    const getDataAddCart = async (idSkus:number, quantity: number) => {
-        await addProductToCart(idSkus, quantity);
-        if(token && authStore.authenticated) {
-            addDataCartToServer();
-        }
+    const getDataAddCart = async (idSku:number, quantity: number) => {
+        await addProductToCart(idSku, quantity);
+        addDataCartToServer();
          notify({ message: 'Added to cart!', type: 'success', time: 3000 });
     }
 
     // CLICK BUY NOW
-    const getDataBuyNow = (idSkus: number, quantity: number) => {       
+    const getDataBuyNow = (idSku: number, quantity: number) => {       
         buyNowItem.value = null;
-        const checkoutData = { idSkus, quantity };
+        const checkoutData = { idSku, quantity };
         sessionStorage.setItem('checkout_data', JSON.stringify(checkoutData))
         notify({ message: 'Buy now item added!', type: 'success', time: 3000 })
     }
@@ -125,23 +129,32 @@ export const useCartStore = defineStore('cart', () => {
         const checkoutData = raw ? JSON.parse(raw) : null;
         if (!checkoutData) return
 
-        const { idSkus, quantity = 1 } = checkoutData;
-        const daPro = await getDataProduct(idSkus);
+        const { idSku, quantity = 1 } = checkoutData;
+        const product = await getDataProduct(idSku);
+        await fetchPromotion(idSku);
        
-        if (daPro.dataProduct) {
+        if (product.dataProduct) {
             buyNowItem.value = {
-                skuId: Number(daPro.dataProduct?.id),
-                title: daPro.dataProduct?.title,
-                price: Number(daPro.dataSkus?.price) || 0,
-                type: daPro.typeValue === 'default' ? '' : daPro.typeValue,
+                skuId: Number(product.dataProduct?.id),
+                title: product.dataProduct?.title,
+                price: Number(product.dataSkus?.price) || 0,
+                type: product.typeValue === 'default' ? '' : product.typeValue,
                 quantity,
-                weight: Number(daPro.dataSkus?.weight) || 0,
+                weight: Number(product.dataSkus?.weight) || 0,
+                namePromotion: '',
+                qtyProductOfPromotion: 0,
             }
         }
     }
 
     //ADD DATA PRODUCT TO SERVER
-    const addDataCartToServer = async () => {
+    const addDataCartToServer = () => {
+        if (authStore.authenticated && token) {
+            syncCart();
+        }
+    }
+
+    const syncCart  = async () => {
 
         const skuIdList = addCartItems.value.map(item => ({
             skuId: item.skuId,
@@ -185,15 +198,15 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     //LOAD PRODUCT
-    const getDataProduct = async (idSkus : number) => {
-        await productStore.fetchProductDetailSkus(idSkus);
+    const getDataProduct = async (idSku : number) => {
+        await productStore.fetchProductDetailSkus(idSku);
         const dataSkus = productStore.productDetailSkus;
 
         const idPro = Number(dataSkus?.productId);        
         await productStore.fetchProductWithId(idPro);
         const dataProduct = productStore.product;
 
-        await fetchVariant(idSkus);
+        await fetchVariant(idSku);
         const typeValue = dataVariant.value.join(', ');
         
         return { dataProduct, typeValue, dataSkus }
@@ -233,22 +246,30 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     //PROMOTIONS
-    const fetchPromotion = async (idSkus: number) => {
-        const skuId = idSkus; 
+    const fetchPromotion = async (skuId: number) => {
         try {
-            const promotionRes = await $fetch<{ error: number; data: Promotion[] ; message: string }>(`${apiUrl}promotions`, {
+            const promotionRes = await $fetch<{ error: number; data: Promotion ; message: string }>(`${apiUrl}promotions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: {
-                    skuId,
+                    skuId : skuId,
                 }
             })
 
-            dataPromotion.value[idSkus] = promotionRes?.data || [];
-            console.log("Promotion data:", dataPromotion.value[idSkus]);
-            return dataPromotion.value[idSkus];
+            if(promotionRes.data) {
+                const index = listPromotion.value.findIndex(p => p.skuIdIn === skuId);
+                if (index !== -1) {                    
+                    listPromotion.value[index] = promotionRes.data;
+                } else {                    
+                    listPromotion.value.push(promotionRes.data);
+                }
+            }
+
+            console.log(listPromotion.value)
+            return listPromotion;
+
         } catch (err) {
             error.value = 1
             console.error("Error fetching discounts:", err)
@@ -256,9 +277,9 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     // VARIANT-OPTIONS
-    const fetchVariant = async (idSkus : number) => {
+    const fetchVariant = async (idSku : number) => {
         try {
-            const data = await $fetch<{ error: number; data: { name: string }[] }>(`${apiUrl}skus/${idSkus}/variant-options`)
+            const data = await $fetch<{ error: number; data: { name: string }[] }>(`${apiUrl}skus/${idSku}/variant-options`)
             dataVariant.value = data?.data.map(item => item.name) || [];
             return dataVariant.value;
 
@@ -301,10 +322,7 @@ export const useCartStore = defineStore('cart', () => {
             sessionStorage.removeItem('checkout_data');
         } else {
             addCartItems.value.splice(index, 1)
-
-            if (authStore.authenticated && token) {
-                addDataCartToServer();
-            }
+            addDataCartToServer();
         }
     }
 
@@ -316,12 +334,14 @@ export const useCartStore = defineStore('cart', () => {
         } else {
             // Trường hợp giỏ hàng
             const target = addCartItems.value.find(qty => qty.skuId === item.skuId)
-            if (target) target.quantity++
+            if (target) {
+                target.quantity++;
+                target.qtyProductOfPromotion++;
+                
+            }
+            
         }
-        
-        if (authStore.authenticated && token) {
-            addDataCartToServer();
-        }
+        addDataCartToServer();        
     }
 
     // quantity -
@@ -333,13 +353,39 @@ export const useCartStore = defineStore('cart', () => {
         } else {
             const target = addCartItems.value.find(qty => qty.skuId === item.skuId)
             if (target && target.quantity > 1) {
-                target.quantity--
+                target.quantity--;
+                target.qtyProductOfPromotion--;
             }
         }
+        addDataCartToServer();
+    }
 
-        if (authStore.authenticated && token) {
-            addDataCartToServer();
+    const checkPromotion = async (idSku : number, quantity : number) => {       
+        const promotion = listPromotion.value.find(p => p.skuIdIn === idSku);
+
+        if (!promotion) {
+            console.log("❌ Không tìm thấy promotion cho skuId:", idSku);
+            return;
         }
+
+        if (quantity >= Number(promotion.quantityIn || 0)) {
+            const target = addCartItems.value.find(item => item.skuId === idSku);
+            if (target) {
+                target.namePromotion = promotion.skuNameIn || "";
+                target.qtyProductOfPromotion = promotion.quantityOutMax || 0;
+            }
+            console.log("✅ Promotion applied:", promotion);
+        } else {
+            // Nếu chưa đủ điều kiện thì reset
+            const target = addCartItems.value.find(item => item.skuId === idSku);
+            if (target) {
+                target.namePromotion = "";
+                target.qtyProductOfPromotion = 0;
+            }
+            console.log("ℹ️ Chưa đạt số lượng để hưởng promotion");
+        }
+
+        return promotion;
     }
 
     // Lưu cartPro vào localStorage khi thay đổi
@@ -354,7 +400,7 @@ export const useCartStore = defineStore('cart', () => {
         } else {
             dataDiscount.value = null
         }
-    })
+    });
 
     return {
     // state

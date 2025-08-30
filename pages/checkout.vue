@@ -86,9 +86,9 @@
                                                     </button>
                                                 </div>  
                                                     
-                                                <div class="flex items-center mt-3" v-for="promotion in cartStore.dataPromotion[product.skuId] || []" :key="promotion.skuIdIn" >
+                                                <div v-if="product.namePromotion" class="flex items-center mt-3">
                                                     <p class="font-bold">Gift:</p>
-                                                    <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">{{ promotion.skuNameIn }} x {{ promotion.quantityOutMax }}</p>
+                                                    <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">{{ product.namePromotion }} x {{ product.qtyProductOfPromotion }}</p>
                                                     <button class="w-7 h-7 text-center hover:bg-gray-300 rounded-full ml-5">
                                                         <span class="text-xs">
                                                             <i class="fa fa-times pb-1 text-gray-500" aria-hidden="true"></i>

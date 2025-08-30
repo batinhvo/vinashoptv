@@ -48,6 +48,8 @@ export interface CartItem {
     price: number,
     quantity: number,
     weight: number,
+    namePromotion: string,
+    qtyProductOfPromotion: number,
 }
 
 export type Weight = {

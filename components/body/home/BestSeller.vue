@@ -31,7 +31,7 @@
     const params = ref({
         descending: 1,
         page: 1,
-        perPage: 8,
+        perPage: 20,
         sortBy: 'createdAt',
         special: 1,
     });

@@ -66,7 +66,7 @@
     const params = ref<Params>({
         descending: 1,
         page: 1,
-        perPage: 8,
+        perPage: 20,
         sale: 1,
         sortBy: 'createdAt',
     });

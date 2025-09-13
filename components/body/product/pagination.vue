@@ -22,7 +22,7 @@
     const emit = defineEmits(['updatePages', 'updateRange', 'resetUpdateSort']);
 
     const page = ref(1);
-    const itemsPerPage = 8;
+    const itemsPerPage = 20;
     const pageInput = ref(page.value);
     
     const from = computed(() => (page.value - 1) * itemsPerPage + 1);

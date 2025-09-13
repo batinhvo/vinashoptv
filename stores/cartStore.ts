@@ -1,4 +1,5 @@
-import type { CartItem, Discount, Promotion, Weight } from "types/orderTypes";
+import type { CartItem, Coupon, Discount, Promotion, QuantityGift, Weight } from "types/orderTypes";
+import type { Product } from "types/productTypes";
 const notify = useNotify();
 
 export const useCartStore = defineStore('cart', () => {
@@ -13,9 +14,12 @@ export const useCartStore = defineStore('cart', () => {
     const dataWeight = ref<Weight[]>([])
     const dataDiscount = ref<Discount | null>(null)
     const dataVariant = ref<String[]>([])
-    const dataPromotion = ref<Promotion | null>(null)
-    const listPromotion = ref<Promotion[]>([])
+    const dataPromotions = ref<Promotion[]>([])
+
+    const listDataProduct = ref<Product[]>([])
+    const listGiftChecked = ref<QuantityGift[]>([])
     const discountValue = ref<number>(0)
+    const couponValue = ref<number>(0)
 
     const productStore = useProductStore()
     const authStore = useAuthStore()
@@ -24,18 +28,30 @@ export const useCartStore = defineStore('cart', () => {
 
     //****************************** GET ******************************//
 
-    const cartCount = computed(() => addCartItems.value.length)
+    const cartCount = computed(() => addCartItems.value.length);
 
-    const dataShow = computed<CartItem[]>(() => {
+    const dataProductShow = computed<CartItem[]>(() => {
         return buyNowItem.value ? [buyNowItem.value] : addCartItems.value
     });
 
+    const dataPromotion = computed<Promotion[]>(() => {
+        return dataPromotions.value;
+    });
+
+    const quantityGift = computed<QuantityGift[]>(() => {
+        return listGiftChecked.value;
+    });
+
+    const taxProductTotal = computed(() => {
+        return dataProductShow.value.reduce((sum, item) => sum + item.tax, 0)
+    });
+
     const subTotal = computed(() => {
-        return dataShow.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+        return dataProductShow.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
     });
 
     const weightsTotal = computed(() => {
-        return dataShow.value.reduce((sum, item) => sum + item.weight * item.quantity, 0)
+        return dataProductShow.value.reduce((sum, item) => sum + item.weight * item.quantity, 0)
     });
 
     const shippingFee = computed(() => {
@@ -50,7 +66,7 @@ export const useCartStore = defineStore('cart', () => {
     const orderTotal = computed(() => {
         return subTotal.value + shippingFee.value - discountValue.value;
     });
-   
+
     //******************************************************** ACTIONS ********************************************************//
 
     // GET DATA CART FROM SERVER
@@ -68,7 +84,6 @@ export const useCartStore = defineStore('cart', () => {
                 if (dataCartResponse.data) {  
                     addCartItems.value = [];    
                     const serverCart = JSON.parse(dataCartResponse.data);
-                   
                     await Promise.all(
                         serverCart.map((i: any) => addProductToCart(i.skuId, i.quantity || 1))
                     );
@@ -87,10 +102,7 @@ export const useCartStore = defineStore('cart', () => {
     // ADD PRODUCT TO CART
     const addProductToCart = async (idSku:number, quantity: number) => {
         const product = await getDataProduct(idSku);
-        await fetchPromotion(idSku);
         const existing = addCartItems.value.find(item => item.skuId === idSku);
-
-        const dataPromotion =  await checkPromotion(idSku, quantity);
 
         if(existing) {
             existing.quantity += quantity;
@@ -102,17 +114,18 @@ export const useCartStore = defineStore('cart', () => {
                 price: Number(product.dataSkus?.price) || 0,
                 quantity,
                 weight: Number(product.dataSkus?.weight) || 0,
-                namePromotion: dataPromotion?.skuNameIn || '',
-                qtyProductOfPromotion: dataPromotion?.quantityOutMax || 0,
+                tax: Number(product.dataProduct?.tax) || 0,   
             });
-        }        
+        }    
+
+        checkQuantityGift(idSku, quantity);
     }
 
     // CLICK ADD TO CART
     const getDataAddCart = async (idSku:number, quantity: number) => {
         await addProductToCart(idSku, quantity);
         addDataCartToServer();
-         notify({ message: 'Added to cart!', type: 'success', time: 3000 });
+        notify({ message: 'Added to cart!', type: 'success', time: 3000 });
     }
 
     // CLICK BUY NOW
@@ -127,12 +140,12 @@ export const useCartStore = defineStore('cart', () => {
     const dataCartBuyNow = async () => {
         const raw = sessionStorage.getItem('checkout_data');
         const checkoutData = raw ? JSON.parse(raw) : null;
-        if (!checkoutData) return
+        if (!checkoutData) return;
 
         const { idSku, quantity = 1 } = checkoutData;
         const product = await getDataProduct(idSku);
         await fetchPromotion(idSku);
-       
+
         if (product.dataProduct) {
             buyNowItem.value = {
                 skuId: Number(product.dataProduct?.id),
@@ -140,9 +153,8 @@ export const useCartStore = defineStore('cart', () => {
                 price: Number(product.dataSkus?.price) || 0,
                 type: product.typeValue === 'default' ? '' : product.typeValue,
                 quantity,
-                weight: Number(product.dataSkus?.weight) || 0,
-                namePromotion: '',
-                qtyProductOfPromotion: 0,
+                weight: Number(product.dataSkus?.weight) || 0,     
+                tax: Number(product.dataProduct?.tax) || 0,        
             }
         }
     }
@@ -208,7 +220,9 @@ export const useCartStore = defineStore('cart', () => {
 
         await fetchVariant(idSku);
         const typeValue = dataVariant.value.join(', ');
-        
+
+        await fetchPromotion(idSku);
+
         return { dataProduct, typeValue, dataSkus }
     }
 
@@ -247,6 +261,7 @@ export const useCartStore = defineStore('cart', () => {
 
     //PROMOTIONS
     const fetchPromotion = async (skuId: number) => {
+                
         try {
             const promotionRes = await $fetch<{ error: number; data: Promotion ; message: string }>(`${apiUrl}promotions`, {
                 method: 'POST',
@@ -259,16 +274,13 @@ export const useCartStore = defineStore('cart', () => {
             })
 
             if(promotionRes.data) {
-                const index = listPromotion.value.findIndex(p => p.skuIdIn === skuId);
-                if (index !== -1) {                    
-                    listPromotion.value[index] = promotionRes.data;
-                } else {                    
-                    listPromotion.value.push(promotionRes.data);
+                const index = dataPromotions.value.findIndex(p => p.skuIdIn === skuId);
+                if (index === -1) {                                                      
+                    dataPromotions.value.push(promotionRes.data);
                 }
+                
             }
-
-            console.log(listPromotion.value)
-            return listPromotion;
+            return dataPromotions;
 
         } catch (err) {
             error.value = 1
@@ -298,6 +310,42 @@ export const useCartStore = defineStore('cart', () => {
         } catch (err) {
             error.value = 1
             console.error("Error fetching weights:", err)
+        }
+    }
+
+    // check Coupon
+    const fetchCoupon = async (code:string) => {
+        try {
+            const dataCoupon = await $fetch<{ error: number; data: Coupon; message: string }>(`${apiUrl}coupons`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: {
+                    code,
+                }
+            })
+
+            if (dataCoupon.data) {
+                const coupon = dataCoupon.data;
+
+                if (coupon.discountBasedOn === 'percent') {
+                    couponValue.value = (coupon.codeValue / 100) * shippingFee.value;
+                } else if (coupon.discountBasedOn === 'value') {
+                    couponValue.value = coupon.codeValue;
+                } else {
+                    couponValue.value = 0
+                }
+                notify({ message: 'Coupon Code Applied Successfuly!', type: 'success', time: 3000 });
+            } else {
+                notify({ message: 'Invalid or expired coupon code!', type: 'error', time: 3000 });
+            }
+
+            return couponValue.value;
+
+        } catch (err) {
+            error.value = 1
+            console.error("Error fetching coupons:", err)
         }
     }
 
@@ -335,13 +383,12 @@ export const useCartStore = defineStore('cart', () => {
             // Trường hợp giỏ hàng
             const target = addCartItems.value.find(qty => qty.skuId === item.skuId)
             if (target) {
-                target.quantity++;
-                target.qtyProductOfPromotion++;
-                
+                target.quantity++;              
+                checkQuantityGift(target.skuId, target.quantity);   
             }
             
         }
-        addDataCartToServer();        
+        addDataCartToServer();     
     }
 
     // quantity -
@@ -354,38 +401,44 @@ export const useCartStore = defineStore('cart', () => {
             const target = addCartItems.value.find(qty => qty.skuId === item.skuId)
             if (target && target.quantity > 1) {
                 target.quantity--;
-                target.qtyProductOfPromotion--;
+                checkQuantityGift(target.skuId, target.quantity);   
             }
         }
         addDataCartToServer();
     }
 
-    const checkPromotion = async (idSku : number, quantity : number) => {       
-        const promotion = listPromotion.value.find(p => p.skuIdIn === idSku);
+    // check quantity gift
+    const checkQuantityGift = (idSku : number, quantity : number) => {       
+        const promotionCheck = dataPromotions.value.find(p => p.skuIdOut === idSku);
+        const qtyIn = promotionCheck?.quantityIn || 1;
+        const qtyGiftMax = promotionCheck?.quantityOutMax || 1;
+        const qtyGiftShow = ref(1);
 
-        if (!promotion) {
-            console.log("❌ Không tìm thấy promotion cho skuId:", idSku);
-            return;
+        if (quantity >= qtyIn && promotionCheck) {
+            const qtyGift = Math.floor(quantity / qtyIn);
+
+            if (qtyGift > qtyGiftMax) {
+                qtyGiftShow.value = qtyGiftMax;
+            } else {
+                qtyGiftShow.value = qtyGift;
+            }          
+            
+            const exists = listGiftChecked.value.find(p => p.skuId === promotionCheck.skuIdOut);
+
+            if (exists) {
+                exists.quantity = qtyGiftShow.value;
+            } else {
+                listGiftChecked.value.push({ 
+                    skuId: promotionCheck.skuIdOut,
+                    quantity: qtyGiftShow.value,
+                });
+            }            
+
+        } else {          
+            listGiftChecked.value = listGiftChecked.value.filter(p => p.skuId !== promotionCheck?.skuIdOut);
         }
 
-        if (quantity >= Number(promotion.quantityIn || 0)) {
-            const target = addCartItems.value.find(item => item.skuId === idSku);
-            if (target) {
-                target.namePromotion = promotion.skuNameIn || "";
-                target.qtyProductOfPromotion = promotion.quantityOutMax || 0;
-            }
-            console.log("✅ Promotion applied:", promotion);
-        } else {
-            // Nếu chưa đủ điều kiện thì reset
-            const target = addCartItems.value.find(item => item.skuId === idSku);
-            if (target) {
-                target.namePromotion = "";
-                target.qtyProductOfPromotion = 0;
-            }
-            console.log("ℹ️ Chưa đạt số lượng để hưởng promotion");
-        }
-
-        return promotion;
+        return listGiftChecked.value;
     }
 
     // Lưu cartPro vào localStorage khi thay đổi
@@ -403,34 +456,40 @@ export const useCartStore = defineStore('cart', () => {
     });
 
     return {
-    // state
-    addCartItems,
-    buyNowItem,
-    dataWeight,
+        // state
+        addCartItems,
+        buyNowItem,
+        dataWeight,
+        dataPromotion,
 
-    // getters
-    cartCount,
-    dataShow,
-    subTotal,
-    weightsTotal,
-    shippingFee,
-    orderTotal,
-    discountValue,
-    dataPromotion,
+        // getters
+        cartCount,
+        dataProductShow,
+        subTotal,
+        weightsTotal,
+        shippingFee,
+        orderTotal,
+        taxProductTotal,
+        discountValue,
+        quantityGift,
+        couponValue,
 
-    // actions
-    fetchDataCart,
-    fetchWeights,
-    fetchDiscount,
-    fetchPromotion,
-    getDataBuyNow,
-    dataCartBuyNow,
-    getDataAddCart,
-    loadCartFromStorage,
-    clearBuyNowOnReload,
-    removeItem,
-    increment,
-    decrement,
-  }
+        // actions
+        fetchDataCart,
+        fetchWeights,
+        fetchDiscount,
+        fetchPromotion,
+
+        getDataAddCart,
+        getDataBuyNow,
+        dataCartBuyNow,
+
+        loadCartFromStorage,
+        clearBuyNowOnReload,
+        removeItem,
+        increment,
+        decrement,
+        fetchCoupon,
+    }
   
 });

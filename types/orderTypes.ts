@@ -48,8 +48,7 @@ export interface CartItem {
     price: number,
     quantity: number,
     weight: number,
-    namePromotion: string,
-    qtyProductOfPromotion: number,
+    tax: number,
 }
 
 export type Weight = {
@@ -84,4 +83,22 @@ export type Promotion = {
     quantityOutMax: number,
     startAt: Date,
     endArt: Date,      
+}
+
+export type QuantityGift = {
+    skuId: number,
+    quantity: number,
+}
+
+export type Coupon = {
+    code: string,
+    codeValue: number,
+    discountBasedOn: string,
+    endAt: Date,
+    id: number,
+    name: string,
+    quantity: number,
+    startAt: Date,
+    status: string,
+    type: string,
 }

@@ -122,7 +122,14 @@
                                                 </div>
 
                                                 <div v-for="(promotion, index) in cartStore.dataPromotion" :key="index">
-                                                    <div v-if="(product.skuId === promotion.skuIdIn) && (product.quantity >= promotion.quantityIn)"
+                                                    <div v-if="
+                                                            product.skuId === promotion.skuIdIn &&
+                                                            product.quantity >= promotion.quantityIn &&
+                                                            (() => {
+                                                            const gift = cartStore.quantityGift.find(g => g.skuId === promotion.skuIdOut);
+                                                            return gift && gift.quantity > 0;
+                                                            })()
+                                                        "
                                                         class="flex items-center mt-3">
                                                         <p class="font-bold">Gift:</p>
                                                         <p
@@ -131,7 +138,7 @@
                                                                 cartStore.quantityGift.find(g => g.skuId ===
                                                             promotion.skuIdOut)?.quantity || 0 }}
                                                         </p>
-                                                        <button
+                                                        <button @click="cartStore.removeGift(promotion.skuIdOut)"
                                                             class="w-7 h-7 text-center hover:bg-gray-300 rounded-full ml-5">
                                                             <span class="text-xs">
                                                                 <i class="fa fa-times pb-1 text-gray-500"
@@ -177,11 +184,11 @@
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Tax</th>
-                                            <td class="text-right py-3">${{ formatPrice(cartStore.taxProductTotal) }}</td>
+                                            <td class="text-right py-3">${{ formatPrice(cartStore.taxTotal) }}</td>
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Total</th>
-                                            <th class="text-right py-3">${{ formatPrice(cartStore.orderTotal - coupon)}}</th>
+                                            <th class="text-right py-3">${{ formatPrice(cartStore.orderTotal) }}</th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -355,22 +362,16 @@ watch(newStateSelect, async (newState) => {
     }
 });
 
-watch(
-    () => cartStore.couponValue,
-    (val) => {
+watch(() => cartStore.couponValue, (val) => {
         coupon.value = val ?? 0;
-    },
-    { immediate: true } // chạy luôn lần đầu khi mount
+    },{ immediate: true }
 );
 
-watch(newStateSelect, async (newState) => {
-    const state = stateStore.states.find((state) => state.name === newState);
-    if (state) {
-        await stateStore.fetchCities(state.code);
-    } else {
-        stateStore.resetCities();
-    }
-});
+watch(() => formData.value.state, (val) => {
+        console.log('State changed to:', val);
+        cartStore.checklocalTax(val);
+    },{ immediate: true }
+);
 
 watchEffect(() => {
   if (authStore.userInfo) {
@@ -396,9 +397,9 @@ onMounted(async () => {
 });
 
 onMounted(() => {
-    cartStore.dataCartBuyNow()
-    cartStore.loadCartFromStorage()
-    cartStore.clearBuyNowOnReload()
+    cartStore.dataCartBuyNow();
+    cartStore.loadCartFromStorage();
+    cartStore.clearBuyNowOnReload();
 });
 
 

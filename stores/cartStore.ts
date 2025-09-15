@@ -1,5 +1,4 @@
 import type { CartItem, Coupon, Discount, Promotion, QuantityGift, Weight } from "types/orderTypes";
-import type { Product } from "types/productTypes";
 const notify = useNotify();
 
 export const useCartStore = defineStore('cart', () => {
@@ -16,15 +15,21 @@ export const useCartStore = defineStore('cart', () => {
     const dataVariant = ref<String[]>([])
     const dataPromotions = ref<Promotion[]>([])
 
-    const listDataProduct = ref<Product[]>([])
+    const valueTaxLocal = ref<number>(0) // state tax local
     const listGiftChecked = ref<QuantityGift[]>([])
     const discountValue = ref<number>(0)
     const couponValue = ref<number>(0)
+    const typeCoupon = ref<string>('') // 'shipping' | 'discount'
 
     const productStore = useProductStore()
     const authStore = useAuthStore()
 
     const token = useCookie('tokenAccess').value;
+
+    // local caches & timers
+    const productCache = new Map<number, { dataProduct: any; dataSkus: any; typeValue: string }>();
+    let saveTimer: ReturnType<typeof setTimeout> | null = null;
+    let discountTimer: ReturnType<typeof setTimeout> | null = null;
 
     //****************************** GET ******************************//
 
@@ -32,6 +37,51 @@ export const useCartStore = defineStore('cart', () => {
 
     const dataProductShow = computed<CartItem[]>(() => {
         return buyNowItem.value ? [buyNowItem.value] : addCartItems.value
+    });
+
+    const cartSummary = computed(() => {
+        return dataProductShow.value.reduce(
+            (total, item) => {
+            total.subTotal += item.price * item.quantity;
+            total.weight += item.weight * item.quantity;
+            total.tax += item.tax || 0;
+            return total;
+        },
+        { subTotal: 0, weight: 0, tax: 0 }
+        )
+    });
+
+    const subTotal = computed(() => {
+        return cartSummary.value.subTotal;
+    });
+
+    const weightsTotal = computed(() => {
+        return cartSummary.value.weight;
+    });
+
+    const taxProductTotal = computed(() => {
+        return cartSummary.value.tax;
+    });
+
+    const taxTotal = computed(() => {
+        const couponValueType = typeCoupon.value === 'shipping' ? couponValue.value : 0;
+        const shippingAfterCoupon = Math.max(shippingFee.value - couponValueType, 0);
+        return taxProductTotal.value + shippingAfterCoupon * valueTaxLocal.value;
+    });
+
+    const orderTotal = computed(() => {
+        const shippingAfterCoupon = Math.max(shippingFee.value - (typeCoupon.value === 'shipping' ? couponValue.value : 0), 0)
+        const total = subTotal.value + shippingAfterCoupon + taxTotal.value - discountValue.value - (typeCoupon.value === 'discount' ? couponValue.value : 0);
+        return total;
+    });
+
+    const shippingFee = computed(() => {
+        if (!dataWeight.value.length) return 0;
+
+        const weight = weightsTotal.value;
+        const found = dataWeight.value.find(w => weight <= w.zoneTo)
+
+        return found ? found.fee : dataWeight.value.at(-1)?.fee || 0;
     });
 
     const dataPromotion = computed<Promotion[]>(() => {
@@ -42,32 +92,26 @@ export const useCartStore = defineStore('cart', () => {
         return listGiftChecked.value;
     });
 
-    const taxProductTotal = computed(() => {
-        return dataProductShow.value.reduce((sum, item) => sum + item.tax, 0)
-    });
-
-    const subTotal = computed(() => {
-        return dataProductShow.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    });
-
-    const weightsTotal = computed(() => {
-        return dataProductShow.value.reduce((sum, item) => sum + item.weight * item.quantity, 0)
-    });
-
-    const shippingFee = computed(() => {
-        if (!dataWeight.value.length) return 0;
-
-        const weight = weightsTotal.value
-        const found = dataWeight.value.find(w => weight <= w.zoneTo)
-
-        return found ? found.fee : dataWeight.value.at(-1)?.fee || 0;
-    });
-
-    const orderTotal = computed(() => {
-        return subTotal.value + shippingFee.value - discountValue.value;
-    });
-
     //******************************************************** ACTIONS ********************************************************//
+
+    // small helpers
+    const successNotify = (msg: string) => notify({ message: msg, type: 'success', time: 3000 });
+    const errorNotify = (msg: string) => notify({ message: msg, type: 'error', time: 3000 });              
+    
+    // debounce localStorage
+    const scheduleSaveToLocal = () => {
+        if (saveTimer) clearTimeout(saveTimer)
+        saveTimer = setTimeout(() => {
+            localStorage.setItem('cart_data', JSON.stringify(addCartItems.value))
+            saveTimer = null
+        }, 300) // 300ms delay tránh việc ghi quá nhiều lần trong thời gian ngắn (ví dụ khi tăng giảm số lượng)
+    }
+
+    // debounce discount API calls
+    const scheduleFetchDiscount = (subtotal: number) => {
+        if (discountTimer) clearTimeout(discountTimer)
+        discountTimer = setTimeout(() => fetchDiscount(subtotal), 400) // tránh việc gọi API quá nhiều lần khi subtotal thay đổi nhanh
+    }
 
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
@@ -81,27 +125,41 @@ export const useCartStore = defineStore('cart', () => {
                     },
                 })
 
-                if (dataCartResponse.data) {  
+                if (dataCartResponse?.data) {  
                     addCartItems.value = [];    
-                    const serverCart = JSON.parse(dataCartResponse.data);
+                    const serverCart: any[] = JSON.parse(dataCartResponse.data);
+                    // Xử lý trùng lặp SKU từ server
+                    // Lấy danh sách SKU duy nhất và tổng hợp số lượng cho mỗi SKU trước khi thêm vào giỏ hàng
+                    const unique = Array.from(new Set(serverCart.map((i: any) => Number(i.skuId))));
+
                     await Promise.all(
-                        serverCart.map((i: any) => addProductToCart(i.skuId, i.quantity || 1))
+                        unique.map((sku: any) =>
+                            addProductToCart(sku, serverCart.filter((s: any) => Number(s.skuId) === sku).reduce((a: number, b: any) => a + (b.quantity || 1), 0))
+                        )
                     );
                 } 
 
             } catch (err) {
-                console.error("Error fetching cart:", err)
+                console.error("Error fetching cart:", err);
+                error.value = 1;
             }
 
         } else {
-            const localCart = localStorage.getItem('cart_data')
+            const localCart = localStorage.getItem('cart_data');
             addCartItems.value = localCart ? JSON.parse(localCart) : [];
         }   
     }
 
     // ADD PRODUCT TO CART
     const addProductToCart = async (idSku:number, quantity: number) => {
-        const product = await getDataProduct(idSku);
+        let cached = productCache.get(idSku);
+        
+        // Kiểm tra nếu đã có trong cache thì dùng luôn tránh gọi API nhiều lần
+        if (!cached) {
+            const product = await getDataProduct(idSku);
+            cached = { dataProduct: product.dataProduct, dataSkus: product.dataSkus, typeValue: product.typeValue }
+            productCache.set(idSku, cached);
+        }                   
         const existing = addCartItems.value.find(item => item.skuId === idSku);
 
         if(existing) {
@@ -109,23 +167,24 @@ export const useCartStore = defineStore('cart', () => {
         } else {
             addCartItems.value.push({
                 skuId: idSku,
-                title: product.dataProduct?.title || '',
-                type: product.typeValue === 'default' ? '' : product.typeValue,
-                price: Number(product.dataSkus?.price) || 0,
+                title: cached.dataProduct?.title || '',
+                type: cached.typeValue === 'default' ? '' : cached.typeValue,
+                price: Number(cached.dataSkus?.price) || 0,
                 quantity,
-                weight: Number(product.dataSkus?.weight) || 0,
-                tax: Number(product.dataProduct?.tax) || 0,   
+                weight: Number(cached.dataSkus?.weight) || 0,
+                tax: Number(cached.dataProduct?.tax) || 0,   
             });
         }    
 
-        checkQuantityGift(idSku, quantity);
+        checkQuantityGift(idSku, addCartItems.value.find(i => i.skuId === idSku)?.quantity || quantity);
+        scheduleSaveToLocal();
+        addDataCartToServer();
     }
 
     // CLICK ADD TO CART
     const getDataAddCart = async (idSku:number, quantity: number) => {
         await addProductToCart(idSku, quantity);
-        addDataCartToServer();
-        notify({ message: 'Added to cart!', type: 'success', time: 3000 });
+        successNotify('Added to cart!');
     }
 
     // CLICK BUY NOW
@@ -133,7 +192,7 @@ export const useCartStore = defineStore('cart', () => {
         buyNowItem.value = null;
         const checkoutData = { idSku, quantity };
         sessionStorage.setItem('checkout_data', JSON.stringify(checkoutData))
-        notify({ message: 'Buy now item added!', type: 'success', time: 3000 })
+        successNotify('Buy now item added!');
     }
 
     // DATA CART BUY NOW
@@ -143,18 +202,26 @@ export const useCartStore = defineStore('cart', () => {
         if (!checkoutData) return;
 
         const { idSku, quantity = 1 } = checkoutData;
-        const product = await getDataProduct(idSku);
+
+        // reuse cache
+        let cached = productCache.get(idSku)
+        if (!cached) {
+            const product = await getDataProduct(idSku)
+            cached = { dataProduct: product.dataProduct, dataSkus: product.dataSkus, typeValue: product.typeValue }
+            productCache.set(idSku, cached)
+        }
+
         await fetchPromotion(idSku);
 
-        if (product.dataProduct) {
+        if (cached.dataProduct) {
             buyNowItem.value = {
-                skuId: Number(product.dataProduct?.id),
-                title: product.dataProduct?.title,
-                price: Number(product.dataSkus?.price) || 0,
-                type: product.typeValue === 'default' ? '' : product.typeValue,
-                quantity,
-                weight: Number(product.dataSkus?.weight) || 0,     
-                tax: Number(product.dataProduct?.tax) || 0,        
+            skuId: Number(cached.dataProduct?.id),
+            title: cached.dataProduct?.title,
+            price: Number(cached.dataSkus?.price) || 0,
+            type: cached.typeValue === 'default' ? '' : cached.typeValue,
+            quantity,
+            weight: Number(cached.dataSkus?.weight) || 0,
+            tax: Number(cached.dataProduct?.tax) || 0,
             }
         }
     }
@@ -168,45 +235,23 @@ export const useCartStore = defineStore('cart', () => {
 
     const syncCart  = async () => {
 
-        const skuIdList = addCartItems.value.map(item => ({
-            skuId: item.skuId,
-            quantity: item.quantity
-        }));
-
-        const cartQty = addCartItems.value.length;
-
+        const skuIdList = addCartItems.value.map(item => ({ skuId: item.skuId, quantity: item.quantity }));
         try {
+            // Luôn PUT để đồng bộ trạng thái giỏ hàng hiện tại lên server (không cần quan tâm giỏ hàng rỗng hay không)
+            await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: { skuIdList: JSON.stringify(skuIdList) },
+            });
 
-            if (cartQty < 1) {
-                // Nếu giỏ hàng rỗng -> POST
-                await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: { 
-                        skuIdList: JSON.stringify(skuIdList) 
-                    },
-                })
-            } else {
-                // Nếu giỏ hàng đã có sản phẩm -> PUT
-                await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-                    method: 'PUT',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: { 
-                        skuIdList: JSON.stringify(skuIdList) 
-                    },
-                })
-            }
-
+            error.value = 0;
         } catch (err) {
             console.error("Error posting cart:", err)
+            error.value = 1;
         }
-    
     }
 
     //LOAD PRODUCT
@@ -226,22 +271,33 @@ export const useCartStore = defineStore('cart', () => {
         return { dataProduct, typeValue, dataSkus }
     }
 
-    //*********************** - CHECK - ***********************//
+    //*********************** - FETCH - ***********************//
 
     //DISCOUNT
     const fetchDiscount = async (subtotal : number) => {
         try {
             const dataDis = await $fetch<{ error: number; data: Discount; message: string }>(`${apiUrl}discounts`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: {
-                    subtotal,
-                }
+                headers: { 'Content-Type': 'application/json' },
+                body: { subtotal }
             })
 
             const dis = dataDis.data;
+
+            if (!dis) {
+                discountValue.value = 0
+                dataDiscount.value = null
+                error.value = 0
+                return discountValue
+            }
+
+            if (dis.discountBasedOn === 'percent') {
+                discountValue.value = (dis.discountValue / 100) * subTotal.value
+            } else if (dis.discountBasedOn === 'value') {
+                discountValue.value = dis.discountValue
+            } else {
+                discountValue.value = 0
+            }
 
             if (dis?.discountBasedOn === 'percent') {
                 discountValue.value = (dis.discountValue / 100) * subTotal.value
@@ -251,11 +307,14 @@ export const useCartStore = defineStore('cart', () => {
                 discountValue.value = 0
             }
 
+            dataDiscount.value = dis;
+            error.value = 0;
             return discountValue;
 
         } catch (err) {
             error.value = 1
             console.error("Error fetching discounts:", err)
+            return 0
         }
     }
 
@@ -265,26 +324,22 @@ export const useCartStore = defineStore('cart', () => {
         try {
             const promotionRes = await $fetch<{ error: number; data: Promotion ; message: string }>(`${apiUrl}promotions`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: {
-                    skuId : skuId,
-                }
+                headers: { 'Content-Type': 'application/json' },
+                body: { skuId : skuId }
             })
 
-            if(promotionRes.data) {
-                const index = dataPromotions.value.findIndex(p => p.skuIdIn === skuId);
-                if (index === -1) {                                                      
-                    dataPromotions.value.push(promotionRes.data);
-                }
-                
+            if (promotionRes?.data) {
+                const exists = dataPromotions.value.find(p => p.skuIdIn === promotionRes.data.skuIdIn)
+                if (!exists) dataPromotions.value.push(promotionRes.data)
             }
+
+            error.value = 0;
             return dataPromotions;
 
         } catch (err) {
             error.value = 1
-            console.error("Error fetching discounts:", err)
+            console.error("Error fetching discounts:", err);
+            return dataPromotions;
         }
     }
 
@@ -293,8 +348,8 @@ export const useCartStore = defineStore('cart', () => {
         try {
             const data = await $fetch<{ error: number; data: { name: string }[] }>(`${apiUrl}skus/${idSku}/variant-options`)
             dataVariant.value = data?.data.map(item => item.name) || [];
+            error.value = 0;
             return dataVariant.value;
-
         } catch (err) {
             error.value = 1
             console.error("Error fetching variant options:", err)
@@ -307,26 +362,23 @@ export const useCartStore = defineStore('cart', () => {
         try {
             const data = await $fetch<{ error: number; data: Weight[]; message: string }>(`${apiUrl}weights`)
             dataWeight.value = data?.data || []
+            error.value = 0;
         } catch (err) {
             error.value = 1
             console.error("Error fetching weights:", err)
         }
     }
 
-    // check Coupon
+    // COUPON
     const fetchCoupon = async (code:string) => {
         try {
             const dataCoupon = await $fetch<{ error: number; data: Coupon; message: string }>(`${apiUrl}coupons`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: {
-                    code,
-                }
+                headers: { 'Content-Type': 'application/json' },
+                body: { code }
             })
 
-            if (dataCoupon.data) {
+            if (dataCoupon?.data) {
                 const coupon = dataCoupon.data;
 
                 if (coupon.discountBasedOn === 'percent') {
@@ -334,22 +386,27 @@ export const useCartStore = defineStore('cart', () => {
                 } else if (coupon.discountBasedOn === 'value') {
                     couponValue.value = coupon.codeValue;
                 } else {
-                    couponValue.value = 0
+                    couponValue.value = 0;
                 }
-                notify({ message: 'Coupon Code Applied Successfuly!', type: 'success', time: 3000 });
+
+                typeCoupon.value = coupon.type;
+                successNotify('Coupon Code Applied Successfully!')
             } else {
-                notify({ message: 'Invalid or expired coupon code!', type: 'error', time: 3000 });
+                couponValue.value = 0;
+                errorNotify('Invalid or expired coupon code!');
             }
 
+            error.value = 0;
             return couponValue.value;
 
         } catch (err) {
             error.value = 1
-            console.error("Error fetching coupons:", err)
+            console.error("Error fetching coupons:", err);
+            return 0;
         }
     }
 
-    // ******************** // ******************** // ********************  UI  ******************** // ******************** // ******************** //
+    // ******************** // ******************** // ********************  UI & CHECK  ******************** // ******************** // ******************** //
 
     // Khi store khởi tạo → load cart từ localStorage
     const loadCartFromStorage = () => {
@@ -366,12 +423,18 @@ export const useCartStore = defineStore('cart', () => {
     //remove product cart
     const removeItem = (index: number) => {
         if (buyNowItem.value) {
-            buyNowItem.value = null
+            buyNowItem.value = null;
             sessionStorage.removeItem('checkout_data');
         } else {
-            addCartItems.value.splice(index, 1)
+            addCartItems.value.splice(index, 1);
+            scheduleSaveToLocal();
             addDataCartToServer();
         }
+    }
+
+    // remove gift
+    const removeGift = (skuId: number) => {
+        listGiftChecked.value = listGiftChecked.value.filter(g => g.skuId !== skuId);
     }
 
     // quantity +
@@ -388,6 +451,7 @@ export const useCartStore = defineStore('cart', () => {
             }
             
         }
+        scheduleSaveToLocal();
         addDataCartToServer();     
     }
 
@@ -404,6 +468,7 @@ export const useCartStore = defineStore('cart', () => {
                 checkQuantityGift(target.skuId, target.quantity);   
             }
         }
+        scheduleSaveToLocal();
         addDataCartToServer();
     }
 
@@ -412,46 +477,35 @@ export const useCartStore = defineStore('cart', () => {
         const promotionCheck = dataPromotions.value.find(p => p.skuIdOut === idSku);
         const qtyIn = promotionCheck?.quantityIn || 1;
         const qtyGiftMax = promotionCheck?.quantityOutMax || 1;
-        const qtyGiftShow = ref(1);
 
         if (quantity >= qtyIn && promotionCheck) {
-            const qtyGift = Math.floor(quantity / qtyIn);
+            const qtyGift = Math.min(Math.floor(quantity / qtyIn), qtyGiftMax);
 
-            if (qtyGift > qtyGiftMax) {
-                qtyGiftShow.value = qtyGiftMax;
-            } else {
-                qtyGiftShow.value = qtyGift;
-            }          
-            
+            // Giới hạn số lượng quà tặng hiển thị không vượt quá quantityOutMax
             const exists = listGiftChecked.value.find(p => p.skuId === promotionCheck.skuIdOut);
+            if (exists) exists.quantity = qtyGift;
+            else listGiftChecked.value.push({ skuId: promotionCheck.skuIdOut, quantity: qtyGift });
 
-            if (exists) {
-                exists.quantity = qtyGiftShow.value;
-            } else {
-                listGiftChecked.value.push({ 
-                    skuId: promotionCheck.skuIdOut,
-                    quantity: qtyGiftShow.value,
-                });
-            }            
-
-        } else {          
-            listGiftChecked.value = listGiftChecked.value.filter(p => p.skuId !== promotionCheck?.skuIdOut);
+        } else {
+            listGiftChecked.value = listGiftChecked.value.filter(p => p.skuId !== promotionCheck?.skuIdOut)
         }
-
         return listGiftChecked.value;
     }
 
-    // Lưu cartPro vào localStorage khi thay đổi
-    watch(addCartItems, async (val)=> {
-        localStorage.setItem('cart_data', JSON.stringify(val));       
-    }, { deep: true })
+    //check tax local
+    const checklocalTax = (stateId : string) => {
+        valueTaxLocal.value = stateId === 'TX' ? 0.0825 : 0; // Texas - other states
+    }
 
-    // Check discounts
+    // Lưu cartPro vào localStorage khi thay đổi (debounced)
+    watch(addCartItems, () => scheduleSaveToLocal(), { deep: true });
+
+    // Check discounts (debounced)
     watch(subTotal, (newSubtotal) => {
-        if (newSubtotal > 0) {
-            fetchDiscount(newSubtotal)
-        } else {
-            dataDiscount.value = null
+        if (newSubtotal > 0) scheduleFetchDiscount(newSubtotal)
+        else {
+            dataDiscount.value = null;
+            discountValue.value = 0;
         }
     });
 
@@ -462,6 +516,7 @@ export const useCartStore = defineStore('cart', () => {
         dataWeight,
         dataPromotion,
 
+
         // getters
         cartCount,
         dataProductShow,
@@ -469,27 +524,33 @@ export const useCartStore = defineStore('cart', () => {
         weightsTotal,
         shippingFee,
         orderTotal,
+        taxTotal,
         taxProductTotal,
         discountValue,
         quantityGift,
         couponValue,
+
 
         // actions
         fetchDataCart,
         fetchWeights,
         fetchDiscount,
         fetchPromotion,
+        fetchCoupon,
+
 
         getDataAddCart,
         getDataBuyNow,
         dataCartBuyNow,
 
+
         loadCartFromStorage,
         clearBuyNowOnReload,
         removeItem,
+        removeGift,
         increment,
         decrement,
-        fetchCoupon,
+        checklocalTax
     }
   
 });

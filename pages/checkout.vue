@@ -164,10 +164,8 @@
                                         <tr>
                                             <th class="py-4">If you have a coupon code, please apply it below.</th>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <BodyOrderCouponcode @cancel="handleCancel" />
-                                            </td>
+                                        <tr>                                            
+                                            <BodyOrderCouponcode @cancel="handleCancel" />                                          
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Subtotal</th>
@@ -368,7 +366,6 @@ watch(() => cartStore.couponValue, (val) => {
 );
 
 watch(() => formData.value.state, (val) => {
-        console.log('State changed to:', val);
         cartStore.checklocalTax(val);
     },{ immediate: true }
 );

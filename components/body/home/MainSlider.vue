@@ -5,7 +5,7 @@
         :pagination="{ clickable: true }"
         :modules="[Pagination]"
         @slideChange="handleSlideChange"
-        class="container min-h-[420px]">
+        class="container min-h-[320px]">
             <swiper-slide v-for="(slide, index) in slides" :key="index">       
                 <div class="flex flex-wrap py-8 lg:py-4">
                     <div class="w-2/5 lg:w-3/5 mt-5 px-4 content" :class="{ active: currentSlideIndex === index }">
@@ -16,7 +16,7 @@
                             <div class="mb-4 in-top-3">
                                 <span class="font-normal in-top-3 leading-none md:leading-loose">FROM</span>
                                 <div class="text-3xl md:text-5xl font-bold leading-[3.5rem]">
-                                    <sup>$</sup><span>{{ slide.price }}</span><sup>{{ slide.sub }}</sup>
+                                    <sup class="text-[60%]">$</sup><span>{{ slide.price }}</span><sup class="text-[60%]">{{ slide.sub }}</sup>
                                 </div>
                             </div>
                             <NuxtLink :to="`/product/${dataLinkPro}`">

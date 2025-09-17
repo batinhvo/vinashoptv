@@ -9,7 +9,7 @@
 
         <!-- Price -->
         <div v-if="dataSkusfilter" class="flex items-end my-5">                           
-            <div class="text-4xl"
+            <div class="text-3xl sm:text-4xl"
             :class="{ 'text-red-500': dataSkusfilter.salePrice && dataSkusfilter.salePrice !== dataSkusfilter.price }">
                 ${{ formatPrice(dataSkusfilter.salePrice) }}
             </div>      

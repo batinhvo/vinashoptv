@@ -18,19 +18,19 @@
         </div>      
 
         <!-- main-header-mobile -->
-        <div class="xl:hidden h-12 bg-gray-80 py-2 px-3 bg-neutral-100">
+        <div class="xl:hidden h-12 bg-gray-80 pt-2 mb-1 px-3 bg-neutral-100">
             <div class="container flex justify-between">
-                <div class="flex">
-                <MenuCategoryPhone />               
-                <div class="max-w-[250px]">
-                    <VinaLogo />
+                <div class="flex items-center">
+                    <MenuCategoryPhone />               
+                    <div class="max-w-[250px]">
+                        <VinaLogo />
+                    </div>
                 </div>
-            </div>
-            <div class="flex">
-                <HeaderSearchIcon />
-                <HeaderIconUserIcon />
-                <HeaderIconCartIcon />
-            </div> 
+                <div class="flex">
+                    <HeaderSearchIcon />
+                    <HeaderIconUserIcon />
+                    <HeaderIconCartIcon />
+                </div> 
             </div>
         </div>      
     </header>

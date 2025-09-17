@@ -40,15 +40,26 @@ export const useCartStore = defineStore('cart', () => {
     });
 
     const cartSummary = computed(() => {
-        return dataProductShow.value.reduce(
+        const base = dataProductShow.value.reduce(
             (total, item) => {
             total.subTotal += item.price * item.quantity;
-            total.weight += item.weight * item.quantity;
-            total.tax += item.tax || 0;
+            total.weight   += item.weight * item.quantity;
+            total.tax      += item.tax || 0;
             return total;
-        },
-        { subTotal: 0, weight: 0, tax: 0 }
-        )
+            },
+            { subTotal: 0, weight: 0, tax: 0 }
+        );
+
+        // cộng thêm weight quà tặng
+        for (const gift of listGiftChecked.value) {
+            // tìm thông tin sản phẩm quà tặng trong giỏ
+            const giftItem = addCartItems.value.find(i => i.skuId === gift.skuId);
+            if (giftItem) {
+                base.weight += giftItem.weight * gift.quantity;
+            }
+        }
+
+        return base;
     });
 
     const subTotal = computed(() => {
@@ -79,7 +90,7 @@ export const useCartStore = defineStore('cart', () => {
         if (!dataWeight.value.length) return 0;
 
         const weight = weightsTotal.value;
-        const found = dataWeight.value.find(w => weight <= w.zoneTo)
+        const found = dataWeight.value.find(w => weight <= w.zoneTo);
 
         return found ? found.fee : dataWeight.value.at(-1)?.fee || 0;
     });

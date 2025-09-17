@@ -66,8 +66,6 @@
 </template>
 
 <script setup lang="ts">
-    const router = useRouter();
-
     const triggerSubmitProfile = ref(false);
     const triggerSubmitChangePass = ref(false);
 

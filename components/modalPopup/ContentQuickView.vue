@@ -7,9 +7,9 @@
         <div class="text-left">
             <div class="text-2xl" v-if="products">${{ formatPrice(products.minPrice) }}</div>
         </div>
-        <div class="text-xs">{{ products?.totalOutFake }}</div>
+        <div class="text-xs">Sold: {{ products?.totalOutFake }}</div>
     </div>
-    <div class="mt-5 line-clamp-4 text-justify"  v-html="changeCharacter(products?.summary || '')">      
+    <div class="my-5 line-clamp-4 text-justify" v-html="changeCharacter(products?.summary || '')">      
     </div>
 </template>
 

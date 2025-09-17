@@ -1,9 +1,9 @@
 <template>
     <div class="max-w-[420px] xl:min-w-[800px]">
-        <div class="flex flex-wrap mt-2 bg-zinc-100 border border-gray-200">
+        <div class="flex flex-wrap mt-2 bg-zinc-100 border border-gray-300">
             <div class="w-1/2 pr-3 text-center hidden lg:block">
-                <div class="border border-gray-200 shadow-inner m-3">
-                    <BodyProductImages :linkImg="products?.media" :altImg="products?.title" />
+                <div class="border border-zinc-200 shadow-inner m-3">
+                    <BodyProductImages :linkImg="products?.media" :altImg="products?.title"/>
                 </div>
                 <div class="hover:-translate-y-1 duration-300 my-6">
                     <NuxtLink class="btn text-black text-xs bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]"
@@ -31,7 +31,7 @@
                     :cateTitle="cateTitle" 
                     />
                 </div>
-                <div class="hover:-translate-y-1 duration-300 my-8">
+                <div class="hover:-translate-y-1 duration-300 py-6 border-t bg-white">
                     <NuxtLink class="btn text-black text-xs bg-primary py-1.5 px-4 rounded-md hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]"
                     @click.prevent="closeModal()"
                     :to="`/product/${products?.slug}`">

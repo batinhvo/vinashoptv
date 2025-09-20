@@ -85,12 +85,10 @@
   const onSubmit = handleSubmit( async () => {
     
     try {
-      const postData = await $fetch(`${apiUrl}comments/contact`, {
+        await $fetch(`${apiUrl}comments/contact`, {
         method: 'POST',
         body: formDataContact.value,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
 
       notify({

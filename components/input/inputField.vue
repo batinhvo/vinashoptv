@@ -1,5 +1,5 @@
 <template>
-    <div :class="['w-full mb-6 xl:px-2', widthfull ? '' : 'xl:w-1/2']">
+    <div :class="['w-full mb-6 xl:px-2', widthfull ? '' : 'lg:w-1/2 lg:px-1']">
         <label :for="name" class="font-bold ml-3 block">{{ label }} <span v-if="isStrong" class="text-red-500">*</span></label>
         <Field 
         v-bind="$attrs"

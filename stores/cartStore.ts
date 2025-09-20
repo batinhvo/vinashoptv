@@ -12,7 +12,7 @@ export const useCartStore = defineStore('cart', () => {
 
     const dataWeight = ref<Weight[]>([])
     const dataDiscount = ref<Discount | null>(null)
-    const dataVariant = ref<String[]>([])
+    const dataVariant = ref<string[]>([]);
     const dataPromotions = ref<Promotion[]>([])
 
     const valueTaxLocal = ref<number>(0) // state tax local
@@ -24,7 +24,8 @@ export const useCartStore = defineStore('cart', () => {
     const productStore = useProductStore()
     const authStore = useAuthStore()
 
-    const token = useCookie('tokenAccess').value;
+    //const token = useCookie('tokenAccess').value;
+    const token = () => useCookie('tokenAccess').value;
 
     // local caches & timers
     const productCache = new Map<number, { dataProduct: any; dataSkus: any; typeValue: string }>();
@@ -42,10 +43,10 @@ export const useCartStore = defineStore('cart', () => {
     const cartSummary = computed(() => {
         const base = dataProductShow.value.reduce(
             (total, item) => {
-            total.subTotal += item.price * item.quantity;
-            total.weight   += item.weight * item.quantity;
-            total.tax      += item.tax || 0;
-            return total;
+                total.subTotal += item.price * item.quantity;
+                total.weight   += item.weight * item.quantity;
+                total.tax      += item.tax || 0;
+                return total;
             },
             { subTotal: 0, weight: 0, tax: 0 }
         );
@@ -118,6 +119,10 @@ export const useCartStore = defineStore('cart', () => {
         }, 300) // 300ms delay tránh việc ghi quá nhiều lần trong thời gian ngắn (ví dụ khi tăng giảm số lượng)
     }
 
+    const savePromotionsToLocal = () => {   
+        localStorage.setItem('dataPromotions_data', JSON.stringify(dataPromotions.value));
+    }
+
     // debounce discount API calls
     const scheduleFetchDiscount = (subtotal: number) => {
         if (discountTimer) clearTimeout(discountTimer)
@@ -126,12 +131,12 @@ export const useCartStore = defineStore('cart', () => {
 
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
-        if (authStore.authenticated && token) {
+        if (authStore.authenticated && token()) {
             try {
                 const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                     method: 'GET',
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${token()}`,
                         'Content-Type': 'application/json',
                     },
                 })
@@ -155,10 +160,7 @@ export const useCartStore = defineStore('cart', () => {
                 error.value = 1;
             }
 
-        } else {
-            const localCart = localStorage.getItem('cart_data');
-            addCartItems.value = localCart ? JSON.parse(localCart) : [];
-        }   
+        } 
     }
 
     // ADD PRODUCT TO CART
@@ -184,6 +186,9 @@ export const useCartStore = defineStore('cart', () => {
                 quantity,
                 weight: Number(cached.dataSkus?.weight) || 0,
                 tax: Number(cached.dataProduct?.tax) || 0,   
+                media: cached.dataProduct.media || '',
+                productId: cached.dataProduct.id || 0,
+                salePrice: cached.dataProduct.minPrice || 0,
             });
         }    
 
@@ -215,7 +220,8 @@ export const useCartStore = defineStore('cart', () => {
         const { idSku, quantity = 1 } = checkoutData;
 
         // reuse cache
-        let cached = productCache.get(idSku)
+        let cached = productCache.get(idSku);
+        
         if (!cached) {
             const product = await getDataProduct(idSku)
             cached = { dataProduct: product.dataProduct, dataSkus: product.dataSkus, typeValue: product.typeValue }
@@ -226,24 +232,30 @@ export const useCartStore = defineStore('cart', () => {
 
         if (cached.dataProduct) {
             buyNowItem.value = {
-            skuId: Number(cached.dataProduct?.id),
-            title: cached.dataProduct?.title,
-            price: Number(cached.dataSkus?.price) || 0,
-            type: cached.typeValue === 'default' ? '' : cached.typeValue,
-            quantity,
-            weight: Number(cached.dataSkus?.weight) || 0,
-            tax: Number(cached.dataProduct?.tax) || 0,
+                skuId: idSku,
+                title: cached.dataProduct?.title,
+                price: Number(cached.dataSkus?.price) || 0,
+                type: cached.typeValue === 'default' ? '' : cached.typeValue,
+                quantity,
+                weight: Number(cached.dataSkus?.weight) || 0,
+                tax: Number(cached.dataProduct?.tax) || 0,
+                media: cached.dataProduct.media || '',
+                productId: cached.dataProduct.id || 0,
+                salePrice: cached.dataProduct.minPrice || 0,
             }
         }
+
+        checkQuantityGift(idSku, buyNowItem.value?.quantity ?? quantity);
     }
 
     //ADD DATA PRODUCT TO SERVER
     const addDataCartToServer = () => {
-        if (authStore.authenticated && token) {
+        if (authStore.authenticated && token()) {
             syncCart();
         }
     }
 
+    //sync cart
     const syncCart  = async () => {
 
         const skuIdList = addCartItems.value.map(item => ({ skuId: item.skuId, quantity: item.quantity }));
@@ -252,7 +264,7 @@ export const useCartStore = defineStore('cart', () => {
             await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                 method: 'PUT',
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token()}`,
                     'Content-Type': 'application/json',
                 },
                 body: { skuIdList: JSON.stringify(skuIdList) },
@@ -305,14 +317,6 @@ export const useCartStore = defineStore('cart', () => {
             if (dis.discountBasedOn === 'percent') {
                 discountValue.value = (dis.discountValue / 100) * subTotal.value
             } else if (dis.discountBasedOn === 'value') {
-                discountValue.value = dis.discountValue
-            } else {
-                discountValue.value = 0
-            }
-
-            if (dis?.discountBasedOn === 'percent') {
-                discountValue.value = (dis.discountValue / 100) * subTotal.value
-            } else if (dis?.discountBasedOn === 'value') {
                 discountValue.value = dis.discountValue
             } else {
                 discountValue.value = 0
@@ -422,7 +426,16 @@ export const useCartStore = defineStore('cart', () => {
     // Khi store khởi tạo → load cart từ localStorage
     const loadCartFromStorage = () => {
         const raw = localStorage.getItem('cart_data')
-        addCartItems.value = raw ? JSON.parse(raw) : []
+        addCartItems.value = raw ? JSON.parse(raw) : [];
+
+        const promoRaw = localStorage.getItem('dataPromotions_data');
+        dataPromotions.value = promoRaw ? JSON.parse(promoRaw) : [];
+
+        if (addCartItems.value.length && dataPromotions.value.length) {
+            for (const item of addCartItems.value) {
+                checkQuantityGift(item.skuId, item.quantity);
+            }
+        }
     }
 
     // Khi reload → xoá BuyNow (vì chỉ dùng 1 lần)
@@ -448,6 +461,11 @@ export const useCartStore = defineStore('cart', () => {
         listGiftChecked.value = listGiftChecked.value.filter(g => g.skuId !== skuId);
     }
 
+    // remove code coupon
+    const cancelCodeCoupon = () => {
+        couponValue.value = 0;
+    }
+
     // quantity +
     const increment = (item: CartItem) => {
         if (buyNowItem.value && buyNowItem.value.skuId === item.skuId) {
@@ -463,7 +481,7 @@ export const useCartStore = defineStore('cart', () => {
             
         }
         scheduleSaveToLocal();
-        addDataCartToServer();     
+        addDataCartToServer();    
     }
 
     // quantity -
@@ -500,6 +518,7 @@ export const useCartStore = defineStore('cart', () => {
         } else {
             listGiftChecked.value = listGiftChecked.value.filter(p => p.skuId !== promotionCheck?.skuIdOut)
         }
+
         return listGiftChecked.value;
     }
 
@@ -510,6 +529,9 @@ export const useCartStore = defineStore('cart', () => {
 
     // Lưu cartPro vào localStorage khi thay đổi (debounced)
     watch(addCartItems, () => scheduleSaveToLocal(), { deep: true });
+
+    // Lưu data vào localStorage
+    watch(dataPromotions, () => savePromotionsToLocal(), { deep: true });
 
     // Check discounts (debounced)
     watch(subTotal, (newSubtotal) => {
@@ -561,7 +583,9 @@ export const useCartStore = defineStore('cart', () => {
         removeGift,
         increment,
         decrement,
-        checklocalTax
+        checklocalTax,
+        cancelCodeCoupon,
+
     }
   
 });

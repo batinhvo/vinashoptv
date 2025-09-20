@@ -49,6 +49,9 @@ export interface CartItem {
     quantity: number,
     weight: number,
     tax: number,
+    media: string,
+    productId: number,
+    salePrice: number,
 }
 
 export type Weight = {
@@ -70,7 +73,7 @@ export type Discount = {
     minSubtotal: number,
 }
 
-export type Promotion = {
+export interface Promotion {
     id: string,
     name: string,
     skuIdIn: number,
@@ -101,4 +104,25 @@ export type Coupon = {
     startAt: Date,
     status: string,
     type: string,
+}
+
+export interface Gift {
+  name: string;
+  quantity: number;
+  skuId: number;
+  weight: number;
+}
+
+export interface ProductSubmit {
+  gift: Gift[];
+  media: string;
+  name: string;
+  price: number;
+  productId: number;
+  promotion: Promotion[];
+  quantity: number;
+  salePrice: number;
+  skuId: number;
+  tax: number;
+  weight: number;
 }

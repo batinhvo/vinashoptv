@@ -73,21 +73,6 @@ export type Discount = {
     minSubtotal: number,
 }
 
-export interface Promotion {
-    id: string,
-    name: string,
-    skuIdIn: number,
-    skuNameIn: string,
-    skuIdOut: number,
-    skuNameOut: string,
-    skuWeightOut: number,
-    status: string,
-    quantityIn: number,
-    quantityOutMax: number,
-    startAt: Date,
-    endArt: Date,      
-}
-
 export type QuantityGift = {
     skuId: number,
     quantity: number,
@@ -111,6 +96,21 @@ export interface Gift {
   quantity: number;
   skuId: number;
   weight: number;
+}
+
+export interface Promotion {
+    id: string,
+    name: string,
+    skuIdIn: number,
+    skuNameIn: string,
+    skuIdOut: number,
+    skuNameOut: string,
+    skuWeightOut: number,
+    status: string,
+    quantityIn: number,
+    quantityOutMax: number,
+    startAt: Date,
+    endArt: Date,      
 }
 
 export interface ProductSubmit {

@@ -57,23 +57,23 @@
                         <div v-if="isShippingInfo">
                             <div class="flex flex-wrap">
                                 <InputField name="firstNameDif" label="First Name" rules="required"
-                                    v-model="formData.shippingInfo.firstName" placeholder="enter your first name" />
+                                    v-model="shippingInfo.firstName" placeholder="enter your first name" />
                                 <InputField name="lastNameDif" label="Last Name" rules="required"
-                                    v-model="formData.shippingInfo.lastName" placeholder="enter your last name" />
-                                <InputSelective name="stateDif" label="State" v-model="formData.shippingInfo.state" class="lg:w-1/2 px-1"
+                                    v-model="shippingInfo.lastName" placeholder="enter your last name" />
+                                <InputSelective name="stateDif" label="State" v-model="shippingInfo.state" class="lg:w-1/2 px-1"
                                     rules="required" :widthfull=true :options="stateOpt" placeholder="Select State"
                                     @selected="stateOnSelected" />
-                                <InputSelective name="cityDif" label="City" v-model="formData.shippingInfo.city"
+                                <InputSelective name="cityDif" label="City" v-model="shippingInfo.city"
                                     rules="required|number" :options="cityOpt" placeholder="Select City" class="lg:w-1/2 px-1"
                                     @selected="cityOnSelected" />
                                 <InputField name="postCodeDif" label="PostCode/Zip" rules="required" type="number" :widthfull=true
-                                    v-model="formData.shippingInfo.zipCode" placeholder="9999" />
+                                    v-model="shippingInfo.zipCode" placeholder="9999" />
                                 <InputField name="streetDif" label="Street Address" rules="required"
-                                    v-model="formData.shippingInfo.address" :widthfull=true placeholder="enter your address" />
+                                    v-model="shippingInfo.address" :widthfull=true placeholder="enter your address" />
                                 <InputField name="emailDif" label="Email Address" rules="required|email"
-                                    v-model="formData.shippingInfo.email" placeholder="enter your email address" />
+                                    v-model="shippingInfo.email" placeholder="enter your email address" />
                                 <InputField name="phoneDif" label="Phone" rules="required|phone"
-                                    v-model="formData.shippingInfo.phone" placeholder="enter your phone number" />
+                                    v-model="shippingInfo.phone" placeholder="enter your phone number" />
                             </div>
                         </div>
 
@@ -122,15 +122,7 @@
                                                 </div>
 
                                                 <div v-for="(promotion, index) in cartStore.dataPromotion" :key="index">                                                
-                                                    <div v-if="
-                                                            product.skuId === promotion.skuIdIn &&
-                                                            product.quantity >= promotion.quantityIn &&
-                                                            (() => {
-                                                            const gift = cartStore.quantityGift.find(g => g.skuId === promotion.skuIdOut);
-                                                            return gift && gift.quantity > 0;
-                                                            })()
-                                                        "
-                                                        class="flex items-center mt-3">
+                                                    <div v-if="checkGiftCondition(product, promotion)" class="flex items-center mt-3">
                                                         <p class="font-bold">Gift:</p>
                                                         <p class="border border-green-300 bg-green-100 rounded-lg py-0.5 px-3 ml-5">
                                                             {{ promotion.skuNameOut }} x {{ cartStore.quantityGift.find(g => g.skuId === promotion.skuIdOut)?.quantity || 0 }}
@@ -266,7 +258,7 @@
 </template>
 
 <script setup lang="ts">
-    import type { ProductSubmit } from 'types/orderTypes';
+    import type { Gift, ProductSubmit } from 'types/orderTypes';
     const isShippingInfo = ref(false);
     const isConditions = ref(true);
     const isReceiveEmail = ref(false);
@@ -352,8 +344,37 @@
         cityPlaceholder.value = stateStore.cities.find((city) => city.id === valueCity)?.name || 'Select City';
     }
 
-    const handleCouponCode = (val: string) => {
-        formData.value.couponCode = val;
+    const checkGiftCondition = (product: any, promotion: any) => {
+        if (!product || !promotion) return false;
+
+        // điều kiện chính
+        const matchSku = product.skuId === promotion.skuIdIn;
+        const enoughQuantity = product.quantity >= promotion.quantityIn;
+
+        return matchSku && enoughQuantity;
+    };
+
+    const getGifts = (product: ProductSubmit): Gift[] => {
+        if (!product || !product.promotion?.length) return [];
+
+        const gifts: Gift[] = [];
+
+        product.promotion.forEach((promotion) => {
+            const matchSku = product.skuId === promotion.skuIdIn;
+            const enoughQuantity = product.quantity >= promotion.quantityIn;
+
+            if (matchSku && enoughQuantity) {
+            const promoGifts = product.gift.filter(
+                (gift) =>
+                gift.skuId === promotion.skuIdOut &&
+                gift.weight === promotion.skuWeightOut
+            );
+
+            gifts.push(...promoGifts);
+            }
+        });
+
+        return gifts;
     }
 
     watch(newStateSelect, async (newState) => {
@@ -384,7 +405,7 @@
             phone: authStore.userInfo.phone || "",
             address: authStore.userInfo.address || "",
             state: authStore.userInfo.state || "",
-            zip: authStore.userInfo.zip || "",
+            zipCode: authStore.userInfo.zip || "",
             city: authStore.userInfo.cityId || "",
             });
 
@@ -410,13 +431,20 @@
         }
     });
 
-    watch(() => isShippingInfo.value, (val) => {
-        if (!val) {
-            formData.value.shippingInfo = { ...formData.value.billingInfo };
+    const getFinalFormData = () => {
+        return {
+            ...formData.value,
+            shippingInfo: { ...shippingInfo.value }, // luôn trả ra shipping đúng
+            billingInfo: { ...formData.value.billingInfo },
+            productList: [...formData.value.productList]
         }
-        console.log(formData.value.shippingInfo)
-    },
-    { immediate: true } // chạy ngay khi khởi tạo
+    }
+
+    const shippingInfo = computed(() => {
+        return isShippingInfo.value
+            ? formData.value.shippingInfo
+            : formData.value.billingInfo
+        }
     );
 
     onMounted(async () => {
@@ -457,13 +485,12 @@
 
     //----------------------------HANDLE SUBMIT-----------------------------------//
 
-    
-
     //-----SUBMIT-----//
 
     const { handleSubmit } = useForm();
     const onSubmit = handleSubmit( async () => {
-        console.log(formData.value)
+        const payload = getFinalFormData()
+        console.log(payload) // ✅ shippingInfo sẽ luôn đúng ở đây
         try {
             notify({
                 message: 'Order Placed Successfully. Thank you for shopping with us!',

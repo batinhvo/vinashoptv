@@ -19,7 +19,7 @@
             <!-- Dropdown Menu -->
             <ul v-if="isOpen" class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
                 <li
-                    v-for="(option, index) in options"
+                    v-for="(option, index) in unref(options)"
                     :key="index"
                     @click="selectOption(option, field)"
                     class="cursor-pointer px-4 py-2 hover:bg-gray-100"
@@ -39,7 +39,7 @@
         label: { type: String, default: '' },
         name: { type: String, required: true },
         widthfull: { type: Boolean, default: false },
-        options: { type: Array as () => string[], required: true },
+        options: { type: [Array, Object] as PropType<string[] | Ref<string[]>>, required: true },
         placeholder: { type: String, default: 'Select an option' },
         rules: { type: String, default: '' },
         isStrong: { type: Boolean, default: true},

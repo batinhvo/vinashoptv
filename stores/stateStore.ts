@@ -32,18 +32,20 @@ export const useStateStore = defineStore('states', () => {
         }
     };
 
-    const fetchCities = async (stateCode: string) => {
+    const fetchCities = async (stateCode: string): Promise<{id:number; name:string}[]> => {
         try {
             cities.value = [];
             const data = await $fetch<{ error: number; data: City[]; message: string }>(`${apiUrl}cities?state=${stateCode}`);
             if (data.data) {
                 cities.value = data.data || [];
                 message.value = data.message || 'Không có thông báo';
-                return cities;
+                return cities.value;
             }
+            return [];
         } catch (err) {
             error.value = 1;
             message.value = 'Lỗi khi tải dữ liệu city.';
+            return [];
         }
     };
 

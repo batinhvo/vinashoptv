@@ -25,24 +25,38 @@
                         </div>
 
                         <div class="flex flex-wrap">
-                            <InputField v-model="formData.billingInfo.firstName" name="firstName" label="First Name"
-                                rules="required" placeholder="enter your first name" />
-                            <InputField v-model="formData.billingInfo.lastName" name="lastName" label="Last Name" rules="required"
-                                placeholder="enter your last name" />
-                            <InputSelective v-model="formData.billingInfo.state" name="state" label="State" class="lg:w-1/2 px-1"
-                                :widthfull=true :options="stateOpt" :placeholder="statePlaceholder"
-                                @selected="stateOnSelected" />
-                            <InputSelective v-model="formData.billingInfo.city" name="city" label="City" class="lg:w-1/2 px-1"
-                                :options="cityOpt" :placeholder="cityPlaceholder" 
-                                @selected="cityOnSelected" />
-                            <InputField v-model="formData.billingInfo.zipCode" name="postCode" label="PostCode/Zip" :widthfull=true
-                                type="number" placeholder="9999" />
-                            <InputField v-model="formData.billingInfo.address" name="street" label="Street Address" rules="required"
-                                :widthfull=true placeholder="enter your address" />
-                            <InputField v-model="formData.billingInfo.email" name="email" label="Email Address"
-                                rules="required|email" placeholder="enter your email address" />
-                            <InputField v-model="formData.billingInfo.phone" name="phone" label="Phone" rules="required|phone"
-                                placeholder="enter your phone number" />
+                            <InputField v-model="formData.billingInfo.firstName" 
+                                name="firstName" label="First Name" rules="required" placeholder="enter your first name" />
+
+                            <InputField v-model="formData.billingInfo.lastName" 
+                                name="lastName" label="Last Name" rules="required" placeholder="enter your last name" />
+
+                            <InputSelective                             
+                                :options="billingLocation.stateOpt" 
+                                :placeholder="billingLocation.statePlaceholder.value"
+                                @selected="billingLocation.stateOnSelected" 
+                                :widthfull=true 
+                                name="state" label="State" class="lg:w-1/2 px-1"/>
+
+                            <InputSelective 
+                                :options="billingLocation.cityOpt" 
+                                :placeholder="billingLocation.cityPlaceholder.value" 
+                                @selected="billingLocation.cityOnSelected" 
+                                name="city" label="City" class="lg:w-1/2 px-1"/>
+
+                            <InputField v-model="formData.billingInfo.zipCode" 
+                                :widthfull=true
+                                name="postCode" label="PostCode/Zip" type="number" placeholder="9999" />
+
+                            <InputField v-model="formData.billingInfo.address" 
+                                :widthfull=true 
+                                placeholder="enter your address" name="street" label="Street Address" rules="required"/>
+
+                            <InputField v-model="formData.billingInfo.email"
+                                name="email" label="Email Address" rules="required|email" placeholder="enter your email address"/>
+
+                            <InputField v-model="formData.billingInfo.phone"
+                                name="phone" label="Phone" rules="required|phone" placeholder="enter your phone number" />
                         </div>
 
                         <div class="title border-b border-gray-300 mb-10">
@@ -50,36 +64,53 @@
                         </div>
                         <!-------------------------------------------------------------------- different address ---------------------------------------------------------------------->
                         <div class="px-4 pb-4 flex flex-wrap items-center">
-                            <InputCheckBox name="difAddres" v-model="isShippingInfo" :isStrong=false :value=true
-                                label="Ship to a different address ?" />
+                            <InputCheckBox v-model="isShippingInfo"
+                                
+                                name="difAddress" label="Ship to a different address ?" />
                         </div>
 
                         <div v-if="isShippingInfo">
                             <div class="flex flex-wrap">
-                                <InputField name="firstNameDif" label="First Name" rules="required"
-                                    v-model="shippingInfo.firstName" placeholder="enter your first name" />
-                                <InputField name="lastNameDif" label="Last Name" rules="required"
-                                    v-model="shippingInfo.lastName" placeholder="enter your last name" />
-                                <InputSelective name="stateDif" label="State" v-model="shippingInfo.state" class="lg:w-1/2 px-1"
-                                    rules="required" :widthfull=true :options="stateOpt" placeholder="Select State"
-                                    @selected="stateOnSelected" />
-                                <InputSelective name="cityDif" label="City" v-model="shippingInfo.city"
-                                    rules="required|number" :options="cityOpt" placeholder="Select City" class="lg:w-1/2 px-1"
-                                    @selected="cityOnSelected" />
-                                <InputField name="postCodeDif" label="PostCode/Zip" rules="required" type="number" :widthfull=true
-                                    v-model="shippingInfo.zipCode" placeholder="9999" />
-                                <InputField name="streetDif" label="Street Address" rules="required"
-                                    v-model="shippingInfo.address" :widthfull=true placeholder="enter your address" />
-                                <InputField name="emailDif" label="Email Address" rules="required|email"
-                                    v-model="shippingInfo.email" placeholder="enter your email address" />
-                                <InputField name="phoneDif" label="Phone" rules="required|phone"
-                                    v-model="shippingInfo.phone" placeholder="enter your phone number" />
+                                <InputField v-model="shippingInfo.firstName"
+                                    name="firstNameDif" label="First Name" rules="required" placeholder="enter your first name" />
+
+                                <InputField v-model="shippingInfo.lastName"
+                                    name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />
+
+                                <InputSelective                             
+                                    :options="shippingLocation.stateOpt" 
+                                    :placeholder="shippingLocation.statePlaceholder.value"
+                                    @selected="shippingLocation.stateOnSelected" 
+                                    :widthfull=true 
+                                    name="state" label="State" class="lg:w-1/2 px-1"/>
+
+                                <InputSelective
+                                    :options="shippingLocation.cityOpt" 
+                                    :placeholder="shippingLocation.cityPlaceholder.value" 
+                                    @selected="shippingLocation.cityOnSelected" 
+                                    name="city" label="City" class="lg:w-1/2 px-1"/>
+
+                                <InputField v-model="formData.shippingInfo.zipCode" 
+                                    :widthfull=true
+                                    name="postCode" label="PostCode/Zip" type="number" placeholder="9999" />
+
+                                <InputField v-model="shippingInfo.address" 
+                                    :widthfull=true 
+                                    name="streetDif" label="Street Address" rules="required" placeholder="enter your address" />
+
+                                <InputField v-model="shippingInfo.email" 
+                                    name="emailDif" label="Email Address" rules="required|email" placeholder="enter your email address" />
+                                     
+                                <InputField v-model="shippingInfo.phone" 
+                                    name="phoneDif" label="Phone" rules="required|phone" placeholder="enter your phone number" />
                             </div>
                         </div>
 
-                        <InputField name="message" v-model="formData.note" label="Order notes (optional)"
-                            as="textarea" rows="6" class="rounded-lg" :isStrong=false
-                            placeholder="Tell us something more than you want about this order" :widthfull=true />
+                        <InputField v-model="formData.note"
+                            :isStrong=false
+                            :widthfull=true
+                            name="message"  label="Order notes (optional)" as="textarea" rows="6" class="rounded-lg" 
+                            placeholder="Tell us something more than you want about this order" />
                     </div>
 
                     <!-- ------------------------------------------------------------------invoice --------------------------------------------------------------------->
@@ -315,34 +346,8 @@
     const authStore = useAuthStore();
     const notify = useNotify();
 
-    const stateOpt = computed(() => stateStore.states.map((state) => state.name));
-    const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
-
-    const newStateSelect = ref<string>('');
-    const coupon = ref<number>(0);
-
-
-    const statePlaceholder = ref('Select State');
-    const cityPlaceholder = ref('Select City');
-
-    const stateOnSelected = (value: string) => {
-        newStateSelect.value = value;
-        formData.value.billingInfo.state = stateStore.states.find((sta) => sta.name === value)?.code || '';
-        cityPlaceholder.value = 'Select City';
-    }
-
-    const cityOnSelected = (value: string) => {
-        formData.value.billingInfo.city = String(stateStore.cities.find((city) => city.name === value)?.id || 0);
-    }
-
-    const getNameState = async (valueState: string, valueCity: number) => {
-        if (valueState) await stateStore.fetchCities(valueState); 
-        formData.value.billingInfo.state = valueState;
-        formData.value.billingInfo.city = String(valueCity);
-
-        statePlaceholder.value = stateStore.states.find((state) => state.code === valueState)?.name || 'Select State';
-        cityPlaceholder.value = stateStore.cities.find((city) => city.id === valueCity)?.name || 'Select City';
-    }
+    const billingLocation = useLocationSelect(formData, 'billingInfo');
+    const shippingLocation = useLocationSelect(formData, 'shippingInfo');
 
     const checkGiftCondition = (product: any, promotion: any) => {
         if (!product || !promotion) return false;
@@ -353,6 +358,8 @@
 
         return matchSku && enoughQuantity;
     };
+
+    const coupon = ref<number>(0);
 
     const getGifts = (product: ProductSubmit): Gift[] => {
         if (!product || !product.promotion?.length) return [];
@@ -377,15 +384,6 @@
         return gifts;
     }
 
-    watch(newStateSelect, async (newState) => {
-        const state = stateStore.states.find((state) => state.name === newState);
-        if (state) {
-            await stateStore.fetchCities(state.code); 
-        } else {
-            stateStore.resetCities();
-        }
-    });
-
     watch(() => cartStore.couponValue, (val) => {
             coupon.value = val ?? 0;
     },{ immediate: true }
@@ -409,7 +407,7 @@
             city: authStore.userInfo.cityId || "",
             });
 
-            getNameState(authStore.userInfo.state, authStore.userInfo.cityId);
+            //getNameState(authStore.userInfo.state, authStore.userInfo.cityId);
         }
     });
 
@@ -448,17 +446,19 @@
     );
 
     onMounted(async () => {
-        await stateStore.fetchStates();
-        await cartStore.fetchWeights();
-        await authStore.getInfoUser();
-    });
+        await Promise.all([
+            stateStore.fetchStates(),
+            cartStore.fetchWeights(),
+            authStore.getInfoUser(),
+        ]);
 
-    onMounted(() => {
+        billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
+        shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
+
         cartStore.dataCartBuyNow();
         cartStore.loadCartFromStorage();
         cartStore.clearBuyNowOnReload();
     });
-
 
     const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];
     const monthOpt = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];

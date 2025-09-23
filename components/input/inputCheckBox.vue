@@ -5,7 +5,10 @@
             class="accent-[#169100]"
             type="checkbox"           
             v-bind="$attrs"
-            v-model="modelValue"
+            @change="onChange"
+            :checked="internalValue"
+            :value="true"              
+            unchecked-value="false"
             :name
             :rules
             />
@@ -28,10 +31,16 @@
         isStrong: { type: Boolean, default: true }
     });
 
+    const emit = defineEmits(['update:modelValue']);
     const { setValue } = useField(props.name, props.rules);
-    const modelValue = ref(props.modelValue);
 
-    watch(modelValue, (newValue) => {
-        setValue(newValue);
-    });
+    const internalValue = ref(props.modelValue);
+    watch(() => props.modelValue, v => (internalValue.value = v));
+
+    function onChange(e: Event) {
+        const checked = (e.target as HTMLInputElement).checked
+        internalValue.value = checked
+        emit('update:modelValue', checked) // 🔑 truyền ra cha
+        setValue(checked)                  // đồng bộ VeeValidate
+    }
 </script>

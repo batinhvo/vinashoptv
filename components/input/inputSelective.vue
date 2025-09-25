@@ -5,12 +5,12 @@
         </label>
 
         <!-- VeeValidate Form -->
-        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{ field }">
+        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{field, meta}">
             <!-- Dropdown Button -->
-            <button type="button" @click="toggleDropdown"
+            <button type="button" @click="toggleDropdown" v-bind="field" :value="field.value"
             class="w-full bg-white border border-gray-300 rounded-full px-4 py-3 text-left shadow-sm focus:outline-none"
             :class="[!meta.valid && meta.touched ? 'border-red-500' : 'border-gray-300']">
-                {{ selectedValue || placeholder }}
+                {{ modelValue || placeholder }}
                 <span class="float-right">
                     <i class="fa fa-angle-down text-[9px] text-neutral-500 pl-1.5"></i>
                 </span>
@@ -58,7 +58,7 @@
     }
     
     const selectOption = (option: string, field: any) => {
-        selectedValue.value = option
+        modelValue.value = option 
         field.value = option // Đồng bộ VeeValidate
         isOpen.value = false
         // Emit value back to parent
@@ -67,8 +67,9 @@
     }
 
     const { value: fieldValue, meta } = useField(props.name, props.rules);
-    const modelValue = defineModel();
-    watch(modelValue, () => {
-        meta.valid = fieldValue.value ? true : false; // This is just an example logic. 
-    })
+    const modelValue = defineModel<string | number | null>();
+
+    // watch(modelValue, () => {
+    //     meta.valid = fieldValue.value ? true : false; // This is just an example logic. 
+    // })
 </script>

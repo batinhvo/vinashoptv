@@ -34,5 +34,25 @@ export const useOrderStore = defineStore('order', {
                 console.error('Error get order history: ', e)
             }
         },
+
+        async submitOrder(payload: any) {
+            const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+
+            try {
+                const orderResponse = await $fetch<{error: number; data: number}>(`${apiUrl}invoices`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type" : "application/json",                       
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if(orderResponse) console.log(orderResponse.data);
+                
+            } catch (e: any) {
+                console.error('Error order: ', e);
+                return Promise.reject(e?.response._data?.message || 'Something went wrong');
+            }
+        },
     },
 });

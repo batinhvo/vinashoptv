@@ -15,14 +15,38 @@
             <div class="bg-zinc-100 border border-gray-300 px-6 pt-8">
                 <form @submit.prevent="onSubmit">
                     <div class="flex flex-wrap">                                  
-                        <InputField name="orderFrom" label="Order From" v-model="formData.orderFrom" type="date" rules="required" />
-                        <InputField name="orderTo" label="Order To" v-model="formData.orderTo" type="date" rules="required" />
-                        <InputField name="phone" label="Phone" v-model="formData.phone" rules="required|phone" placeholder="enter phone number" />
-                        <InputSelective name="phoneOf" label="Phone Number Of" v-model="formData.phoneOf" rules="required" :options="PhoneOpt" placeholder="Nothing Selected"/>  
-                        <InputSelective name="statusOrder" label="Order Status" v-model="formData.phoneOf" rules="required" :options="statusOpt" placeholder="Nothing Selected"/>                                                          
+                        <InputField
+                            v-model="formData.orderFrom"
+                            :isStrong=false
+                            name="orderFrom" label="Order From" type="date" />
+
+                        <InputField
+                            v-model="formData.orderTo" 
+                            :isStrong=false
+                            name="orderTo" label="Order To" type="date"/>
+
+                        <InputField 
+                            v-model="formData.phone"
+                            :isStrong=false
+                            name="phone" label="Phone" rules="phone" placeholder="enter phone number" />
+
+                        <InputSelective
+                            v-model="formData.phoneOf"
+                            :options="PhoneOpt"
+                            :isStrong=false
+                            name="phoneOf" label="Phone Number Of" placeholder="Nothing Selected"/>  
+
+                        <InputSelective
+                            v-model="formData.statusOrder"
+                            :options="statusOpt"
+                            :isStrong=false
+                            name="statusOrder"
+                            label="Order Status"
+                            placeholder="Nothing Selected"
+                        />                                                    
                     </div>
                     <div class="flex mb-10 px-3">
-                        <button @click.prevent="clearForm(resetForm)" class="btn btn-primary bg-gray-700 py-2 px-10 rounded-full text-base text-white font-normal hover:shadow-[0_4px_11px_0_rgba(0,0,0,0.5)]">
+                        <button @click.prevent="clearForm()" class="btn btn-primary bg-gray-700 py-2 px-10 rounded-full text-base text-white font-normal hover:shadow-[0_4px_11px_0_rgba(0,0,0,0.5)]">
                             Clear
                         </button>
                         <button type="submit" class="btn btn-primary bg-primary py-2 px-10 ml-5 rounded-full text-base text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
@@ -51,19 +75,19 @@
                     <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">{{ order.status }}</div>
                     <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">${{ order.grandTotal }}</div>
                         <div class="lg:w-1/5 lg:block hidden">
-                            <button @click.prevent="OpenDetails" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
+                            <button @click.prevent="toggleDetails(order.id)" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
                                 More Details
                             </button>
                         </div>
                     </div>
 
                     <div class="w-full text-center border border-gray-300 py-3 lg:hidden">
-                        <button @click.prevent="OpenDetails" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
+                        <button @click.prevent="toggleDetails(order.id)" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
                             More Details
                         </button>
                     </div>
 
-                    <div class="bg-white" :class="[isOpenDetails ? 'overflow-visible' : 'hidden']">
+                    <div class="bg-white" :class="openOrderId === order.id ? 'overflow-visible' : 'hidden'">
                         <div class="text-center border border-gray-300">
                             <BodyOrderBillingInfo :order="order" />
                         </div>
@@ -75,21 +99,20 @@
 </template>
 
 <script setup lang="ts">
+import type { OrderFilter } from 'types/orderTypes';
+
+    const notify = useNotify();
     definePageMeta({middleware: 'auth-middle'})
 
-    const isOpenDetails = ref(false);
-    const OpenDetails = () => {
-        isOpenDetails.value = !isOpenDetails.value;
-    }
+    const openOrderId = ref<number | null>(null);
+    const toggleDetails = (id: number) => {
+        openOrderId.value = openOrderId.value === id ? null : id;
+    };
 
     const PhoneOpt = ['Shipping', 'Billing'];
     const statusOpt = ['All', 'Unable', 'Pending', 'Shipped', 'Cancelled', 'Returned'];
 
-    const clearForm = (resetForm: () => void) => {
-        resetForm(); 
-    };
-
-    const formData = ref({
+    const formData = ref<OrderFilter>({
         phoneOf: '',
         statusOrder: '',
         orderFrom: '',
@@ -97,9 +120,40 @@
         phone: '',
     });
 
-    const { handleSubmit, resetForm } = useForm();
-    const onSubmit = handleSubmit(() => {
-        alert(123)
+    const clearForm = () => {
+        formData.value = {
+            phoneOf: '',
+            statusOrder: '',
+            orderFrom: '',
+            orderTo: '',
+            phone: '',
+        };
+    };
+
+    const { handleSubmit } = useForm();
+    const onSubmit = handleSubmit(async () => {
+        const { orderFrom, orderTo, phone, phoneOf, statusOrder } = formData.value;
+
+        const params = new URLSearchParams();
+        if (orderFrom) params.append('from', orderFrom);
+        if (orderTo)   params.append('to', orderTo);
+        if (statusOrder && statusOrder !== 'All') params.append('status', statusOrder.toLowerCase());
+        if (phone)     params.append('phone', phone);
+        if (phoneOf)   params.append('phoneOf', phoneOf.toLowerCase());
+
+        params.append('page', '1');
+        params.append('perPage', '8');
+
+        try {
+            await orderStore.getDataFilterOrderHistory(params);
+        } catch (err) {
+            console.error(err);
+            notify({
+                message: 'Order Placed Successfully. Thank you for shopping with us!',
+                type: 'success',
+                time: 3000,
+            });   
+        }
     });
 
     //------------------------------------------------------------------------------//

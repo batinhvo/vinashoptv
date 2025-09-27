@@ -55,7 +55,7 @@
     const authStore = useAuthStore();
     const stateStore = useStateStore();
 
-    const cityName = ref('');
+    const cityName = ref(''); 
     const stateName = ref('');
 
     onMounted(async () => {

@@ -126,3 +126,11 @@ export interface ProductSubmit {
   tax: number;
   weight: number;
 }
+
+export interface OrderFilter {
+  phoneOf: string;
+  statusOrder: string;
+  orderFrom: string;
+  orderTo: string;
+  phone: string;
+}

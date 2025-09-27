@@ -89,3 +89,11 @@ export type subImgData = {
     ownerCategoryId: number,
     sort: number,
 };
+
+export interface Params {
+    descending: number;
+    page: number;
+    perPage: number;
+    sale?: number;
+    sortBy: string,
+};

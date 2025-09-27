@@ -72,10 +72,12 @@
 
                         <div v-if="isShippingInfo">
                             <div class="flex flex-wrap">
-                                <InputField v-model="shippingInfo.firstName"
+                                <InputField 
+                                    v-model="shippingInfo.firstName"                                    
                                     name="firstNameDif" label="First Name" rules="required" placeholder="enter your first name" />
 
-                                <InputField v-model="shippingInfo.lastName"
+                                <InputField 
+                                    v-model="shippingInfo.lastName"
                                     name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />
 
                                 <InputSelective         
@@ -92,23 +94,28 @@
                                     @selected="shippingLocation.cityOnSelected" 
                                     name="city" label="City" class="lg:w-1/2 px-1"/>
 
-                                <InputField v-model="formData.shippingInfo.zipCode" 
+                                <InputField 
+                                    v-model="formData.shippingInfo.zipCode" 
                                     :widthfull=true
                                     name="postCode" label="PostCode/Zip" type="number" placeholder="9999" />
 
-                                <InputField v-model="shippingInfo.address" 
+                                <InputField 
+                                    v-model="shippingInfo.address" 
                                     :widthfull=true 
                                     name="streetDif" label="Street Address" placeholder="enter your address" />
 
-                                <InputField v-model="shippingInfo.email" 
+                                <InputField 
+                                    v-model="shippingInfo.email" 
                                     name="emailDif" label="Email Address" rules="email" placeholder="enter your email address" />
                                      
-                                <InputField v-model="shippingInfo.phone" 
+                                <InputField 
+                                    v-model="shippingInfo.phone" 
                                     name="phoneDif" label="Phone" rules="phone" placeholder="enter your phone number" />
                             </div>
                         </div>
 
-                        <InputField v-model="formData.note"
+                        <InputField 
+                            v-model="formData.note"
                             :isStrong=false
                             :widthfull=true
                             name="message"  label="Order notes (optional)" as="textarea" rows="6" class="rounded-lg" 
@@ -245,29 +252,32 @@
                                         <InputField 
                                             v-model="formData.cardInfo.nameOnCard"
                                             :widthfull=true
-                                            name="nameCard" label="Name On Card" rules="required"  placeholder="enter name on card" />
+                                            :rules="formData.paymentMethod === 'card' ? 'required' : ''"
+                                            name="nameCard" label="Name On Card" placeholder="enter name on card" />
 
                                         <InputField 
                                             v-model="formData.cardInfo.cardNumber"
-                                            :widthfull=true
                                             @input="maxInput"
-                                            name="cardNumber" label="Card Number" rules="required" placeholder="0000-0000-0000-0000" />
+                                            :widthfull=true                                            
+                                            :rules="formData.paymentMethod === 'card' ? 'required' : ''"
+                                            name="cardNumber" label="Card Number" placeholder="0000-0000-0000-0000" />
 
                                         <InputSelective 
-                                            v-model="formData.cardInfo.expirationMonth"
+                                            v-model="formData.cardInfo.expirationMonth"                                            
                                             :widthfull=true                                                                                      
                                             :options="monthOpt" 
                                             name="monthCard" label="Month Expired" placeholder="Nothing Selected" />
 
                                         <InputSelective 
-                                            :v-model="formData.cardInfo.expirationYear"
-                                            :options="yearOpt"
+                                            v-model="formData.cardInfo.expirationYear"
                                             :widthfull=true 
+                                            :options="yearOpt"                                            
                                             name="yearCard" label="Year Expired" placeholder="Nothing Selected" />
 
                                         <InputField 
-                                            v-model="formData.cardInfo.cvv" rules="required" 
+                                            v-model="formData.cardInfo.cvv" 
                                             :widthfull=true
+                                            :rules="formData.paymentMethod === 'card' ? 'required' : ''"
                                             name="securityCode" label="Security Code" placeholder="enter security code on card" />
                                     </div>
                                 </div>
@@ -369,7 +379,6 @@
     const giftList = ref<Gift[]>([]);
     const promotionList = ref<Promotion[]>([]);
 
-
     const billingLocation = useLocationSelect(formData, 'billingInfo');
     const shippingLocation = useLocationSelect(formData, 'shippingInfo');
 
@@ -382,31 +391,6 @@
 
         return matchSku && enoughQuantity;
     };    
-
-    function refreshGiftList() {
-        giftList.value = [];
-        promotionList.value = [];
-
-        cartStore.dataProductShow.forEach(product => {
-            cartStore.dataPromotion.forEach(promo => {
-                if (checkGiftCondition(product, promo)) {
-                    const exists = giftList.value.some(g => g.skuId === promo.skuIdOut);
-                    if (!exists) {
-                        giftList.value.push({
-                            name: promo.name,
-                            quantity: product.quantity,
-                            skuId: promo.skuIdOut,
-                            weight: product.weight,
-                        });
-
-                        promotionList.value.push(promo)
-                    }
-                }
-            });
-        });
-    };
-
-    watch([() => cartStore.dataProductShow, () => cartStore.dataPromotion], refreshGiftList, { deep: true })
 
     const shippingInfo = computed(() => {
         return isShippingInfo.value
@@ -436,15 +420,42 @@
         };
     };
 
-    watch(() => cartStore.couponValue, (val) => {
-        coupon.value = val ?? 0;
-        },{ immediate: true }
-    );
+    function normalizeCardInfo() {
+        const expMonth = formData.value.cardInfo.expirationMonth
+        const expYear = formData.value.cardInfo.expirationYear
 
-    watch(() => formData.value.billingInfo.state, (val) => {
-        cartStore.checklocalTax(val);
-        },{ immediate: true }
-    );
+        formData.value.cardInfo.expirationMonth = Number(expMonth)
+        formData.value.cardInfo.expirationYear = Number(expYear)
+    };
+
+    function refreshGiftList() {
+        giftList.value = [];
+        promotionList.value = [];
+
+        cartStore.dataProductShow.forEach(product => {
+            cartStore.dataPromotion.forEach(promo => {
+                if (checkGiftCondition(product, promo)) {
+                    const exists = giftList.value.some(g => g.skuId === promo.skuIdOut);
+                    if (!exists) {
+                        giftList.value.push({
+                            name: promo.name,
+                            quantity: product.quantity,
+                            skuId: promo.skuIdOut,
+                            weight: product.weight,
+                        });
+
+                        promotionList.value.push(promo)
+                    }
+                }
+            });
+        });
+    };
+
+    watch([() => cartStore.dataProductShow, () => cartStore.dataPromotion], refreshGiftList, { deep: true });
+
+    watch(() => cartStore.couponValue, (val) => { coupon.value = val ?? 0 }, { immediate: true });
+
+    watch(() => formData.value.billingInfo.state, (val) => { cartStore.checklocalTax(val) }, { immediate: true });
 
     watchEffect(() => {
         if (authStore.userInfo) {
@@ -494,8 +505,9 @@
         cartStore.clearBuyNowOnReload();
     });
 
+    //----------------------------INVOICE FORM-----------------------------------//.
     const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];
-    const monthOpt = [1, 2, 3];
+    const monthOpt = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     const yearOpt: string[] = Array.from({ length: 30 }, (_, i) => (2025 + i).toString());
 
     const maxInput = (e: Event) => {
@@ -505,8 +517,6 @@
         }
     };
 
-    //----------------------------INVOICE FORM-----------------------------------//.
-
     // handle price total
     const formatPrice = (value: number) => {
         return new Intl.NumberFormat('en-US', {
@@ -515,16 +525,12 @@
         }).format(value);
     };
 
-    const selectedPayment = ref<string | null>(null);
-
     //----------------------------HANDLE SUBMIT-----------------------------------//
-
-    //-----SUBMIT-----//
-
     const { handleSubmit } = useForm();
     const onSubmit = handleSubmit( async () => {
         const payload = getFinalFormData()
         try {
+            normalizeCardInfo()
             await orderStore.submitOrder(payload);
             notify({
                 message: 'Order Placed Successfully. Thank you for shopping with us!',
@@ -533,9 +539,9 @@
             });   
         } catch (error) {
             notify({              
-                message: 'Order Failed. Please try again!',
+                message: 'Order failed. Please check information and try again!',
                 type: 'error',
-                time: 2000,
+                time: 3000,
             });
         }
     });

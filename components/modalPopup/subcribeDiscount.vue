@@ -6,20 +6,35 @@
             <p class="text-2xl text-center">Subscribe to receive a <span class="font-bold">discount</span> on your first order!</p> 
         </div>
         <div class="pt-5">
-            <form action="">
-                <InputField name="subcribe" v-model="subcribe" rules="required|email" widthfull :is-strong="false" />              
+            <form @submit.prevent="onSubmit">
+                <InputField
+                    v-model="subcribe"
+                    name="subcribe"
+                    rules="required|email"
+                    :widthfull="true"
+                    :is-strong="false"
+                />         
             </form>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+
     const authStore = useAuthStore();
-    
     const subcribe = ref('');
-    subcribe.value = authStore.userInfo?.email || 'aaa';
 
-    console.log(authStore.userInfo)
+    onMounted(async () => {
+        try {
+            await authStore.getInfoUser();
+            subcribe.value = authStore.userInfo?.email || '';
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    });
 
-    const { handleSubmit, resetForm  } = useForm();
+    const { handleSubmit } = useForm()
+        const onSubmit = handleSubmit(values => {
+        console.log(values)
+    })
 </script>

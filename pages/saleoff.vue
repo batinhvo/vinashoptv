@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-    import { type Product } from "types/productTypes";
+    import { type Params, type Product } from "types/productTypes";
 
     const imgBanner = '/images/banner/bg-banner-01.jpg';
 
@@ -54,14 +54,6 @@
     const isUpdateSort = ref(false);
     const fromShow = ref(1);
     const toShow = ref(1);
-
-    interface Params {
-        descending: number;
-        page: number;
-        perPage: number;
-        sale?: number;
-        sortBy: string,
-    };
 
     const params = ref<Params>({
         descending: 1,

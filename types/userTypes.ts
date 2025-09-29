@@ -18,7 +18,7 @@ export interface DataProfileUser {
     email: string,
     phone: string,
     state: string,
-    zip: number,
+    zip: number | string,
 }
 
 export interface PassUser {
@@ -48,4 +48,10 @@ export interface UserInfo {
     resetPasswordToken: string,
     state: string,
     zip: number,
+}
+
+export interface InfoSubscribe {
+    isApplied: string,
+    subscribeAt: Date,
+    userId: number,
 }

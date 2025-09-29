@@ -1,4 +1,4 @@
-import type { DataProfileUser, DataRefresh, DataUser, InputDataLogin, PassUser, UserInfo } from "types/userTypes";
+import type { DataProfileUser, DataRefresh, DataUser, InfoSubscribe, InputDataLogin, PassUser, UserInfo } from "types/userTypes";
 const notify = useNotify();
 
 export const useAuthStore = defineStore('auth', {
@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
         authenticated: false,
         user: null as string | null,
         userInfo: null as UserInfo | null,
+        infoSubscribe: null as InfoSubscribe | null,
     }),
 
     actions: {
@@ -177,6 +178,61 @@ export const useAuthStore = defineStore('auth', {
                 if (changePassResponse.error) throw new Error(changePassResponse.message);
             } catch (e: any) {
                 console.error('Error updating password: ', e);
+            }
+        },
+
+        async subscribeEmail(email: string) {
+            try {
+                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const token = useCookie('tokenAccess').value;
+
+                if (!token) throw new Error("No token available");
+
+                const subscribeResponse = await $fetch<{error: number; message: string; userId: number}>(`${apiUrl}subscribes`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type" : "application/json",
+                        "Authorization" : `Bearer ${token || ""}`,
+                    },
+                    body: { email },
+                });
+
+                if (subscribeResponse.error) throw new Error(subscribeResponse.message);
+
+                notify({
+                    message: 'Subscribed to discount emails successfully!',
+                    type: 'success',
+                    time: 3000,
+                });
+
+            } catch (e: any) {
+                console.error('Error subscribe email: ', e);
+                return Promise.reject(e?.response._data?.message || 'Something went wrong')
+            }
+        },
+
+        async checkSubscribeEmail() {
+            if (!this.authenticated || !useCookie('tokenAccess').value) return;
+
+            try {
+                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const token = useCookie('tokenAccess').value;
+
+                const infoSubscribeResponse = await $fetch<{error: number; data: InfoSubscribe; message: string }>(`${apiUrl}subscribes`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type" : "application/json",
+                        "Authorization" : `Bearer ${token || ""}`,
+                    },
+                });
+
+                if (infoSubscribeResponse.data) {
+                    this.infoSubscribe = infoSubscribeResponse.data;
+                }
+                
+            } catch (e: any) {
+                console.error('Error subscribe email: ', e);
+                return Promise.reject(e?.response._data?.message || 'Something went wrong')
             }
         },
     },

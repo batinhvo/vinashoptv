@@ -8,8 +8,8 @@
         <div class="pt-5">
             <form @submit.prevent="onSubmit">
                 <InputField
-                    v-model="subcribe"
-                    name="subcribe"
+                    v-model="emailSubcribe"
+                    name="emailSubcribe"
                     rules="required|email"
                     :widthfull="true"
                     :is-strong="false"
@@ -21,20 +21,45 @@
 
 <script setup lang="ts">
 
+    const notify = useNotify();
     const authStore = useAuthStore();
-    const subcribe = ref('');
 
-    onMounted(async () => {
+    const props = defineProps<{
+        email?: string
+        triggerSubmitSubscribeEmail: boolean
+    }>()
+
+    const emailSubcribe = ref('')
+
+    watch(() => props.email, (newVal) => {
+        if (newVal) {
+            emailSubcribe.value = newVal
+        }
+    }, { immediate: true }) 
+
+    // submit
+    const emit = defineEmits()
+    const { handleSubmit } = useForm();
+    const onSubmit = handleSubmit( async () => {
         try {
-            await authStore.getInfoUser();
-            subcribe.value = authStore.userInfo?.email || '';
+            await authStore.subscribeEmail(emailSubcribe.value);
+            notify({
+                message: 'Your profile has been updated successfully!',
+                type: 'success',
+                time: 2000,
+            });
         } catch (error) {
-            console.error('Error fetching data:', error);
+            notify({
+                message: 'Failed to update profile. Please try again!',
+                type: 'error',
+                time: 2000,
+            });
         }
     });
 
-    const { handleSubmit } = useForm()
-        const onSubmit = handleSubmit(values => {
-        console.log(values)
-    })
+    watch(() => props.triggerSubmitSubscribeEmail, (newValue) => {
+        if (newValue) {
+            onSubmit()
+        }
+    });
 </script>

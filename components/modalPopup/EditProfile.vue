@@ -24,6 +24,7 @@
                 :widthfull=false 
                 :isStrong=false
                 rules="required|phone" name="phone" label="Phone Number" />
+                
             <InputSelective             
                 v-model="location.newStateSelect.value"               
                 :options="location.stateOpt" 

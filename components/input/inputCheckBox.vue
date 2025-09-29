@@ -9,8 +9,8 @@
             :checked="internalValue"
             :value="true"              
             unchecked-value="false"
-            :name
-            :rules
+            :name="name"
+            :rules="rules"
             />
             <label :for="name" class="font-bold ml-3 block">
                 <span v-if="isStrong" class="text-red-500">*</span> 

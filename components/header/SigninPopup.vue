@@ -68,6 +68,7 @@
         try {
             await authStore.authenticateUser(formData.value);
             router.push('/');
+            window.location.reload();
             resetForm();
             signIn.toggleOpenSignIn();
 

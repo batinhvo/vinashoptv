@@ -137,6 +137,22 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
+        async registerUser(profileData: any) {
+            try {
+                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                await $fetch(`${apiUrl}auth/register`, {
+                    method: 'POST',
+                    body: profileData.value,
+                    headers: {
+                    'Content-Type': 'application/json'
+                    }
+                });
+            } catch (e: any) {
+                console.error('Error update profile user: ', e);
+                return Promise.reject(e?.response._data?.message || 'Something went wrong')
+            }
+        },
+
         async updateProfileUser({address, cityId, country, firstName, lastName, phone, state, zip}: DataProfileUser) {
             try {
                 const apiUrl = useRuntimeConfig().public.apiBaseUrl;

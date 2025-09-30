@@ -40,16 +40,47 @@
                     v-model="formDataSubmit.password"
                     name="password" label="Password" rules="required" placeholder="********" type="password" />
                     
-                  <InputField name="confPassword" v-model="confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" />
-                  <InputSelective name="state" label="State" v-model="formDataSubmit.state" rules="required" :options="stateOpt" placeholder="Select State" @selected="stateOnSelected" />
-                  <InputSelective name="city" label="City" v-model="formDataSubmit.cityId" rules="required" :options="cityOpt" placeholder="Select City" @selected="cityOnSelected" />
-                  <InputField name="postCode" v-model="formDataSubmit.zip" label="PostCode/Zip" rules="required" placeholder="9999" />
-                  <InputField name="address" v-model="formDataSubmit.address" label="Street Address" rules="required" placeholder="123 street" />
-                  <InputCheckBox name="angree" v-model="angree" widthfull rules="booRequired" :value="true" label="I agree to the Terms & Consditions." />
-                  <InputCheckBox name="receiveEmail" v-model="formDataSubmit.receiveEmail" widthfull :isStrong="false" :value="true" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
+                  <InputField
+                    v-model="confPassword"
+                    name="confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" />
+                    
+                  <InputSelective             
+                    v-model="location.newStateSelect.value"               
+                    :options="location.stateOpt" 
+                    :placeholder="location.statePlaceholder.value"
+                    @selected="location.stateOnSelected" 
+                    :widthfull=true 
+                    name="state" label="State" class="lg:w-1/2 px-1"/>
+
+                  <InputSelective 
+                    :options="location.cityOpt" 
+                    :placeholder="location.cityPlaceholder.value" 
+                    @selected="location.cityOnSelected" 
+                    name="city" label="City" class="lg:w-1/2 px-1"/>  
+
+                  <InputField
+                    v-model="formDataSubmit.zip"
+                    name="postCode" label="PostCode/Zip" rules="required" placeholder="9999" />
+
+                  <InputField 
+                    v-model="formDataSubmit.address"
+                    name="address" label="Street Address" rules="required" placeholder="123 street" />
+
+                  <InputCheckBox
+                    v-model="angree"
+                    :value="true"
+                    :widthfull=true
+                    name="angree" rules="booRequired" label="I agree to the Terms & Consditions." />
+
+                  <InputCheckBox
+                    v-model="formDataSubmit.receiveEmail"
+                    :widthfull=true
+                    :isStrong="false"
+                    :value="true"
+                    name="receiveEmail" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
                   
                   <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
-                    Send Message
+                    Create Account
                   </button>
                 </div>
               </form>
@@ -65,8 +96,8 @@
   const angree = ref(true);
 
   const formDataSubmit = ref({
+    location: { state: '', city: 0 },
     address: '',
-    cityId: 0,
     country: 'US',
     email: '',
     firstName: '',
@@ -74,40 +105,39 @@
     password: '',
     phone: '',
     receiveEmail: false,
-    state: '',
     zip: '',
   });
 
-  const config = useRuntimeConfig();
-  const apiUrl = config.public.apiBaseUrl;
+  const location = useLocationSelect(formDataSubmit, 'location');
+
   const notify = useNotify();
+  const authStore = useAuthStore();
   const { handleSubmit, resetForm } = useForm();
 
   const onSubmit = handleSubmit( async () => {
-
     try {
-      const postData = await $fetch(`${apiUrl}auth/register`, {
-        method: 'POST',
-        body: formDataSubmit.value,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const profileData = computed(() => ({
+        ...formDataSubmit.value,
+        state: formDataSubmit.value.location.state,
+        cityId: Number(formDataSubmit.value.location.city),
+      }));
 
-      notify({
-        message: 'Registered! Now you can use this account to login!',
-        type: 'success',
-        time: 2000
-      });
+      authStore.registerUser(profileData);
       resetForm();
 
-    } catch(e: any) {
+      notify({
+          message: 'Registered! Now you can use this account to login!',
+          type: 'success',
+          time: 2000
+      });
+
+    } catch (error) {
       notify({
         message: 'Registration Error!!!',
         type: 'error',
         time: 1000
       });
-      console.error('form contac: ', e);
+      console.error('form contac: ', error);
     }
   });
 
@@ -115,31 +145,15 @@
 
   const stateStore = useStateStore();
 
-  const stateOpt = computed(() => stateStore.states.map((state) => state.name));
-  const cityOpt = computed(() => stateStore.cities.map((city) => city.name));
-
-  const newStateSelect = ref<string>('');
-
-  const stateOnSelected = (value: string) => {
-    newStateSelect.value = value;
-    formDataSubmit.value.state = stateStore.states.find((sta) => sta.name === value)?.code ?? '';
-
-  }
-  const cityOnSelected = (value: string) => {
-    formDataSubmit.value.cityId = Number((stateStore.cities.find((city) => city.name === value)?.id)) || 0;
-  }
-
-  watch(newStateSelect, async (newState) => {
-    const state = stateStore.states.find((state) => state.name === newState);
-    if (state) {
-      await stateStore.fetchCities(state.code); 
-    } else {
-      stateStore.resetCities();
-    }
-  });
-
   onMounted(async () => {
-    await stateStore.fetchStates();
+      await stateStore.fetchStates();
+      
+      if (formDataSubmit.value.location.state && formDataSubmit.value.location.city) {
+          location.setStateAndCity(
+              formDataSubmit.value.location.state,
+              Number(formDataSubmit.value.location.city)
+          );
+      }
   });
 
 </script>

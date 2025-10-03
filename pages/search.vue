@@ -17,8 +17,8 @@
                         <p>Showing {{ fromShow }}-{{ toShow }} of {{ totalProducts }} results</p>
                     </div>
                     <BodyProductSelectSort @updateParams="updateProductsFromSort" />
-                    <BodyProductDisplay :dataProduct="productListData"/>
-                    <BodyProductPagination v-if="totalProducts > 0" 
+                    <BodyProductAppProductDisplay :dataProduct="productListData"/>
+                    <BodyProductPagination v-if="totalProducts > 0 && toShow > 1" 
                         :dataTotalPro="totalProducts" 
                         :updateSort="isUpdateSort" 
                         @updatePages="updatePages" 

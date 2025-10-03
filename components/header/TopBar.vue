@@ -61,7 +61,7 @@
                     <i class="ec ec-close-remove"></i>
                 </button>
             </div>
-            <HeaderSignInPopup :toggleOpenSignIn="toggleOpenSignIn" />            
+            <HeaderSigninPopup :toggleOpenSignIn="toggleOpenSignIn" />            
         </div>
     </div>
     

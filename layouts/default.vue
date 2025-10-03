@@ -1,8 +1,8 @@
 <template>
     <div>
-        <Header />
+        <HeaderAppHeader />
         <slot />
-        <Footer />
+        <FooterAppFooter />
 
         <ModalPages v-if="showSubcribe" @close="showSubcribe = false">
             <template #body>
@@ -19,6 +19,8 @@
 </template>
 
 <script setup lang="ts">
+import AppHeader from 'components/header/AppHeader.vue';
+
     const authStore = useAuthStore();
     const orderStore = useOrderStore();
     const cartStore = useCartStore();

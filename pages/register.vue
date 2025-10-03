@@ -20,31 +20,31 @@
               <!-- form -->
               <form @submit.prevent="onSubmit">
                 <div class="flex flex-wrap mt-8">
-                  <InputField 
+                  <InputFieldInput 
                     v-model="formDataSubmit.firstName"
                     name="firstName" label="First Name" rules="required" placeholder="enter your first name" />
 
-                  <InputField 
+                  <InputFieldInput 
                     v-model="formDataSubmit.lastName"
                     name="lastName" label="Last Name" rules="required" placeholder="enter your last name" />
                   
-                  <InputField
+                  <InputFieldInput
                     v-model="formDataSubmit.email"
                     name="email" label="Email Address" rules="required|email|emailExist" type="email" placeholder="info@vinashoptv.com" />
 
-                  <InputField 
+                  <InputFieldInput 
                     v-model="formDataSubmit.phone"
                     name="phone" label="Phone Number" rules="required|phone" placeholder="(000) 000-0000" />
                   
-                  <InputField 
+                  <InputFieldInput 
                     v-model="formDataSubmit.password"
                     name="password" label="Password" rules="required" placeholder="********" type="password" />
                     
-                  <InputField
+                  <InputFieldInput
                     v-model="confPassword"
                     name="confPassword" label="Confirm Password" rules="required|confirmed:@password" type="password" placeholder="********" />
                     
-                  <InputSelective             
+                  <InputSelectiveInput             
                     v-model="location.newStateSelect.value"               
                     :options="location.stateOpt" 
                     :placeholder="location.statePlaceholder.value"
@@ -52,27 +52,27 @@
                     :widthfull=true 
                     name="state" label="State" class="lg:w-1/2 px-1"/>
 
-                  <InputSelective 
+                  <InputSelectiveInput 
                     :options="location.cityOpt" 
                     :placeholder="location.cityPlaceholder.value" 
                     @selected="location.cityOnSelected" 
                     name="city" label="City" class="lg:w-1/2 px-1"/>  
 
-                  <InputField
+                  <InputFieldInput
                     v-model="formDataSubmit.zip"
                     name="postCode" label="PostCode/Zip" rules="required" placeholder="9999" />
 
-                  <InputField 
+                  <InputFieldInput 
                     v-model="formDataSubmit.address"
                     name="address" label="Street Address" rules="required" placeholder="123 street" />
 
-                  <InputCheckBox
+                  <InputCheckBoxInput
                     v-model="angree"
                     :value="true"
                     :widthfull=true
                     name="angree" rules="booRequired" label="I agree to the Terms & Consditions." />
 
-                  <InputCheckBox
+                  <InputCheckBoxInput
                     v-model="formDataSubmit.receiveEmail"
                     :widthfull=true
                     :isStrong="false"

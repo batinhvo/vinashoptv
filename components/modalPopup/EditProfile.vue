@@ -4,25 +4,25 @@
             <InputField 
                 v-model="formData.firstName" 
                 :widthfull=false 
-                :isStrong=false 
+                :is-strong=false 
                 rules="required" name="firstName" label="Fist Name" />
 
             <InputField 
                 v-model="formData.lastName" 
                 :widthfull=false 
-                :isStrong=false              
+                :is-strong=false              
                 rules="required" name="lastName" label="Last Name" />
 
             <InputField 
                 v-model="formData.email" 
                 :widthfull=false 
-                :isStrong=false
+                :is-strong=false
                 rules="required|email" name="email" label="Email Address" type="email" />
 
             <InputField 
                 v-model="formData.phone" 
                 :widthfull=false 
-                :isStrong=false
+                :is-strong=false
                 rules="required|phone" name="phone" label="Phone Number" />
                 
             <InputSelective             
@@ -42,13 +42,13 @@
             <InputField 
                 v-model="formData.zip" 
                 :widthfull=false 
-                :isStrong=false
+                :is-strong=false
                 name="zip" type="number" label="Postcode/Zip"/>
 
             <InputField 
                 v-model="formData.address" 
                 :widthfull=true 
-                :isStrong=false
+                :is-strong=false
                 rules="required" name="address" label="Street Address" />
         </div>
     </form>

@@ -27,7 +27,7 @@
                 <InputField name="phone" v-model="formDataContact.phone" rules="required|phone" label="Phone" placeholder="enter your phone number" />
                 <InputField name="email" v-model="formDataContact.email" rules="required|email" label="Email" type="email" placeholder="enter your email address" />
                 <InputField name="title" v-model="formDataContact.title" label="Title" rules="required" placeholder="title is...." :widthfull=true />
-                <InputField name="message" v-model="formDataContact.content" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." :widthfull=true />
+                <InputField name="message" v-model="formDataContact.content" label="Your Message" as="textarea" rows="5" class="rounded-lg" :is-strong=false placeholder="message..." :widthfull=true />
                 <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                   Send Message
                 </button>

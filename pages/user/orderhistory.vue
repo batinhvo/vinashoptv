@@ -17,29 +17,29 @@
                     <div class="flex flex-wrap">                                  
                         <InputField
                             v-model="formData.orderFrom"
-                            :isStrong=false
+                            :is-strong=false
                             name="orderFrom" label="Order From" type="date" />
 
                         <InputField
                             v-model="formData.orderTo" 
-                            :isStrong=false
+                            :is-strong=false
                             name="orderTo" label="Order To" type="date"/>
 
                         <InputField 
                             v-model="formData.phone"
-                            :isStrong=false
+                            :is-strong=false
                             name="phone" label="Phone" rules="phone" placeholder="enter phone number" />
 
                         <InputSelective
                             v-model="formData.phoneOf"
                             :options="PhoneOpt"
-                            :isStrong=false
+                            :is-strong=false
                             name="phoneOf" label="Phone Number Of" placeholder="Nothing Selected"/>  
 
                         <InputSelective
                             v-model="formData.statusOrder"
                             :options="statusOpt"
-                            :isStrong=false
+                            :is-strong=false
                             name="statusOrder"
                             label="Order Status"
                             placeholder="Nothing Selected"

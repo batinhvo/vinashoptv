@@ -116,7 +116,7 @@
 
                         <InputField 
                             v-model="formData.note"
-                            :isStrong=false
+                            :is-strong=false
                             :widthfull=true
                             name="message"  label="Order notes (optional)" as="textarea" rows="6" class="rounded-lg" 
                             placeholder="Tell us something more than you want about this order" />
@@ -282,19 +282,26 @@
                                     </div>
                                 </div>
                             </div>
-                            <InputCheckBox name="receiveEmail" v-model="isReceiveEmail" :isStrong=false
-                                :widthfull="true" :value=true
+                            <InputCheckBox
+                                v-model="isReceiveEmail" 
+                                :is-strong="false"
+                                widthfull 
+                                :value="true"
                                 label="Yes, I would like to receive emails about special promotions, events and exclusive offers."
-                                class="my-5" />
+                                name="receiveEmail"  class="my-5" />
 
                             <div class="px-4 pb-5 flex flex-wrap items-center my-5">
-                                <div class="w-full flex">
-                                    <InputCheckBox name="conditions" type="checkbox" v-model="isConditions" :value=true
-                                        class="accent-[#169100]">
+                                <div class="flex px-0 ">
+                                    <InputCheckBox
+                                        v-model="isConditions" 
+                                        :value="true"
+                                        :is-strong="false"
+                                        name="conditions" type="checkbox" class="accent-[#169100]" />   
+
                                     <label for="conditions" class="font-bold ml-2">I have read and agree to the website
-                                        <span class="text-[#169100]">Terms And Conditions</span><span
-                                            class="text-red-500"> *</span></label>
-                                        </InputCheckBox>
+                                        <span class="text-[#169100]">Terms And Conditions</span>
+                                        <span class="text-red-500"> *</span>
+                                    </label>
                                 </div>
                             </div>
 

@@ -11,7 +11,7 @@
                     v-model="emailSubcribe"
                     name="emailSubcribe"
                     rules="required|email"
-                    :widthfull="true"
+                    widthfull
                     :is-strong="false"
                 />         
             </form>

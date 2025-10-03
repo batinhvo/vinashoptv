@@ -75,7 +75,7 @@
                   <InputCheckBox
                     v-model="formDataSubmit.receiveEmail"
                     :widthfull=true
-                    :isStrong="false"
+                    :is-strong="false"
                     :value="true"
                     name="receiveEmail" label="Yes, I would like to receive emails about special promotions, events and exclusive offers." />
                   

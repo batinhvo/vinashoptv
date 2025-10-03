@@ -15,28 +15,28 @@
             <div class="bg-zinc-100 border border-gray-300 px-6 pt-8">
                 <form @submit.prevent="onSubmit">
                     <div class="flex flex-wrap">                                  
-                        <InputFieldInput
+                        <InputField
                             v-model="formData.orderFrom"
                             :isStrong=false
                             name="orderFrom" label="Order From" type="date" />
 
-                        <InputFieldInput
+                        <InputField
                             v-model="formData.orderTo" 
                             :isStrong=false
                             name="orderTo" label="Order To" type="date"/>
 
-                        <InputFieldInput 
+                        <InputField 
                             v-model="formData.phone"
                             :isStrong=false
                             name="phone" label="Phone" rules="phone" placeholder="enter phone number" />
 
-                        <InputSelectiveInput
+                        <InputSelective
                             v-model="formData.phoneOf"
                             :options="PhoneOpt"
                             :isStrong=false
                             name="phoneOf" label="Phone Number Of" placeholder="Nothing Selected"/>  
 
-                        <InputSelectiveInput
+                        <InputSelective
                             v-model="formData.statusOrder"
                             :options="statusOpt"
                             :isStrong=false

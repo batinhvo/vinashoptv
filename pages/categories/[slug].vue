@@ -26,7 +26,7 @@
                     </div>
                     <BodyProductSelectSort @updateParams="updateProductsFromSort"/>
                     <BodyProductAppProductDisplay :dataProduct="productListData"/>
-                    <BodyProductPagination v-if="totalProducts > 0" 
+                    <BodyProductPagination v-if="totalProducts > 0 && toShow > 1" 
                         :dataTotalPro="totalProducts" 
                         :updateSort="isUpdateSort" 
                         @updatePages="updatePages" 

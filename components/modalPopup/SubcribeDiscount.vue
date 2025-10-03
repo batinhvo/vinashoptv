@@ -7,7 +7,7 @@
         </div>
         <div class="pt-5">
             <form @submit.prevent="onSubmit">
-                <InputFieldInput
+                <InputField
                     v-model="emailSubcribe"
                     name="emailSubcribe"
                     rules="required|email"

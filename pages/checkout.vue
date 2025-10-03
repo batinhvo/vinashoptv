@@ -25,13 +25,13 @@
                         </div>
 
                         <div class="flex flex-wrap">
-                            <InputFieldInput v-model="formData.billingInfo.firstName" 
+                            <InputField v-model="formData.billingInfo.firstName" 
                                 name="firstName" label="First Name" rules="required" placeholder="enter your first name" />
 
-                            <InputFieldInput v-model="formData.billingInfo.lastName" 
+                            <InputField v-model="formData.billingInfo.lastName" 
                                 name="lastName" label="Last Name" rules="required" placeholder="enter your last name" />
 
-                            <InputSelectiveInput             
+                            <InputSelective             
                                 v-model="billingLocation.newStateSelect.value"               
                                 :options="billingLocation.stateOpt" 
                                 :placeholder="billingLocation.statePlaceholder.value"
@@ -39,24 +39,24 @@
                                 :widthfull=true 
                                 name="state" label="State" class="lg:w-1/2 px-1"/>
 
-                            <InputSelectiveInput 
+                            <InputSelective 
                                 :options="billingLocation.cityOpt" 
                                 :placeholder="billingLocation.cityPlaceholder.value" 
                                 @selected="billingLocation.cityOnSelected" 
                                 name="city" label="City" class="lg:w-1/2 px-1"/>
 
-                            <InputFieldInput v-model="formData.billingInfo.zipCode" 
+                            <InputField v-model="formData.billingInfo.zipCode" 
                                 :widthfull=true
                                 name="postCode" label="PostCode/Zip" type="number" placeholder="9999" />
 
-                            <InputFieldInput v-model="formData.billingInfo.address" 
+                            <InputField v-model="formData.billingInfo.address" 
                                 :widthfull=true 
                                 placeholder="enter your address" name="street" label="Street Address" rules="required"/>
 
-                            <InputFieldInput v-model="formData.billingInfo.email"
+                            <InputField v-model="formData.billingInfo.email"
                                 name="email" label="Email Address" rules="required|email" placeholder="enter your email address"/>
 
-                            <InputFieldInput v-model="formData.billingInfo.phone"
+                            <InputField v-model="formData.billingInfo.phone"
                                 name="phone" label="Phone" rules="required|phone" placeholder="enter your phone number" />
                         </div>
 
@@ -65,22 +65,22 @@
                         </div>
                         <!-------------------------------------------------------------------- different address ---------------------------------------------------------------------->
                         <div class="px-4 pb-4 flex flex-wrap items-center">
-                            <InputCheckBoxInput v-model="isShippingInfo"
+                            <InputCheckBox v-model="isShippingInfo"
                                 
                                 name="difAddress" label="Ship to a different address ?" />
                         </div>
 
                         <div v-if="isShippingInfo">
                             <div class="flex flex-wrap">
-                                <InputFieldInput 
+                                <InputField 
                                     v-model="shippingInfo.firstName"                                    
                                     name="firstNameDif" label="First Name" rules="required" placeholder="enter your first name" />
 
-                                <InputFieldInput 
+                                <InputField 
                                     v-model="shippingInfo.lastName"
                                     name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />
 
-                                <InputSelectiveInput         
+                                <InputSelective         
                                     v-model="shippingLocation.newStateSelect.value"              
                                     :options="shippingLocation.stateOpt" 
                                     :placeholder="shippingLocation.statePlaceholder.value"
@@ -88,33 +88,33 @@
                                     :widthfull=true 
                                     name="state" label="State" class="lg:w-1/2 px-1"/>
 
-                                <InputSelectiveInput  
+                                <InputSelective  
                                     :options="shippingLocation.cityOpt" 
                                     :placeholder="shippingLocation.cityPlaceholder.value"                                     
                                     @selected="shippingLocation.cityOnSelected" 
                                     name="city" label="City" class="lg:w-1/2 px-1"/>
 
-                                <InputFieldInput 
+                                <InputField 
                                     v-model="formData.shippingInfo.zipCode" 
                                     :widthfull=true
                                     name="postCode" label="PostCode/Zip" type="number" placeholder="9999" />
 
-                                <InputFieldInput 
+                                <InputField 
                                     v-model="shippingInfo.address" 
                                     :widthfull=true 
                                     name="streetDif" label="Street Address" placeholder="enter your address" />
 
-                                <InputFieldInput 
+                                <InputField 
                                     v-model="shippingInfo.email" 
                                     name="emailDif" label="Email Address" rules="email" placeholder="enter your email address" />
                                      
-                                <InputFieldInput 
+                                <InputField 
                                     v-model="shippingInfo.phone" 
                                     name="phoneDif" label="Phone" rules="phone" placeholder="enter your phone number" />
                             </div>
                         </div>
 
-                        <InputFieldInput 
+                        <InputField 
                             v-model="formData.note"
                             :isStrong=false
                             :widthfull=true
@@ -194,7 +194,7 @@
                                             <th class="py-4">If you have a coupon code, please apply it below.</th>
                                         </tr>
                                         <tr>                                            
-                                            <BodyOrderCouponcode v-model="formData.couponCode" />                                     
+                                            <BodyOrderCouponCode v-model="formData.couponCode" />                                     
                                         </tr>
                                         <tr class="border-t border-gray-300">
                                             <th class="text-left py-3">Subtotal</th>
@@ -243,38 +243,38 @@
                                         <label class="font-bold ml-3">Credit Card</label>
                                     </div>
                                     <div v-show="formData.paymentMethod === 'card'" class="p-6 bg-gray-100">
-                                        <InputSelectiveInput 
+                                        <InputSelective 
                                             v-model="formData.cardInfo.cardType"
                                             :widthfull=true
                                             :options="creditcardOpt"                                            
                                             name="creditCard" label="Select Your Credit Card" placeholder="Nothing Selected" />
 
-                                        <InputFieldInput 
+                                        <InputField 
                                             v-model="formData.cardInfo.nameOnCard"
                                             :widthfull=true
                                             :rules="formData.paymentMethod === 'card' ? 'required' : ''"
                                             name="nameCard" label="Name On Card" placeholder="enter name on card" />
 
-                                        <InputFieldInput 
+                                        <InputField 
                                             v-model="formData.cardInfo.cardNumber"
                                             @input="maxInput"
                                             :widthfull=true                                            
                                             :rules="formData.paymentMethod === 'card' ? 'required' : ''"
                                             name="cardNumber" label="Card Number" placeholder="0000-0000-0000-0000" />
 
-                                        <InputSelectiveInput 
+                                        <InputSelective 
                                             v-model="formData.cardInfo.expirationMonth"                                            
                                             :widthfull=true                                                                                      
                                             :options="monthOpt" 
                                             name="monthCard" label="Month Expired" placeholder="Nothing Selected" />
 
-                                        <InputSelectiveInput 
+                                        <InputSelective 
                                             v-model="formData.cardInfo.expirationYear"
                                             :widthfull=true 
                                             :options="yearOpt"                                            
                                             name="yearCard" label="Year Expired" placeholder="Nothing Selected" />
 
-                                        <InputFieldInput 
+                                        <InputField 
                                             v-model="formData.cardInfo.cvv" 
                                             :widthfull=true
                                             :rules="formData.paymentMethod === 'card' ? 'required' : ''"
@@ -282,17 +282,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <InputCheckBoxInput name="receiveEmail" v-model="isReceiveEmail" :isStrong=false
-                                :widthfull=true :value=true
+                            <InputCheckBox name="receiveEmail" v-model="isReceiveEmail" :isStrong=false
+                                :widthfull="true" :value=true
                                 label="Yes, I would like to receive emails about special promotions, events and exclusive offers."
                                 class="my-5" />
+
                             <div class="px-4 pb-5 flex flex-wrap items-center my-5">
                                 <div class="w-full flex">
-                                    <Field name="conditions" type="checkbox" v-model="isConditions" :value=true
-                                        class="accent-[#169100]" />
+                                    <InputCheckBox name="conditions" type="checkbox" v-model="isConditions" :value=true
+                                        class="accent-[#169100]">
                                     <label for="conditions" class="font-bold ml-2">I have read and agree to the website
                                         <span class="text-[#169100]">Terms And Conditions</span><span
                                             class="text-red-500"> *</span></label>
+                                        </InputCheckBox>
                                 </div>
                             </div>
 

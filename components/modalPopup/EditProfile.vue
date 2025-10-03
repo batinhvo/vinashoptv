@@ -1,31 +1,31 @@
 <template>
     <form @submit.prevent="onSubmit">
         <div class="flex flex-wrap mt-6 max-w-[860px] bg-zinc-100 border border-zinc-200 py-3 px-1">
-            <InputFieldInput 
+            <InputField 
                 v-model="formData.firstName" 
                 :widthfull=false 
                 :isStrong=false 
                 rules="required" name="firstName" label="Fist Name" />
 
-            <InputFieldInput 
+            <InputField 
                 v-model="formData.lastName" 
                 :widthfull=false 
                 :isStrong=false              
                 rules="required" name="lastName" label="Last Name" />
 
-            <InputFieldInput 
+            <InputField 
                 v-model="formData.email" 
                 :widthfull=false 
                 :isStrong=false
                 rules="required|email" name="email" label="Email Address" type="email" />
 
-            <InputFieldInput 
+            <InputField 
                 v-model="formData.phone" 
                 :widthfull=false 
                 :isStrong=false
                 rules="required|phone" name="phone" label="Phone Number" />
                 
-            <InputSelectiveInput             
+            <InputSelective             
                 v-model="location.newStateSelect.value"               
                 :options="location.stateOpt" 
                 :placeholder="location.statePlaceholder.value"
@@ -33,19 +33,19 @@
                 :widthfull=true 
                 name="state" label="State" class="lg:w-1/2 px-1"/>
 
-            <InputSelectiveInput 
+            <InputSelective 
                 :options="location.cityOpt" 
                 :placeholder="location.cityPlaceholder.value" 
                 @selected="location.cityOnSelected" 
                 name="city" label="City" class="lg:w-1/2 px-1"/>  
 
-            <InputFieldInput 
+            <InputField 
                 v-model="formData.zip" 
                 :widthfull=false 
                 :isStrong=false
                 name="zip" type="number" label="Postcode/Zip"/>
 
-            <InputFieldInput 
+            <InputField 
                 v-model="formData.address" 
                 :widthfull=true 
                 :isStrong=false

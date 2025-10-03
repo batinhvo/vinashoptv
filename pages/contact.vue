@@ -22,12 +22,12 @@
             <!-- form -->
             <form @submit.prevent="onSubmit">
               <div class="flex flex-wrap mt-8">
-                <InputFieldInput name="firstName" v-model="formDataContact.firstName" rules="required" label="First Name" placeholder="enter your first name" />
-                <InputFieldInput name="lastName" v-model="formDataContact.lastName" rules="required" label="Last Name" placeholder="enter your last name" />
-                <InputFieldInput name="phone" v-model="formDataContact.phone" rules="required|phone" label="Phone" placeholder="enter your phone number" />
-                <InputFieldInput name="email" v-model="formDataContact.email" rules="required|email" label="Email" type="email" placeholder="enter your email address" />
-                <InputFieldInput name="title" v-model="formDataContact.title" label="Title" rules="required" placeholder="title is...." :widthfull=true />
-                <InputFieldInput name="message" v-model="formDataContact.content" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." :widthfull=true />
+                <InputField name="firstName" v-model="formDataContact.firstName" rules="required" label="First Name" placeholder="enter your first name" />
+                <InputField name="lastName" v-model="formDataContact.lastName" rules="required" label="Last Name" placeholder="enter your last name" />
+                <InputField name="phone" v-model="formDataContact.phone" rules="required|phone" label="Phone" placeholder="enter your phone number" />
+                <InputField name="email" v-model="formDataContact.email" rules="required|email" label="Email" type="email" placeholder="enter your email address" />
+                <InputField name="title" v-model="formDataContact.title" label="Title" rules="required" placeholder="title is...." :widthfull=true />
+                <InputField name="message" v-model="formDataContact.content" label="Your Message" as="textarea" rows="5" class="rounded-lg" :isStrong=false placeholder="message..." :widthfull=true />
                 <button type="submit" class="btn btn-primary bg-primary ml-4 py-3 px-8 mt-4 rounded-full font-bold shadow-sm hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)] hover:-translate-y-1 duration-300">
                   Send Message
                 </button>

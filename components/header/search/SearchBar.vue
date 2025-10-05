@@ -11,7 +11,7 @@
 
             <input type="hidden" v-model="selectedCategory"/>
 
-            <button @click.prevent="toggleOpenCategories" class="min-w-40 border-y-2 border-primary text-gray-110 flex items-center justify-end pr-5"
+            <button type="button" @click.prevent="toggleOpenCategories" class="min-w-40 border-y-2 border-primary text-gray-110 flex items-center justify-end pr-5"
                 :aria-expanded="isOpenCategories ? 'true' : 'false'">
                 {{ selectedCategory }}
                 <i class="fa fa-angle-down text-[8px] px-2"></i>

@@ -155,6 +155,13 @@
         animation-delay: 0.8s;
     }
 
+    :deep(.swiper-pagination-bullet-active) {
+        opacity: var(--swiper-pagination-bullet-opacity, 1);
+        background: #20d600 !important;
+        border-radius: 6.1875rem !important;
+        width: 1.875125rem !important;
+    }
+
     @keyframes fadeInEffect {
         from {
             opacity: 0;
@@ -164,13 +171,6 @@
             opacity: 1;
             transform: translateY(0);
         }
-    }
-
-    .swiper-pagination-bullet-active {
-        opacity: var(--swiper-pagination-bullet-opacity, 1);
-        width: 1.87512rem;
-        background-color: #20d600 !important;
-        border-radius: 6.1875rem;
     }
 </style>
   

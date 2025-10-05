@@ -16,7 +16,7 @@
         >
             <swiper-slide v-for="(image, index) in dataImages" :key="image.id">
                 <!-- <img :src="image" class="w-full swiper-lazy" alt="Slide image" /> -->
-                <BodyProductAppProductImages :linkImg="image.media" :altImg="dataAlt" />
+                <BodyProductImages :linkImg="image.media" :altImg="dataAlt" />
             </swiper-slide>
             <!-- Custom Navigation Buttons -->
             <div class="custom-prev">
@@ -40,7 +40,7 @@
         class="mt-4"
         >
             <swiper-slide v-for="(image, index) in dataImages" :key="image.id" class="p-2 border border-gray-300 cursor-pointer" :class="{ 'active': activeIndex === index }">
-                <BodyProductAppProductImages :linkImg="image.media" :altImg="dataAlt" />
+                <BodyProductImages :linkImg="image.media" :altImg="dataAlt" />
             </swiper-slide>
         </swiper>
     </div>

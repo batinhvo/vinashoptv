@@ -5,7 +5,7 @@
                 <NuxtLink v-if="pro.slug" :to="`/product/${pro.slug}`">
                     <div class="flex flex-wrap py-1 bg-neutral-100 items-center border border-inherit min-h-36 hover:border-gray-300 hover:shadow-sm">
                         <div class="w-1/2 p-2">
-                            <BodyProductAppProductImages :linkImg="pro.media" :altImg="pro.title" />
+                            <BodyProductImages :linkImg="pro.media" :altImg="pro.title" />
                         </div>
                         <div class="w-1/2 px-4">
                             <div class="mb-2 text-lg font-light tracking-tighter">

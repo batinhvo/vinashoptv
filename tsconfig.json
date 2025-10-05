@@ -6,6 +6,8 @@
     "baseUrl": ".",
     "paths": {
       "swiper/*": ["node_modules/swiper/*"]
-    }
+    },
+    "target": "es2017",
+    "module": "esnext",
   }
 }

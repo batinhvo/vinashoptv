@@ -67,8 +67,7 @@
     const onSubmit = handleSubmit( async () => {
         try {
             await authStore.authenticateUser(formData.value);
-            router.push('/');
-            window.location.reload();
+            router.push('/');            
             resetForm();
             signIn.toggleOpenSignIn();
 

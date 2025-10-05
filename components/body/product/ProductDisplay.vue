@@ -7,7 +7,7 @@
             <div class="px-6 border-x border-zinc-100">
                 <div class="relative group">
                     <button @click="openShowQuickView(pro)">                       
-                        <BodyProductAppProductImages :linkImg="pro.media" :altImg="pro.title" />
+                        <BodyProductImages :linkImg="pro.media" :altImg="pro.title" />
                     </button>
                     
                     <div class="pop-up">

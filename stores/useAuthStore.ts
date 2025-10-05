@@ -37,7 +37,8 @@ export const useAuthStore = defineStore('auth', {
                     
                     this.user = userResponse.data.name;
                     this.authenticated = true;
-
+                    window.location.reload();
+                    
                 }
             } catch (e: any) {
                 console.error("Login failed: ", e);
@@ -53,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
 
             this.authenticated = false; 
             this.user = null;
-
+            window.location.reload();
             navigateTo('/');
         },
 

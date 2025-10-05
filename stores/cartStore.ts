@@ -171,18 +171,18 @@ export const useCartStore = defineStore('cart', () => {
         if (!cached) {
             const product = await getDataProduct(idSku);
             cached = { dataProduct: product.dataProduct, dataSkus: product.dataSkus, typeValue: product.typeValue }
-            productCache.set(idSku, cached);
+            productCache.set(idSku, cached);            
         }                   
         const existing = addCartItems.value.find(item => item.skuId === idSku);
 
         if(existing) {
             existing.quantity += quantity;
-        } else {
+        } else {     
             addCartItems.value.push({
                 skuId: idSku,
                 title: cached.dataProduct?.title || '',
                 type: cached.typeValue === 'default' ? '' : cached.typeValue,
-                price: Number(cached.dataSkus?.price) || 0,
+                price: Number(cached.dataSkus?.salePrice ? cached.dataSkus?.salePrice : cached.dataSkus?.price ) || 0,
                 quantity,
                 weight: Number(cached.dataSkus?.weight) || 0,
                 tax: Number(cached.dataProduct?.tax) || 0,   
@@ -234,7 +234,7 @@ export const useCartStore = defineStore('cart', () => {
             buyNowItem.value = {
                 skuId: idSku,
                 title: cached.dataProduct?.title,
-                price: Number(cached.dataSkus?.price) || 0,
+                price: Number(cached.dataSkus?.salePrice ? cached.dataSkus?.salePrice : cached.dataSkus?.price ) || 0,
                 type: cached.typeValue === 'default' ? '' : cached.typeValue,
                 quantity,
                 weight: Number(cached.dataSkus?.weight) || 0,

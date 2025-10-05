@@ -20,7 +20,7 @@
 
                 <!-- right -->
                 <div class="w-full xl:w-4/5 px-4">          
-                    <div class="flex justify-between mb-4 mt-4 lg:mt-0">
+                    <div class="flex justify-between mb-4 mt-4 lg:mt-0 ">
                         <h3 class="text-2xl">{{ cateTitle }}</h3>
                         <p>Showing {{ fromShow }}-{{ toShow }} of {{ totalProducts }} results</p>
                     </div>

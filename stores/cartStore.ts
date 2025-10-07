@@ -142,7 +142,7 @@ export const useCartStore = defineStore('cart', () => {
                 })
 
                 if (dataCartResponse?.data) {  
-                    //addCartItems.value = [];    
+                    addCartItems.value = [];    
                     const serverCart: any[] = JSON.parse(dataCartResponse.data);
                     // Xử lý trùng lặp SKU từ server
                     // Lấy danh sách SKU duy nhất và tổng hợp số lượng cho mỗi SKU trước khi thêm vào giỏ hàng

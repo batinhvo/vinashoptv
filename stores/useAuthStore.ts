@@ -38,6 +38,7 @@ export const useAuthStore = defineStore('auth', {
                     this.user = userResponse.data.name;
                     this.authenticated = true;
                     window.location.reload();
+                    //refreshNuxtData();
                     
                 }
             } catch (e: any) {
@@ -55,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
             this.authenticated = false; 
             this.user = null;
             window.location.reload();
-            navigateTo('/');
+            //navigateTo('/');
         },
 
         restoreUser() {

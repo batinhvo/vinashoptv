@@ -13,6 +13,10 @@ export default defineNuxtConfig({
       apiBaseUrl: 'https://vinashoptv.com/api/v1/',
     },
   },
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' }
+  },
   modules: [
     '@nuxtjs/tailwindcss', 
     '@nuxt/image', 

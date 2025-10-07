@@ -1,5 +1,5 @@
 <template>
-    <img class="w-full" :src="Imgsource" :key="Imgsource" :alt="propImgs.altImg" crossorigin="anonymous" /> 
+    <img class="w-full" :src="Imgsource" :key="Imgsource" :alt="propImgs.altImg" crossorigin="anonymous" loading="lazy" /> 
 </template>
 
 <script setup lang="ts">

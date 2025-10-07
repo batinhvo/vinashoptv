@@ -6,7 +6,7 @@
     >
         <NuxtLink v-if="cate.slug"      
         :class="['flex justify-between items-center hover:text-black hover:font-bold', (cate.name === 'SPECIAL') ? 'font-bold' : '']"
-        :to="`/categories/${cate.slug}`"
+        :to="`/categories/${cate.slug}`" prefetch
         >
         {{ cate.name }}
         <i v-if="cate.children && cate.children.length > 0" class="fa fa-angle-right text-neutral-400"></i>

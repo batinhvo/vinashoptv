@@ -94,7 +94,7 @@
       notify({
         message: 'Successfully! We will contact you soon.',
         type: 'success',
-        time: 1500
+        time: 6000
       });
       resetForm();
 
@@ -102,7 +102,7 @@
       notify({
         message: 'Error',
         type: 'error',
-        time: 1000
+        time: 6000
       });
       console.error('form contac: ', e);
     }

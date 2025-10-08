@@ -56,6 +56,9 @@ export const useAuthStore = defineStore('auth', {
             this.authenticated = false; 
             this.user = null;
             window.location.reload();
+
+            const cartStore = useCartStore();
+            cartStore.clearLocalCart();
             //navigateTo('/');
         },
 

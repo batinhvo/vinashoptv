@@ -19,7 +19,6 @@
 </template>
 
 <script setup lang="ts">
-import AppHeader from 'components/header/AppHeader.vue';
 
     const authStore = useAuthStore();
     const orderStore = useOrderStore();

@@ -521,8 +521,8 @@
         billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
         shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
 
-        cartStore.dataCartBuyNow();
         cartStore.loadCartFromStorage();
+        cartStore.dataCartBuyNow();
         cartStore.clearBuyNowOnReload();
 
         isLoading.value = false;

@@ -132,33 +132,41 @@ export const useCartStore = defineStore('cart', () => {
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
         if (authStore.authenticated && token()) {
-            try {
-                const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${token()}`,
-                        'Content-Type': 'application/json',
-                    },
-                })
+            console.log('moi đang nhap')
 
-                if (dataCartResponse?.data) {  
-                    addCartItems.value = [];    
-                    const serverCart: any[] = JSON.parse(dataCartResponse.data);
-                    // Xử lý trùng lặp SKU từ server
-                    // Lấy danh sách SKU duy nhất và tổng hợp số lượng cho mỗi SKU trước khi thêm vào giỏ hàng
-                    const unique = Array.from(new Set(serverCart.map((i: any) => Number(i.skuId))));
-
-                    await Promise.all(
-                        unique.map((sku: any) =>
-                            addProductToCart(sku, serverCart.filter((s: any) => Number(s.skuId) === sku).reduce((a: number, b: any) => a + (b.quantity || 1), 0))
-                        )
-                    );
-                } 
-
-            } catch (err) {
-                console.error("Error fetching cart:", err);
-                error.value = 1;
+            if(addCartItems.value) {
+                //await syncCart();
+                console.log('co add cart sau login')
+                console.log(addCartItems.value)
             }
+
+            // try {
+            //     const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+            //         method: 'GET',
+            //         headers: {
+            //             Authorization: `Bearer ${token()}`,
+            //             'Content-Type': 'application/json',
+            //         },
+            //     })
+
+            //     if (dataCartResponse?.data) {  
+            //         //addCartItems.value = [];    
+            //         const serverCart: any[] = JSON.parse(dataCartResponse.data);
+            //         // Xử lý trùng lặp SKU từ server
+            //         // Lấy danh sách SKU duy nhất và tổng hợp số lượng cho mỗi SKU trước khi thêm vào giỏ hàng
+            //         const unique = Array.from(new Set(serverCart.map((i: any) => Number(i.skuId))));
+
+            //         await Promise.all(
+            //             unique.map((sku: any) =>
+            //                 addProductToCart(sku, serverCart.filter((s: any) => Number(s.skuId) === sku).reduce((a: number, b: any) => a + (b.quantity || 1), 0))
+            //             )
+            //         );
+            //     } 
+
+            // } catch (err) {
+            //     console.error("Error fetching cart:", err);
+            //     error.value = 1;
+            // }
 
         } 
     }
@@ -444,6 +452,14 @@ export const useCartStore = defineStore('cart', () => {
         sessionStorage.removeItem('checkout_data')
     }
 
+    // clear data -> logout
+    const clearLocalCart = () => {
+        addCartItems.value = []
+        dataPromotions.value = []
+        localStorage.removeItem('cart_data')
+        localStorage.removeItem('dataPromotions_data')
+    }
+
     //remove product cart
     const removeItem = (index: number) => {
         if (buyNowItem.value) {
@@ -518,7 +534,7 @@ export const useCartStore = defineStore('cart', () => {
         } else {
             listGiftChecked.value = listGiftChecked.value.filter(p => p.skuId !== promotionCheck?.skuIdOut)
         }
-
+        console.log('co check gift')
         return listGiftChecked.value;
     }
 
@@ -579,6 +595,7 @@ export const useCartStore = defineStore('cart', () => {
 
         loadCartFromStorage,
         clearBuyNowOnReload,
+        clearLocalCart,
         removeItem,
         removeGift,
         increment,

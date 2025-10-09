@@ -19,8 +19,8 @@
     const dataCategories = ref<Category[]>([]);
     const openCategory = ref<string | null>(null);
 
-    const cateStores = useCateStore();
-    dataCategories.value = cateStores.categories || [];
+    const cateStore = useCateStore();
+    dataCategories.value = await cateStore.getCategories();
 
 
 </script>

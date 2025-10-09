@@ -57,8 +57,9 @@
     //----------------------------------API---------------------------------------//
     const dataCategories = ref<Category[]>([]);
 
-    const cateStores = useCateStore();
-    dataCategories.value = cateStores.categories || [];
+    const cateStore = useCateStore();
+    dataCategories.value = await cateStore.getCategories();
+    
 
 </script>
 

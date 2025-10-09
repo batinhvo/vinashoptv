@@ -43,6 +43,7 @@
     const cateStore = useCateStore();
 
     const cateParent = ref<Category[]>([]);
+    cateParent.value = cateStore.categories;
     //trạng thái lưu trữ
     const queryProducts = ref(""); 
     const categoryQuery = ref(''); 
@@ -64,11 +65,11 @@
     // Lọc danh mục để loại bỏ "SPECIAL"
     const filteredCategories = computed(() => cateParent.value.filter((cate) => cate.name !== 'SPECIAL'));
 
-    const fetchDataCategories =  async () => {
-        await cateStore.fetchCategories();
-        cateParent.value = cateStore.categories;
-    };
-    fetchDataCategories();
+    // const fetchDataCategories =  async () => {
+    //     await cateStore.fetchCategories();
+    //     cateParent.value = cateStore.categories;
+    // };
+    // fetchDataCategories();
 
     // Xử lý tìm kiếm
     const onSearch = () => {

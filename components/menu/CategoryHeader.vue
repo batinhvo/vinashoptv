@@ -58,15 +58,7 @@
     const dataCategories = ref<Category[]>([]);
 
     const cateStores = useCateStore();
-
-    const fetchCateData = async () => {
-        await cateStores.fetchCategories();
-        dataCategories.value = cateStores.categories || [];
-    };
-
-    onMounted(() => {
-        fetchCateData();
-    });
+    dataCategories.value = cateStores.categories || [];
 
 </script>
 

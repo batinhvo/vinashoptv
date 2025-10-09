@@ -83,12 +83,7 @@
     const openCategory = ref<string | null>(null);
 
     const cateStores = useCateStore();
-
-    const fetchCateData = async () => {
-        await cateStores.fetchCategories();
-        dataCategories.value = cateStores.categories || [];
-    };
-    fetchCateData();
+    dataCategories.value = cateStores.categories || [];
     
 </script>
 

@@ -85,7 +85,7 @@ export const useOrderStore = defineStore('order', {
                     if (urlPattern.test(orderResponse.data)) {
                         window.open(orderResponse.data, "_blank");
                     } else {
-                        window.location.href = "/";
+                        window.location.href = "/";                       
                     }
                 }
                 

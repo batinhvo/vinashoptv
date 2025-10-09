@@ -1,11 +1,15 @@
 <template>
     <div>
-        <button type="button" @click="toggleOpenSearch" class="py-2 px-2 text-black flex items-center justify-center text-font-22">
+        <button type="button" @click.stop="toggleOpenSearch" class="py-2 px-2 text-black flex items-center justify-center text-font-22">
             <i class="ec ec-search"></i>
         </button>
     </div>
 
-    <div v-if="isSearchVisible" class="flex items-center absolute min-w-36 inset-x-0 top-12 h-20 m-2 z-40 bg-white border border-gray-200 rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.28)] search" :class="[isOpenSearch ? 'show' : '']">
+    <div 
+    v-if="isSearchVisible" 
+    ref="searchRef"
+    class="flex items-center absolute min-w-36 inset-x-0 top-12 h-20 m-2 z-40 bg-white border border-gray-200 rounded-md shadow-[0_2px_5px_rgba(0,0,0,0.28)] search" 
+    :class="[isOpenSearch ? 'show' : '']">
         <form @submit.prevent="onSearch" class="max-w-[650px] w-full">
             <div class="input-group flex px-5">
                 <input 
@@ -27,18 +31,44 @@
 
     const isOpenSearch = ref(false);
     const isSearchVisible = ref(false);
+    const searchRef = ref<HTMLElement | null>(null) // ref cho khung search
 
     function toggleOpenSearch() {
-        if(isOpenSearch.value) {
-            isOpenSearch.value = false;
-            setTimeout(() => {
-                isSearchVisible.value = false;
-            }, 500);
+        if(isOpenSearch.value) {           
+            closeSearch()
         } else {
             isOpenSearch.value = true;
             isSearchVisible.value = true;
         }
     }
+
+    function closeSearch() {
+        isOpenSearch.value = false
+        setTimeout(() => {
+            isSearchVisible.value = false
+        }, 500)
+    }
+
+    function handleClickOutside(event: MouseEvent) {
+        const target = event.target as HTMLElement
+
+        // Nếu click ngoài cả icon search & khung search thì đóng
+        const clickedInsideSearch =
+            searchRef.value && searchRef.value.contains(target)
+        const clickedSearchButton = target.closest('.search-toggle-btn') // class riêng cho nút icon
+
+        if (!clickedInsideSearch && !clickedSearchButton) {
+            closeSearch()
+        }
+    }
+
+    onMounted(() => {
+        document.addEventListener('click', handleClickOutside)
+    });
+
+    onBeforeUnmount(() => {
+        document.removeEventListener('click', handleClickOutside)
+    });
 
     //---------------------------API------------------------------//
 

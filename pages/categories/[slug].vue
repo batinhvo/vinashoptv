@@ -130,7 +130,7 @@
         updateProducts();
         setTimeout(() => {
             isLoading.value = false;
-        }, 200);
+        }, 3000);
     })();
 
 </script>

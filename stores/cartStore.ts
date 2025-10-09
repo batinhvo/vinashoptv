@@ -131,60 +131,77 @@ export const useCartStore = defineStore('cart', () => {
 
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
-        if (authStore.authenticated && token()) {
-            console.log('moi đang nhap')
+        if (!authStore.authenticated || !token()) return;
 
-            if(addCartItems.value) {
-                //await syncCart();
-                console.log('co add cart sau login')
-                console.log(addCartItems.value)
+        try {
+            const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token()}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            let serverCart: any[] = [];
+
+            if (dataCartResponse?.data) {
+                try {
+                    serverCart = JSON.parse(dataCartResponse.data);
+                } catch {
+                    serverCart = [];
+                }
             }
 
-            // try {
-            //     const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-            //         method: 'GET',
-            //         headers: {
-            //             Authorization: `Bearer ${token()}`,
-            //             'Content-Type': 'application/json',
-            //         },
-            //     })
+            // CASE 1: Server có dữ liệu
+            if (serverCart.length > 0) {
+                addCartItems.value = [];
 
-            //     if (dataCartResponse?.data) {  
-            //         //addCartItems.value = [];    
-            //         const serverCart: any[] = JSON.parse(dataCartResponse.data);
-            //         // Xử lý trùng lặp SKU từ server
-            //         // Lấy danh sách SKU duy nhất và tổng hợp số lượng cho mỗi SKU trước khi thêm vào giỏ hàng
-            //         const unique = Array.from(new Set(serverCart.map((i: any) => Number(i.skuId))));
+                await Promise.all(
+                    serverCart.map((item: any) =>
+                    addProductToCart(Number(item.skuId), Number(item.quantity), true)
+                    )
+                );
 
-            //         await Promise.all(
-            //             unique.map((sku: any) =>
-            //                 addProductToCart(sku, serverCart.filter((s: any) => Number(s.skuId) === sku).reduce((a: number, b: any) => a + (b.quantity || 1), 0))
-            //             )
-            //         );
-            //     } 
+                localStorage.setItem("cart_data", JSON.stringify(serverCart));
+                await syncCart();
+            }
 
-            // } catch (err) {
-            //     console.error("Error fetching cart:", err);
-            //     error.value = 1;
-            // }
+            // CASE 2: Server rỗng nhưng local có cart → đẩy local lên
+            else if (addCartItems.value.length > 0) {
+                await syncCart();
+            }
 
-        } 
+        } catch (err) {
+            console.error("Error fetching cart:", err);
+            error.value = 1;
+        }
+
     }
 
     // ADD PRODUCT TO CART
-    const addProductToCart = async (idSku:number, quantity: number) => {
+    const addProductToCart = async (idSku:number, quantity: number, replace = false) => {
         let cached = productCache.get(idSku);
         
         // Kiểm tra nếu đã có trong cache thì dùng luôn tránh gọi API nhiều lần
         if (!cached) {
-            const product = await getDataProduct(idSku);
-            cached = { dataProduct: product.dataProduct, dataSkus: product.dataSkus, typeValue: product.typeValue }
-            productCache.set(idSku, cached);            
-        }                   
+            try {
+                const product = await getDataProduct(idSku);
+                cached = {
+                    dataProduct: product.dataProduct,
+                    dataSkus: product.dataSkus,
+                    typeValue: product.typeValue
+                };
+                productCache.set(idSku, cached);
+            } catch (err) {
+                console.error("Error fetching product:", err);
+                return;
+            }
+        } 
+
         const existing = addCartItems.value.find(item => item.skuId === idSku);
 
         if(existing) {
-            existing.quantity += quantity;
+            existing.quantity = replace ? quantity : existing.quantity + quantity;
         } else {     
             addCartItems.value.push({
                 skuId: idSku,
@@ -200,7 +217,7 @@ export const useCartStore = defineStore('cart', () => {
             });
         }    
 
-        checkQuantityGift(idSku, addCartItems.value.find(i => i.skuId === idSku)?.quantity || quantity);
+        checkQuantityGift(idSku, existing ? existing.quantity : quantity);
         scheduleSaveToLocal();
         addDataCartToServer();
     }
@@ -266,7 +283,11 @@ export const useCartStore = defineStore('cart', () => {
     //sync cart
     const syncCart  = async () => {
 
-        const skuIdList = addCartItems.value.map(item => ({ skuId: item.skuId, quantity: item.quantity }));
+        const skuIdList = addCartItems.value.map(item => ({ 
+            skuId: item.skuId, 
+            quantity: item.quantity 
+        }));
+
         try {
             // Luôn PUT để đồng bộ trạng thái giỏ hàng hiện tại lên server (không cần quan tâm giỏ hàng rỗng hay không)
             await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
@@ -278,6 +299,24 @@ export const useCartStore = defineStore('cart', () => {
                 body: { skuIdList: JSON.stringify(skuIdList) },
             });
 
+            error.value = 0;
+        } catch (err) {
+            console.error("Error posting cart:", err)
+            error.value = 1;
+        }
+    }
+
+    //Clear Cart
+    const clearCart = async () => {
+        try {
+            await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token()}`,
+                    'Content-Type': 'application/json',
+                },
+                body: { skuIdList: JSON.stringify([]) },
+            });
             error.value = 0;
         } catch (err) {
             console.error("Error posting cart:", err)
@@ -534,7 +573,6 @@ export const useCartStore = defineStore('cart', () => {
         } else {
             listGiftChecked.value = listGiftChecked.value.filter(p => p.skuId !== promotionCheck?.skuIdOut)
         }
-        console.log('co check gift')
         return listGiftChecked.value;
     }
 
@@ -596,6 +634,7 @@ export const useCartStore = defineStore('cart', () => {
         loadCartFromStorage,
         clearBuyNowOnReload,
         clearLocalCart,
+        clearCart,
         removeItem,
         removeGift,
         increment,

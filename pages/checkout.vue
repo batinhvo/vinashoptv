@@ -512,6 +512,10 @@
     });
 
     onMounted(async () => {
+        cartStore.loadCartFromStorage();
+        cartStore.dataCartBuyNow();
+        cartStore.clearBuyNowOnReload();
+
         await Promise.all([
             stateStore.fetchStates(),
             cartStore.fetchWeights(),
@@ -521,11 +525,9 @@
         billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
         shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
 
-        cartStore.loadCartFromStorage();
-        cartStore.dataCartBuyNow();
-        cartStore.clearBuyNowOnReload();
-
-        isLoading.value = false;
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 2000)
     });
 
     //----------------------------INVOICE FORM-----------------------------------//.
@@ -555,11 +557,15 @@
         try {
             normalizeCardInfo()
             await orderStore.submitOrder(payload);
-            notify({
+            await cartStore.clearCart();
+            cartStore.clearLocalCart();
+;           notify({
                 message: 'Order Placed Successfully. Thank you for shopping with us!',
                 type: 'success',
                 time: 3000,
-            });   
+            }); 
+            
+
         } catch (error) {
             notify({              
                 message: 'Order failed. Please check information and try again!',

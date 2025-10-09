@@ -1,39 +1,50 @@
 <template>
-    <div>
-        <div>
-            <NuxtImg :src="imgBanner" class="w-full" alt="" />
+    <div class="relative">
+        <div v-if="isLoading" class="fixed inset-0 bg-white/80 flex flex-col items-center justify-center z-50"> 
+            <div class="flex space-x-2">
+                <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce"></span>
+            </div>
+            <p class="mt-4 text-gray-700 font-medium text-lg">Loading</p>
         </div>
-        <div class="container mx-auto" v-if="dataDetails">
-            <!-- header -->
-            <div class="my-0 md:my-10 overflow-x-auto whitespace-nowrap max-w-[450px] md:max-w-full">
-                <ul class="flex items-center bg-zinc-100 md:bg-white py-2 xl:py-0 pl-2 xl:pl-0">
-                    <li class="px-3 py-2 hover:bg-zinc-100 rounded hover:border hover:border-gray-200"><a href="/">Home</a></li>
-                    <li class="px-2"><i class="ec ec-arrow-right-categproes"></i></li>
-                    <li class="px-3 py-2 md:bg-zinc-100 hover:bg-gray-200 rounded md:border md:border-gray-100"><NuxtLink v-if="cateSlug" :to="`/categories/${cateSlug}`">{{ cateTitle }}</NuxtLink></li>
-                    <li class="px-2"><i class="ec ec-arrow-right-categproes"></i></li>
-                    <li class="px-3 py-2 rounded">{{ dataDetails.title }}</li>
-                </ul>
-            </div>         
-            
-            <!-- main -->
-            <div class="flex flex-wrap mb-6 mt-5 md:mt-0">
-                <div class="w-full md:w-1/2 lg:w-1/3 xl:w-5/12 px-4">
-                    <BodyProductSlideImage :dataImages="listImages" :dataAlt="dataDetails.title" :imageChoice="imageChoice"/>              
-                </div>
 
-                <div class="w-full md:w-1/2 lg:w-1/3 xl:w-4/12 px-4 mt-8 md:mt-0">
-                    <div class="text-xs mb-2">{{ cateTitle }}</div>
-                    <div class="text-2xl mb-2">{{ dataDetails.title }}</div>
-                    <div class="text-right mb-2 pr-3">Sold: {{ dataDetails.totalOutFake }}</div>                                         
-                    <div class="text-justify" v-html="changeCharacter(dataDetails.summary)" ></div>                   
-                </div>
+        <div v-else>
+            <div>
+                <NuxtImg :src="imgBanner" class="w-full" alt="" />
+            </div>
+            <div class="container mx-auto" v-if="dataDetails">
+                <!-- header -->
+                <div class="my-0 md:my-10 overflow-x-auto whitespace-nowrap max-w-[450px] md:max-w-full">
+                    <ul class="flex items-center bg-zinc-100 md:bg-white py-2 xl:py-0 pl-2 xl:pl-0">
+                        <li class="px-3 py-2 hover:bg-zinc-100 rounded hover:border hover:border-gray-200"><a href="/">Home</a></li>
+                        <li class="px-2"><i class="ec ec-arrow-right-categproes"></i></li>
+                        <li class="px-3 py-2 md:bg-zinc-100 hover:bg-gray-200 rounded md:border md:border-gray-100"><NuxtLink v-if="cateSlug" :to="`/categories/${cateSlug}`">{{ cateTitle }}</NuxtLink></li>
+                        <li class="px-2"><i class="ec ec-arrow-right-categproes"></i></li>
+                        <li class="px-3 py-2 rounded">{{ dataDetails.title }}</li>
+                    </ul>
+                </div>         
+                
+                <!-- main -->
+                <div class="flex flex-wrap mb-6 mt-5 md:mt-0">
+                    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-5/12 px-4">
+                        <BodyProductSlideImage :dataImages="listImages" :dataAlt="dataDetails.title" :imageChoice="imageChoice"/>              
+                    </div>
 
-                <div class="w-full md:w-full lg:w-1/3 xl:w-3/12 px-4 mt-8 xl:mt-0">
-                    <BodyProductSelectionProductType :dataPro="dataDetails" :dataVariant="dataVariant" @updateSlideImages="updateSlideImages"/>
+                    <div class="w-full md:w-1/2 lg:w-1/3 xl:w-4/12 px-4 mt-8 md:mt-0">
+                        <div class="text-xs mb-2">{{ cateTitle }}</div>
+                        <div class="text-2xl mb-2">{{ dataDetails.title }}</div>
+                        <div class="text-right mb-2 pr-3">Sold: {{ dataDetails.totalOutFake }}</div>                                         
+                        <div class="text-justify" v-html="changeCharacter(dataDetails.summary)" ></div>                   
+                    </div>
+
+                    <div class="w-full md:w-full lg:w-1/3 xl:w-3/12 px-4 mt-8 xl:mt-0">
+                        <BodyProductSelectionProductType :dataPro="dataDetails" :dataVariant="dataVariant" @updateSlideImages="updateSlideImages"/>
+                    </div>
                 </div>
             </div>
+            <BodyProductDesc :contentPro="dataDetails?.content" :howToUsePro="dataDetails?.howToUse"/>
         </div>
-        <BodyProductDesc :contentPro="dataDetails?.content" :howToUsePro="dataDetails?.howToUse"/>
     </div>
 </template>
 
@@ -53,17 +64,17 @@
     const dataDetails = ref<ProductDetail | null>(null);
     const dataVariant = ref<Variant[]>([]);
     const dataSubImgs = ref<subImgData[]>([]);
+    const listImages = ref<{ id: number; media: string }[]>([]);
     const cateTitle = ref('');
     const cateSlug = ref('');
     const proId = ref(0);
     const imageChoice = ref(0);
-    const listImages = ref<{ id: number; media: string }[]>([]);
+    const isLoading = ref(true);
     
     const getImagesVariant = () => {
         const mediaList = dataVariant.value.flatMap(variant => variant.options
         .map(option => ({ id: option.id, media: option.media }))
         .filter(item => item.media !== ""));       
-
         return mediaList;
     }
 
@@ -122,6 +133,10 @@
         if (proId.value) {
             await getImages(proId.value);
         }
+
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 1000);
     }
 
     fetchDataProduct();

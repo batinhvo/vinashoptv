@@ -43,11 +43,15 @@
     onMounted(async () => {
         if(authStore.authenticated) {
 
-            await orderStore.getDataOrderHistory();
-            await cartStore.fetchDataCart();
-            await authStore.checkSubscribeEmail();
-            await authStore.getInfoUser();
+            cartStore.loadCartFromStorage();
 
+            await Promise.all([
+                cartStore.fetchDataCart(),
+                authStore.getInfoUser(),
+                authStore.checkSubscribeEmail(),
+                orderStore.getDataOrderHistory()
+            ]);
+            
             if (authStore.infoSubscribe?.userId) {
                 showSubcribe.value = false;
                 return;

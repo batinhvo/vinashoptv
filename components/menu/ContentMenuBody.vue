@@ -5,7 +5,7 @@
                 <NuxtLink v-if="cate.status === 'active' && cate.slug" prefetch
                 :to="`/categories/${cate.slug}`" 
                 class="group-hover:font-bold hover:text-primary" 
-                :class="[openCategory === cate.name ? 'font-bold' : '']">
+                :class="[openCategory === cate.name ? 'font-bold' : '']"> 
                     {{ cate.name }}
                 </NuxtLink>
                 <button v-if="cate.children && cate.children.length > 0">

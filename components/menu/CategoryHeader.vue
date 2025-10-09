@@ -63,7 +63,10 @@
         await cateStores.fetchCategories();
         dataCategories.value = cateStores.categories || [];
     };
-    fetchCateData();
+
+    onMounted(() => {
+        fetchCateData();
+    });
 
 </script>
 

@@ -25,7 +25,6 @@
         await cateStores.fetchCategories();
         dataCategories.value = cateStores.categories || [];
     };
-
     fetchCateData();
 
 </script>

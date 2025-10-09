@@ -37,5 +37,8 @@
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@types/yup": "^0.32.0"
-  }
+  },
+  "trustedDependencies": [
+    "@parcel/watcher"
+  ]
 }

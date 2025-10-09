@@ -17,14 +17,13 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     layoutTransition: { name: 'layout', mode: 'out-in' }
   },
-  devServer: {
-    port: 3001, 
-    host: '0.0.0.0',
+  nitro: {
+    port: 3001
   },
   modules: [
-    '@nuxtjs/tailwindcss', 
-    '@nuxt/image', 
-    '@vee-validate/nuxt', 
+    '@nuxtjs/tailwindcss',
+    '@nuxt/image',
+    '@vee-validate/nuxt',
     '@pinia/nuxt',
   ],
   css: [

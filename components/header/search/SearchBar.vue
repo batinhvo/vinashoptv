@@ -1,18 +1,21 @@
 <template>
     <form @submit.prevent="onSearch" class="max-w-[700px] w-full">
-        <div class="input-group flex px-5 relative">
+        <div class="input-group flex px-5 relative" ref="dropdownRef">
             <input 
-            type="search" 
-            v-model="queryProducts"
-            placeholder="Search for Products" 
-            class="w-full border-2 border-r-0 border-primary rounded-l-full py-2 px-4 focus:outline-none"
-            required
+                type="search" 
+                v-model="queryProducts"
+                placeholder="Search for Products" 
+                class="w-full border-2 border-r-0 border-primary rounded-l-full py-2 px-4 focus:outline-none"
+                required
             />
 
-            <input type="hidden" v-model="selectedCategory"/>
+            <!-- <input type="hidden" v-model="selectedCategory"/> -->
 
-            <button type="button" @click.prevent="toggleOpenCategories" class="min-w-40 border-y-2 border-primary text-gray-110 flex items-center justify-end pr-5"
-                :aria-expanded="isOpenCategories ? 'true' : 'false'">
+            <button 
+                type="button" 
+                @click.prevent="toggleOpenCategories" 
+                class="min-w-40 border-y-2 border-primary text-gray-110 flex items-center justify-end pr-5"
+                :aria-expanded="isOpenCategories">
                 {{ selectedCategory }}
                 <i class="fa fa-angle-down text-[8px] px-2"></i>
             </button>
@@ -37,63 +40,65 @@
 </template>
 
 <script setup lang="ts">
-    import { type Category } from "types/categoryTypes";
 
     const router = useRouter();
     const cateStore = useCateStore();
 
-    const cateParent = ref<Category[]>([]);
-    cateParent.value = cateStore.categories;
     //trạng thái lưu trữ
-    const queryProducts = ref(""); 
-    const categoryQuery = ref(''); 
-    const keywordQuery = ref('');
-
-    const isOpenCategories = ref(false);
+    const queryProducts = ref("");
     const selectedCategory = ref("All categories");
+    const isOpenCategories = ref(false);
+    const dropdownRef = ref<HTMLElement | null>(null);
 
-    //show categories
-    function toggleOpenCategories() {
-        isOpenCategories.value =  !isOpenCategories.value;
-    }
+    // Lọc bỏ category "SPECIAL"
+    const filteredCategories = computed(() =>
+        cateStore.categories.filter((cate: Category) => cate.name !== "SPECIAL")
+    );
 
-    function selectCategory(category: string) {
-        selectedCategory.value = category; // Cập nhật category đã chọn       
-        toggleOpenCategories(); // Đóng dropdown sau khi chọn
-    } 
+    const toggleOpenCategories = () => {
+        isOpenCategories.value = !isOpenCategories.value;
+    };
 
-    // Lọc danh mục để loại bỏ "SPECIAL"
-    const filteredCategories = computed(() => cateParent.value.filter((cate) => cate.name !== 'SPECIAL'));
+    const selectCategory = (category: string) => {
+        selectedCategory.value = category;
+        isOpenCategories.value = false;
+    };
 
-    // const fetchDataCategories =  async () => {
-    //     await cateStore.fetchCategories();
-    //     cateParent.value = cateStore.categories;
-    // };
-    // fetchDataCategories();
+    // ✅ Đóng dropdown khi click ra ngoài
+    const handleClickOutside = (event: MouseEvent) => {
+        if (
+            dropdownRef.value &&
+            !dropdownRef.value.contains(event.target as Node)
+        ) {
+            isOpenCategories.value = false;
+        }
+    };
+
+    onMounted(() => {
+        document.addEventListener("click", handleClickOutside);
+    });
+
+    onBeforeUnmount(() => {
+        document.removeEventListener("click", handleClickOutside);
+    });
 
     // Xử lý tìm kiếm
     const onSearch = () => {
         const keyword = queryProducts.value.trim();
-        if (!keyword) return; // Không tìm nếu keyword rỗng
+        if (!keyword) return;
 
-        keywordQuery.value = keyword;
+        const selectedCate =
+            selectedCategory.value !== "All categories"
+            ? cateStore.categories.find(
+                (cate: Category) => cate.name === selectedCategory.value
+                )
+            : null;
 
-        // Nếu chọn category khác "All categories", lấy slug
-        if (selectedCategory.value !== "All categories") {
-            const selectedCate = cateStore.categories.find(
-                (cate) => cate.name === selectedCategory.value
-            );
-            categoryQuery.value = selectedCate ? selectedCate.slug : "";
-        } else {
-            categoryQuery.value = "";
-        }
-
-        // Chuyển hướng với query params
         router.push({
             path: "/search",
             query: {
-                ...(categoryQuery.value && { category: categoryQuery.value }),
-                keyword: keywordQuery.value,
+            ...(selectedCate?.slug && { category: selectedCate.slug }),
+            keyword,
             },
         });
     };

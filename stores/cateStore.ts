@@ -6,63 +6,59 @@ export const useCateStore = defineStore('categories', () => {
     const apiUrl = config.public.apiBaseUrl;
 
     const categories = ref<Category[]>([]);
-    const dataCatePro = ref<Category[]>([]);
+    const flatCategories  = ref<Category[]>([]);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
     const loaded = ref(false);
 
-    const processCategories = (dataCate: Category[]): Category[] => {
-        const parentCate: Category[] = [];
-        const categoryMap = new Map<number, Category>(); // Map of category
+    const buildCategoryTree = (list: Category[]): Category[] => {
+        const map = new Map<number, Category & { children: Category[] }>()
+        const roots: Category[] = []
 
-        // Gán từng danh mục vào Map
-        dataCate.forEach((cate) => {
-            categoryMap.set(cate.id, {...cate, children: [] });
-        });
+        // Tạo map
+        for (const c of list) {
+            map.set(c.id, { ...c, children: [] })
+        }
 
-        //Gán các phần tử con vào đúng cha
-        dataCate.forEach((cate) => {
-            if (cate.parentId === 0) {
-                parentCate.push(categoryMap.get(cate.id)!);
-            } else {
-                const parent = categoryMap.get(cate.parentId);
-                if (parent) {
-                    parent.children?.push(categoryMap.get(cate.id)!);
-                }
-            }
-        });
+        // Gắn con vào cha
+        for (const c of list) {
+            if (c.parentId === 0) roots.push(map.get(c.id)!)
+            else map.get(c.parentId)?.children.push(map.get(c.id)!)
+        }
 
-        // Sắp xếp danh mục theo `sort`
-        const sortCategories = (categories: Category[]): Category[] => {
-            return categories
+        // Hàm đệ quy sắp xếp
+        const sortTree = (nodes: Category[]): Category[] =>
+            [...nodes]
             .sort((a, b) => a.sort - b.sort)
-            .map((cate) => ({
-                ...cate,
-                children: cate.children ? sortCategories(cate.children) : [],
-            }));
-        };
+            .map((n) => ({
+            ...n,
+            children: n.children?.length ? sortTree(n.children) : [],
+        }))
 
-        return sortCategories(parentCate);
+        return sortTree(roots)
     }
 
-    const fetchCategories =  async ():Promise<void> => {
-        if (loaded.value && categories.value.length > 0) return;// nếu dữ liệu đã có thì không gọi lại
+    const fetchCategories =  async (force = false): Promise<void> => {
+        if (loaded.value && categories.value.length && !force) return;// nếu dữ liệu đã có thì không gọi lại
 
         try {
-            const { data: cateData, error: fetchCateError } = await useAsyncData(
+            const { data: cateData, error: fetchError } = await useAsyncData(
                 'categories', // Tên key duy nhất
                 () => $fetch<{ error: number; data: Category[]; message: string }>(`${apiUrl}categories`)
             );
 
-            if(fetchCateError.value) {
+            if(fetchError.value) {
                 error.value = 1; // Có lỗi xảy ra
-                console.error('Error fetching categories:', fetchCateError.value);
+                console.error('Error fetching categories:', fetchError.value);
                 return;
             }
 
-            dataCatePro.value = cateData.value?.data || [];
-            categories.value = processCategories(dataCatePro.value);
-            loaded.value = true;
-            error.value = 0; // Không có lỗi
+            const res = cateData.value
+            if (!res?.data) throw new Error('Dữ liệu trả về không hợp lệ')
+
+            flatCategories.value = res.data;
+            categories.value = buildCategoryTree(res.data)
+            loaded.value = true
+            error.value = 0; // Reset lỗi khi fetch thành công
 
         } catch (e) {
             error.value = 1; // Gán lỗi khi xảy ra exception
@@ -71,17 +67,29 @@ export const useCateStore = defineStore('categories', () => {
     };
 
     const getCategories = async (): Promise<Category[]> => {
-        if (!loaded.value) await fetchCategories();
-        return categories.value;
-    };
+        if (!loaded.value) await fetchCategories()
+        return categories.value
+    }
     
+    // const rootCategories = computed(() =>
+    //     categories.value.filter((c) => c.parentId === 0)
+    // )
+
     return {
+        // state
         categories,
-        dataCatePro,
+        flatCategories,
         error,
+        loaded,
+
+        // actions
         fetchCategories,
         getCategories,
-    };
+
+        // getters
+        //rootCategories,
+    }
+
 });
 
 

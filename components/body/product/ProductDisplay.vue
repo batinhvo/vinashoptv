@@ -78,7 +78,7 @@
     const updateProducts = computed(() => {
         if (!data.dataProduct) return [];
         return data.dataProduct?.map((pro) => {
-            const matchingCategory = cateStore.dataCatePro.find((cate) => cate.id === pro.categoryId);
+            const matchingCategory = cateStore.flatCategories .find((cate) => cate.id === pro.categoryId);
             return {
                 ...pro,
                 categoryName: matchingCategory ? matchingCategory.name : undefined,

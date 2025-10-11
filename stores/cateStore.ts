@@ -5,9 +5,11 @@ export const useCateStore = defineStore('categories', () => {
     const config = useRuntimeConfig();
     //const apiUrl = config.public.apiBaseUrl;
 
-    const apiUrl = import.meta.server
+    const apiUrl = import.meta.browser
     ? config.apiBaseServer
     : config.public.apiBaseUrl
+
+    console.log(apiUrl)
 
     const categories = ref<Category[]>([]);
     const flatCategories  = ref<Category[]>([]);

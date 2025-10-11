@@ -95,15 +95,16 @@
 
     const updatePages = async (page: number) => {
         params.value.page = page;
-        updateProducts();
+        await updateProducts();
 
-        const isMobile = window.innerWidth <= 768;
-        const scrollTop = isMobile ? 0 : 600;
-
-        window.scrollTo({
-            top: scrollTop,
-            behavior: 'smooth'
-        });
+        if (import.meta.client) {
+            const isMobile = window.innerWidth <= 768;
+            const scrollTop = isMobile ? 0 : 600;
+            window.scrollTo({
+                top: scrollTop,
+                behavior: 'smooth'
+            });
+        }
     };
 
     const rangeChange = ({ from, to }: { from: number; to: number }) => {
@@ -111,7 +112,7 @@
         toShow.value = to; 
     }
 
-    (async () => {
+    onMounted(async () => {
         await cateStore.fetchCategories();
 
         const category = cateStore.flatCategories .find((cate) => cate.slug === slug);
@@ -127,11 +128,12 @@
                 Imgsource.value = "/images/banner/bg-banner-01.jpg";
             }       
         }
-        updateProducts();
+
+        await updateProducts();
         setTimeout(() => {
             isLoading.value = false;
         }, 3000);
-    })();
+    });
 
 </script>
 

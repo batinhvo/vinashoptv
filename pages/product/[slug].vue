@@ -124,7 +124,7 @@
         await productStore.fetchProductDetails(slug);
         dataDetails.value = productStore.productDetail;
 
-        const foundCate = cateStore.dataCatePro.find(cate => cate.id === dataDetails.value?.categoryId);
+        const foundCate = cateStore.flatCategories .find(cate => cate.id === dataDetails.value?.categoryId);
         cateTitle.value = foundCate?.name || '';
         cateSlug.value = foundCate?.slug || '';
         proId.value = dataDetails.value?.id || 0;

@@ -15,13 +15,18 @@
 
 <script setup lang="ts">
     import { type Category } from "types/categoryTypes";
-
-    const dataCategories = ref<Category[]>([]);
     const openCategory = ref<string | null>(null);
 
     const cateStore = useCateStore();
-    dataCategories.value = await cateStore.getCategories();
+    // ✅ computed để tự động theo dõi khi store thay đổi
+    const dataCategories = computed<Category[]>(() => cateStore.categories);
 
+    // ✅ fetch khi chưa có dữ liệu (tránh lỗi SSR)
+    onMounted(async () => {
+        if (!cateStore.categories.length) {
+            await cateStore.fetchCategories();
+        }
+    });
 
 </script>
 

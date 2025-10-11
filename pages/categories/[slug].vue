@@ -114,7 +114,7 @@
     (async () => {
         await cateStore.fetchCategories();
 
-        const category = cateStore.dataCatePro.find((cate) => cate.slug === slug);
+        const category = cateStore.flatCategories .find((cate) => cate.slug === slug);
         if (category) {
             params.value.categoryId = category.id; // Gán ID vào params
             cateTitle.value = category.name;

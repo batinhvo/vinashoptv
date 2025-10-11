@@ -1,7 +1,7 @@
 <template>
   <div>
     <BodyHomeMainSlider />
-    <BodyHomeBestSeller />
+    <!-- <BodyHomeBestSeller /> -->
     <BodyHomeMainSeller />
     <BodyHomeBigDiscount />
   </div>

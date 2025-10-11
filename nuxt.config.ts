@@ -21,6 +21,15 @@ export default defineNuxtConfig({
     port: process.env.PORT || 3002,
     host: process.env.HOST || '0.0.0.0'
   },
+  vite: {
+    server: {
+      // Thêm tên miền của bạn vào danh sách cho phép
+      allowedHosts: [
+        'beta.vinashoptv.com',
+        // Bạn có thể thêm các tên miền khác nếu cần (ví dụ: 'localhost', '127.0.0.1')
+      ],
+    },
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/image',

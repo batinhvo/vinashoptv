@@ -78,12 +78,17 @@
     }
 
     //-----------------------------------API-------------------------------------//
-
-    const dataCategories = ref<Category[]>([]);
     const openCategory = ref<string | null>(null);
 
     const cateStore = useCateStore();
-    dataCategories.value = await cateStore.getCategories();
+    const dataCategories = computed<Category[]>(() => cateStore.categories);
+
+    onMounted(async () => {
+        if (!cateStore.categories.length) {
+            await cateStore.fetchCategories();
+        }
+    });
+    
     
 </script>
 

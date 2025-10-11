@@ -55,10 +55,14 @@
     });
 
     //----------------------------------API---------------------------------------//
-    const dataCategories = ref<Category[]>([]);
-
     const cateStore = useCateStore();
-    dataCategories.value = await cateStore.getCategories();
+    const dataCategories = computed<Category[]>(() => cateStore.categories);
+
+    onMounted(async () => {
+        if (!cateStore.categories.length) {
+            await cateStore.fetchCategories();
+        }
+    });
     
 
 </script>

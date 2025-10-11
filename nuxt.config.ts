@@ -10,9 +10,7 @@ export default defineNuxtConfig({
   components: true,
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NODE_ENV === 'production'
-        ? 'https://vinashoptv.com/api/v1/'
-        : 'http://localhost:3001/api/v1/',
+      apiBaseUrl: process.env.NODE_ENV === 'production' ? 'https://vinashoptv.com/api/v1/' : 'http://localhost:3001/api/v1/',
     },
   },
   app: {

@@ -9,8 +9,9 @@ export default defineNuxtConfig({
   plugins: ['~/plugins/veeValidate.ts'],
   components: true,
   runtimeConfig: {
+    apiBaseServer: 'http://localhost:3001/api/v1/',
     public: {
-      apiBaseUrl: process.env.NODE_ENV === 'production' ? 'https://vinashoptv.com/api/v1/' : 'http://localhost:3001/api/v1/',
+      apiBaseUrl: 'https://vinashoptv.com/api/v1/',
     },
   },
   app: {

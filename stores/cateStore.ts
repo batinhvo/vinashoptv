@@ -3,7 +3,11 @@ import { type Category } from "types/categoryTypes";
 export const useCateStore = defineStore('categories', () => {
 
     const config = useRuntimeConfig();
-    const apiUrl = config.public.apiBaseUrl;
+    //const apiUrl = config.public.apiBaseUrl;
+
+    const apiUrl = import.meta.server
+    ? config.apiBaseServer
+    : config.public.apiBaseUrl
 
     const categories = ref<Category[]>([]);
     const flatCategories  = ref<Category[]>([]);

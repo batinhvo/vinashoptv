@@ -6,8 +6,8 @@ export const useCateStore = defineStore('categories', () => {
     //const apiUrl = config.public.apiBaseUrl;
 
     const apiUrl = import.meta.browser
-    ? config.public.apiBaseServer
-    : config.public.apiBaseUrl
+    ? config.public.apiBaseUrl
+    : config.public.apiBaseServer
 
     console.log(apiUrl)
 

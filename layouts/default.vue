@@ -23,7 +23,6 @@
     const authStore = useAuthStore();
     const orderStore = useOrderStore();
     const cartStore = useCartStore();
-    const cateStore = useCateStore();
 
     const showSubcribe = ref(false);
     const triggerSubmitSubscribeEmail = ref(false);
@@ -51,7 +50,6 @@
                 authStore.getInfoUser(),
                 authStore.checkSubscribeEmail(),
                 orderStore.getDataOrderHistory(),
-                cateStore.fetchCategories()
             ]);
             
             if (authStore.infoSubscribe?.userId) {

@@ -17,9 +17,8 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     layoutTransition: { name: 'layout', mode: 'out-in' }
   },
-  devServer: {
-    port: 3001, 
-    host: '0.0.0.0',
+  nitro: {
+    port: 3001
   },
   modules: [
     '@nuxtjs/tailwindcss', 

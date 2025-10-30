@@ -17,7 +17,7 @@
                 v-model="formData.email" 
                 :widthfull=false 
                 :is-strong=false
-                rules="required|email" name="email" label="Email Address" type="email" />
+                rules="required|email" name="email" label="Email Address" type="email" disabled/>
 
             <InputField 
                 v-model="formData.phone" 
@@ -31,12 +31,14 @@
                 :placeholder="location.statePlaceholder.value"
                 @selected="location.stateOnSelected" 
                 :widthfull=true 
+                isSearch
                 name="state" label="State" class="lg:w-1/2 px-1"/>
 
             <InputSelective 
                 :options="location.cityOpt" 
                 :placeholder="location.cityPlaceholder.value" 
-                @selected="location.cityOnSelected" 
+                @selected="location.cityOnSelected"
+                isSearch 
                 name="city" label="City" class="lg:w-1/2 px-1"/>  
 
             <InputField 

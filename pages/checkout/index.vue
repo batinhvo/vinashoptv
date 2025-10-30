@@ -47,11 +47,13 @@
                                     :placeholder="billingLocation.statePlaceholder.value"
                                     @selected="billingLocation.stateOnSelected" 
                                     :widthfull=true 
+                                    isSearch
                                     name="state" label="State" class="lg:w-1/2 px-1"/>
 
                                 <InputSelective 
                                     :options="billingLocation.cityOpt" 
                                     :placeholder="billingLocation.cityPlaceholder.value" 
+                                    isSearch
                                     @selected="billingLocation.cityOnSelected" 
                                     name="city" label="City" class="lg:w-1/2 px-1"/>
 
@@ -77,7 +79,7 @@
                             <div class="px-4 pb-4 flex flex-wrap items-center">
                                 <InputCheckBox v-model="isShippingInfo"
                                     
-                                    name="difAddress" label="Ship to a different address ?" />
+                                    name="difAddress" label="Ship to a different address ?" :is-strong="false"/>
                             </div>
 
                             <div v-if="isShippingInfo">
@@ -234,11 +236,19 @@
                                 <!----------------------------------------------------------------- payment method --------------------------------------------------------->
                                 <div class="pt-5 border-t-2 border-gray-300">
                                     <div>
-                                        <div class="flex items-center p-4 border-b border-gray-300">
-                                            <input type="radio" name="payment" value="paypal" v-model="formData.paymentMethod"
-                                                class="accent-[#169100] w-4 h-4">
-                                            <label class="font-bold ml-3">PayPal <span class="text-[#167000]">What Is
-                                                    PayPal?</span></label>
+                                        <div class="flex items-center p-4 pl-0 border-b border-gray-300">
+                                            <label class="font-bold ml-3 cursor-pointer">
+                                                <input 
+                                                    type="radio" 
+                                                    name="payment" 
+                                                    value="paypal" 
+                                                    v-model="formData.paymentMethod"
+                                                    class="accent-[#169100] w-4 h-4"
+                                                >
+                                                <span class="font-bold ml-3">
+                                                    PayPal <span class="text-[#167000]">What Is PayPal?</span>
+                                                </span>
+                                            </label>
                                         </div>
                                         <div v-show="formData.paymentMethod === 'paypal'"
                                             class="p-6 bg-gray-100 border-b border-gray-300">
@@ -247,10 +257,17 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="flex items-center p-4 border-b border-gray-300">
-                                            <input type="radio" name="payment" value="card" v-model="formData.paymentMethod"
-                                                class="accent-[#169100] w-4 h-4 border">
-                                            <label class="font-bold ml-3">Credit Card</label>
+                                        <div class="flex items-center p-4 pl-0 border-b border-gray-300">
+                                            <label class="font-bold ml-3 cursor-pointer">
+                                                <input 
+                                                    type="radio" 
+                                                    name="payment" 
+                                                    value="card" 
+                                                    v-model="formData.paymentMethod"
+                                                    class="accent-[#169100] w-4 h-4"
+                                                >                                               
+                                                <span class="ml-3">Credit Card   </span>                                            
+                                            </label>
                                         </div>
                                         <div v-show="formData.paymentMethod === 'card'" class="p-6 bg-gray-100">
                                             <InputSelective 
@@ -315,9 +332,14 @@
                                     </div>
                                 </div>
 
-                                <button
+                                <button v-if="!isSummit"
                                     class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6">
                                     Place order
+                                </button>
+
+                                <button v-else
+                                    class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6" disabled>
+                                    Loading...
                                 </button>
                             </div>
                         </div>
@@ -342,6 +364,7 @@
     const isConditions = ref(true);
     const isReceiveEmail = ref(false);
     const isLoading = ref(true);
+    const isSummit = ref(false);
 
     const formData = ref<{
         billingInfo: any;
@@ -553,6 +576,7 @@
     //----------------------------HANDLE SUBMIT-----------------------------------//
     const { handleSubmit } = useForm();
     const onSubmit = handleSubmit( async () => {
+        isSummit.value = true;
         const payload = getFinalFormData()
         try {
             normalizeCardInfo()
@@ -574,7 +598,6 @@
             });
         }
     });
-
 </script>
 
 <style lang="css" scoped>

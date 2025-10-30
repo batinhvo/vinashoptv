@@ -45,19 +45,31 @@
         } 
         return false; //email chua dang ky
         } catch (error) {
-        console.error('Error checking email:', error);
-        return false;
+            console.error('Error checking email:', error);
+            return false;
         }
     };
 
     defineRule('emailExist', async (value: string | undefined): Promise<boolean | string> => {
         if (!value) return 'Email is required';
-        const exists = await checkEmailExist(value);
+            const exists = await checkEmailExist(value);
         if (exists) {
-        return 'Email address already exists';
+            return 'Email address already exists';
         }
         return true;
     });
+
+    watch(
+        () => meta.validated,
+        () => {
+            if (!meta.valid) {
+            nextTick(() => {
+                const el = document.querySelector(`[name="${props.name}"]`);
+                el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            }
+        }
+    );
 </script>
 
 <style lang="css" scoped>

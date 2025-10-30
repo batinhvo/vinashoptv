@@ -15,25 +15,25 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-    name: { type: String, required: true },
-    label: { type: String },
-    widthfull: { type: Boolean, default: false },
-    rules: { type: String, default: '' },
-    modelValue: { type: Boolean, default: false },
-    isStrong: { type: Boolean, default: true }
-});
+    const props = defineProps({
+        name: { type: String, required: true },
+        label: { type: String },
+        widthfull: { type: Boolean, default: false },
+        rules: { type: String, default: '' },
+        modelValue: { type: Boolean, default: false },
+        isStrong: { type: Boolean, default: true }
+    });
 
-const emit = defineEmits(['update:modelValue']);
-const { setValue } = useField(props.name, props.rules);
+    const emit = defineEmits(['update:modelValue']);
+    const { setValue } = useField(props.name, props.rules);
 
-const internalValue = ref(props.modelValue);
-watch(() => props.modelValue, v => (internalValue.value = v));
+    const internalValue = ref(props.modelValue);
+    watch(() => props.modelValue, v => (internalValue.value = v));
 
-function onChange(e: Event) {
-    const checked = (e.target as HTMLInputElement).checked
-    internalValue.value = checked
-    emit('update:modelValue', checked) // 🔑 truyền ra cha
-    setValue(checked)                  // đồng bộ VeeValidate
-}
+    function onChange(e: Event) {
+        const checked = (e.target as HTMLInputElement).checked
+        internalValue.value = checked
+        emit('update:modelValue', checked) // 🔑 truyền ra cha
+        setValue(checked)                  // đồng bộ VeeValidate
+    }
 </script>

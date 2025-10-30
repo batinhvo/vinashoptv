@@ -5,8 +5,8 @@
         </label>
 
         <!-- VeeValidate Form -->
-        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{field, meta}">
-            <!-- Dropdown Button -->
+        <!-- <Field  :name="name" :rules="rules" v-model="selectedValue" v-slot="{field, meta}">
+            
             <button type="button" @click="toggleDropdown" v-bind="field" :value="field.value"
             class="w-full bg-white border border-gray-300 rounded-full px-4 py-3 text-left shadow-sm focus:outline-none"
             :class="[!meta.valid && meta.touched ? 'border-red-500' : 'border-gray-300']">
@@ -16,7 +16,7 @@
                 </span>
             </button>
 
-            <!-- Dropdown Menu -->
+            
             <ul v-if="isOpen" class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
                 <li
                     v-for="(option, index) in unref(options)"
@@ -27,8 +27,57 @@
                     {{ option }}
                 </li>
             </ul>
-            <!-- Error Message -->
+            
             <ErrorMessage :name="name" class="text-red-500 mt-2 text-xs pl-4"/>
+        </Field> -->
+
+        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{ field, meta }">
+            <!-- Nút dropdown -->
+            <button
+                type="button"
+                @click="toggleDropdown"
+                v-bind="field"
+                :value="field.value"
+                class="w-full bg-white border border-gray-300 rounded-full px-4 py-3 text-left shadow-sm focus:outline-none"
+                :class="[!meta.valid && meta.touched ? 'border-red-500' : 'border-gray-300']"
+            >
+                {{ modelValue || placeholder }}
+                <span class="float-right">
+                <i class="fa fa-angle-down text-[9px] text-neutral-500 pl-1.5"></i>
+                </span>
+            </button>
+
+            <!-- Menu dropdown -->
+            <div
+                v-if="isOpen"
+                class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+            >
+                <!-- Ô tìm kiếm -->
+                <div v-if="isSearch" class="p-2 border-b border-gray-200">
+                    <input
+                        type="text"
+                        v-model="searchQuery"
+                        placeholder="Type to search..."
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    />
+                </div>
+
+                <ul>
+                    <li
+                        v-for="(option, index) in filteredOptions"
+                        :key="index"
+                        @click="selectOption(option, field)"
+                        class="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                    >
+                        {{ option }}
+                    </li>
+                    <li v-if="filteredOptions.length === 0" class="px-4 py-2 text-gray-400 text-sm">
+                        No results found
+                    </li>
+                </ul>
+            </div>
+
+            <ErrorMessage :name="name" class="text-red-500 mt-2 text-xs pl-4" />
         </Field>
     </div>
 </template>
@@ -43,6 +92,7 @@
         placeholder: { type: String, default: 'Select an option' },
         rules: { type: String, default: '' },
         isStrong: { type: Boolean, default: true},
+        isSearch: { type: Boolean, default: false},
     });
     
     // Emit for parent
@@ -50,6 +100,7 @@
     
     // States
     const isOpen = ref(false)
+    const searchQuery = ref("");
     const selectedValue = ref<string | null>(null)
     
     // Methods
@@ -68,6 +119,20 @@
 
     const { value: fieldValue, meta } = useField(props.name, props.rules);
     const modelValue = defineModel<string | number | null>();
+
+    // lọc danh sách theo input
+    const filteredOptions = computed(() => {
+        const list = unref(props.options);
+        return list.filter((opt: string) =>
+            opt.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+    });
+
+    watch(isOpen, (val) => {
+        if (!val) {
+            searchQuery.value = ''; // Xóa ô search khi dropdown đóng
+        }
+    });
 
     // watch(modelValue, () => {
     //     meta.valid = fieldValue.value ? true : false; // This is just an example logic. 

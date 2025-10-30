@@ -50,12 +50,14 @@
                     :placeholder="location.statePlaceholder.value"
                     @selected="location.stateOnSelected" 
                     :widthfull=true 
+                    isSearch
                     name="state" label="State" class="lg:w-1/2 px-1"/>
 
                   <InputSelective 
                     :options="location.cityOpt" 
                     :placeholder="location.cityPlaceholder.value" 
                     @selected="location.cityOnSelected" 
+                    isSearch
                     name="city" label="City" class="lg:w-1/2 px-1"/>  
 
                   <InputField

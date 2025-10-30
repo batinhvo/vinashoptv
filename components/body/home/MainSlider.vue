@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="w-3/5 lg:w-2/5 px-4">
-                        <NuxtImg 
+                        <img 
                             :src="slide.image" 
                             class="zoom-in-image w-[320px]" 
                             :class="{'active-image': currentSlideIndex === index, 'inactive-image': currentSlideIndex !== index}"

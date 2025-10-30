@@ -4,6 +4,8 @@ export const useCateStore = defineStore('categories', () => {
 
     const apiUrl = useApi();
 
+    console.log(apiUrl)
+
   const categories = ref<Category[]>([]);
   const flatCategories = ref<Category[]>([]);
   const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
@@ -50,6 +52,8 @@ export const useCateStore = defineStore('categories', () => {
           categories.value = buildCategoryTree(res.data);
           loaded.value = true;
           error.value = 0;
+
+           console.log("hahahah ",flatCategories.value)
 
       } catch (e) {
           error.value = 1; // Gán lỗi khi xảy ra exception

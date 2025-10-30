@@ -11,7 +11,7 @@
 
         <div v-else>
             <div>
-                <NuxtImg :src="imgBanner" class="w-full" alt="" />
+                <img :src="imgBanner" class="w-full" alt="" />
             </div>
             <div class="container mx-auto" v-if="dataDetails">
                 <!-- header -->

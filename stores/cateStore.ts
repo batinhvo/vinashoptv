@@ -37,24 +37,24 @@ export const useCateStore = defineStore('categories', () => {
     }
 
     const fetchCategories =  async (force = false): Promise<void> => {
-        if (loaded.value && categories.value.length && !force) return;// nếu dữ liệu đã có thì không gọi lại
+      if (loaded.value && categories.value.length && !force) return;// nếu dữ liệu đã có thì không gọi lại
 
-        try {
-            const res = await $fetch<{ error: number; data: Category[]; message: string }>(`${apiUrl}categories`);
+      try {
+          const res = await $fetch<{ error: number; data: Category[]; message: string }>(`${apiUrl}categories`);
 
-            if (res.error !== 0 || !res.data) {
-                throw new Error(res.message || 'Dữ liệu trả về không hợp lệ');
-            }
+          if (res.error !== 0 || !res.data) {
+              throw new Error(res.message || 'Dữ liệu trả về không hợp lệ');
+          }
 
-            flatCategories.value = res.data;
-            categories.value = buildCategoryTree(res.data);
-            loaded.value = true;
-            error.value = 0;
+          flatCategories.value = res.data;
+          categories.value = buildCategoryTree(res.data);
+          loaded.value = true;
+          error.value = 0;
 
-    // } catch (e) {
-    //     error.value = 1; // Gán lỗi khi xảy ra exception
-    //     console.error('Exception in fetchCate:', e);
-    // }
+      } catch (e) {
+          error.value = 1; // Gán lỗi khi xảy ra exception
+          console.error('Exception in fetchCate:', e);
+      }
   };
 
     const getCategories = async (): Promise<Category[]> => {

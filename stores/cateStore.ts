@@ -55,7 +55,7 @@ export const useCateStore = defineStore('categories', () => {
           error.value = 1; // Gán lỗi khi xảy ra exception
           console.error('Exception in fetchCate:', e);
       }
-  };
+    }
 
     const getCategories = async (): Promise<Category[]> => {
         if (!loaded.value || !categories.value.length) {

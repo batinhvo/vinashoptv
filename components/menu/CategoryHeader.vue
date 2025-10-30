@@ -11,8 +11,8 @@
         ]">
             <ul class="p-2 relative">
                 <li class="border-b py-1.5 px-4 hover:bg-neutral-100 cursor-pointer relative">
-                    <NuxtLink class="flex justify-between items-center hover:text-black font-bold" to="/categories/saleoff">
-                        Sale Off
+                    <NuxtLink class="flex justify-between items-center hover:text-black font-bold" to="/allproducts">
+                        All Products
                     </NuxtLink>                    
                 </li>
                 <MenuContentMenuHeader 

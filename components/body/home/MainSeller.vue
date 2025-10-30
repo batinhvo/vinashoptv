@@ -3,7 +3,7 @@
         <div class="flex flex-wrap">
             <div v-for="(item, index) in images" :key="index" class="w-full lg:w-1/2 p-4">
                 <NuxtLink :to="item.link" class="block border border-[#00890c] shadow-[3px_2px_5px_1px_#898989]">
-                    <NuxtImg :src="item.img" :alt="item.desc" />
+                    <img :src="item.img" :alt="item.desc" />
                 </NuxtLink>
             </div>           
         </div>

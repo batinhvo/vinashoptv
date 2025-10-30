@@ -16,8 +16,8 @@
                     </NuxtLink>                    
                 </li>
                 <MenuContentMenuHeader 
-                v-for="(cate, index) in dataCategories" 
-                :key="index" 
+                v-for="cate in categories" 
+                :key="cate.id" 
                 :cate="cate"  
                 />               
             </ul>
@@ -37,6 +37,10 @@
         isMenuOpen.value = !isMenuOpen.value;
     }
 
+    defineProps<{
+        categories: Category[];
+    }>();
+
     watch(isMenuOpen, async (newValue) => {
         if (newValue) {
             isOverflowHidden.value = true;
@@ -52,18 +56,7 @@
 
     watch(() => route.path, (newPath) => {
         isMenuOpen.value = newPath === "/";
-    });
-
-    //----------------------------------API---------------------------------------//
-    const cateStore = useCateStore();
-    const dataCategories = computed<Category[]>(() => cateStore.categories);
-
-    onMounted(async () => {
-        if (!cateStore.categories.length) {
-            await cateStore.fetchCategories();
-        }
-    });
-    
+    });     
 
 </script>
 

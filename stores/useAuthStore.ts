@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         async authenticateUser({email, password}: InputDataLogin) {
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const userResponse = await $fetch<{ error: number; data: DataUser; message: string }>(`${apiUrl}auth/login`, {
                     method: 'POST',
                     headers: {
@@ -85,7 +85,7 @@ export const useAuthStore = defineStore('auth', {
             if (!this.authenticated || !useCookie('tokenAccess').value) return;
 
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
                 const infoUserResponse = await $fetch<{error: number; data: UserInfo; message: string }>(`${apiUrl}user/info`, {
@@ -109,7 +109,7 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async refreshAccessToken() {
-            const apiUrl = useRuntimeConfig().public.apiBaseUrl;         
+            const apiUrl = useApi();       
             const tokenRefresh = useCookie('tokenRefresh');
             
             try {
@@ -144,7 +144,7 @@ export const useAuthStore = defineStore('auth', {
 
         async registerUser(profileData: any) {
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 await $fetch(`${apiUrl}auth/register`, {
                     method: 'POST',
                     body: profileData.value,
@@ -160,7 +160,7 @@ export const useAuthStore = defineStore('auth', {
 
         async updateProfileUser({address, cityId, country, firstName, lastName, phone, state, zip}: DataProfileUser) {
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
                 if (!token) throw new Error("No token available");
@@ -182,7 +182,7 @@ export const useAuthStore = defineStore('auth', {
 
         async updatePasswordUser({currentPassword, newPassword}: PassUser) {
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
                 if (!token) throw new Error("No token available");
@@ -204,7 +204,7 @@ export const useAuthStore = defineStore('auth', {
 
         async subscribeEmail(email: string) {
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
                 if (!token) throw new Error("No token available");
@@ -236,7 +236,7 @@ export const useAuthStore = defineStore('auth', {
             if (!this.authenticated || !useCookie('tokenAccess').value) return;
 
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
                 const infoSubscribeResponse = await $fetch<{error: number; data: InfoSubscribe; message: string }>(`${apiUrl}subscribes`, {

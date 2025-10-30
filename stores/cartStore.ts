@@ -2,8 +2,8 @@ import type { CartItem, Coupon, Discount, Promotion, QuantityGift, Weight } from
 const notify = useNotify();
 
 export const useCartStore = defineStore('cart', () => {
-    const config = useRuntimeConfig()
-    const apiUrl = config.public.apiBaseUrl
+    const apiUrl = useApi();
+
     const error = ref<number>(0)
 
     // state
@@ -216,7 +216,6 @@ export const useCartStore = defineStore('cart', () => {
                 salePrice: cached.dataProduct.minPrice || 0,
             });
         }    
-
         checkQuantityGift(idSku, existing ? existing.quantity : quantity);
         scheduleSaveToLocal();
         addDataCartToServer();

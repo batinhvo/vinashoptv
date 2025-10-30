@@ -29,7 +29,7 @@
                 <form @submit.prevent="onSubmit">
                     <div class="flex flex-wrap">
                         <!----------------------------------------------------- address ----------------------------------------------------------------->
-                        <div class="w-full xl:w-3/5 px-4">
+                        <div class="w-full xl:w-1/2 px-4">
                             <div class="title border-b border-gray-300 mb-10">
                                 <h3 class="text-2xl pb-2">Billing address</h3>
                             </div>
@@ -133,7 +133,7 @@
                         </div>
 
                         <!-- ------------------------------------------------------------------invoice --------------------------------------------------------------------->
-                        <div class="w-full xl:w-2/5 px-4">
+                        <div class="w-full xl:w-1/2 px-4">
                             <div class="bg-[#f5f5f5] px-8 py-6 rounded-lg border border-gray-300">
                                 <div class="title border-b border-gray-300 mb-10">
                                     <h3 class="text-2xl pb-2">Your invoice</h3>

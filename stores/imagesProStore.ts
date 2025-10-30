@@ -2,12 +2,7 @@ import type { subImgData } from "types/productTypes";
 
 export const useImagesProduct = defineStore('imagesProduct', () => {
 
-    const config = useRuntimeConfig();
-    // const apiUrl = config.public.apiBaseUrl;
-
-    const apiUrl = import.meta.browser
-    ? config.public.apiBaseUrl
-    : config.public.apiBaseServer
+    const apiUrl = useApi();
 
     const dataImgCache = ref<{ [key: string]: string }>({}); // Cache hình ảnh theo imgName
     const subDataImg = ref<subImgData[]>([]);

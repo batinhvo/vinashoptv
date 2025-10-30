@@ -19,7 +19,7 @@
                                     <sup class="text-[60%]">$</sup><span>{{ slide.price }}</span><sup class="text-[60%]">{{ slide.sub }}</sup>
                                 </div>
                             </div>
-                            <NuxtLink :to="`/product/${dataLinkPro}`">
+                            <NuxtLink :to="`/product/${slide.link}`">
                                 <button class="in-top-3 btn btn-primary bg-primary py-2 px-5 lg:px-12 rounded-lg text-base text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
                                     Start Buying
                                 </button>
@@ -58,6 +58,7 @@
             sub: "95",
             image: '/images/banner/banner-03.png',
             alt: 'king-golden-oils-promotion-image',
+            link: 'kings-golden-oils-du-vng-thin-t-6-bottlesbox'
         },
         {
             title: 'Premium Yuki Collagen',
@@ -67,6 +68,7 @@
             sub: "00",
             image: '/images/banner/banner-04.png',
             alt: 'Premium-Yuki-Collagen-promotion-image',
+            link: 'premium-yuki-collagen-30-sticks'
         },
     ]);     
 
@@ -78,13 +80,21 @@
 
 
     //-----------------------------------------------------//
-    const productStore = useProductStore();
+    // const productStore = useProductStore();
 
-    const params = ref("39");
-    const dataLinkPro = ref("");
+    // const params = ref({
+    //     descending: 1,
+    //     page: 1,
+    //     perPage: 20,
+    //     sortBy: 'createdAt',
+    //     special: 1,
+    // });
 
-    await productStore.fetchProductDetails(params.value);
-    dataLinkPro.value = productStore.productDetail?.slug || '';
+
+    // const dataLinkPro = ref("");
+
+    // await productStore.fetchProductDetails(params.value);
+    // dataLinkPro.value = productStore.productDetail?.slug || '';
     
 </script>
   

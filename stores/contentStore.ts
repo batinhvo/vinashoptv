@@ -5,8 +5,7 @@ interface Content {
 }
 
 export const useContentStore = defineStore('content', () => {
-    const config = useRuntimeConfig();
-    const apiUrl = config.public.apiBaseUrl;
+    const apiUrl = useApi();
 
     const content = ref<Content | null>(null);
     const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.

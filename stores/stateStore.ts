@@ -9,8 +9,7 @@ interface City {
 }
 
 export const useStateStore = defineStore('states', () => {
-    const config = useRuntimeConfig();
-    const apiUrl = config.public.apiBaseUrl;
+    const apiUrl = useApi();
 
     // Dữ liệu state
     const states = ref<State[]>([]);  

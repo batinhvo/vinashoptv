@@ -10,8 +10,8 @@ export default defineNuxtConfig({
   components: true,
   runtimeConfig: {
     public: {
-      apiBaseServer: 'http://localhost:3001/api/v1/',
-      apiBaseUrl: 'https://vinashoptv.com/api/v1/',
+      apiBaseServer: process.env.NUXT_API_BASE_SERVER_URL,
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
     },
   },
   app: {

@@ -36,7 +36,9 @@
         special: 1,
     });
 
-    await productStore.fetchProducts(params);
+    onMounted(async () => {
+        await productStore.fetchProducts(params);
+    });
 
     const products = computed(() => productStore.productList.slice(0, 4));
 </script>

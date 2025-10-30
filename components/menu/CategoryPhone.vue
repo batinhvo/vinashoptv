@@ -25,8 +25,8 @@
                     </div>                   
                 </li>   
                 <MenuContentMenuPhone 
-                v-for="(cate, index) in dataCategories" 
-                :key="index" 
+                v-for="cate in categories" 
+                :key="cate.id" 
                 :cate="cate" 
                 :openCategory="openCategory"
                 @update:openCategory="openCategory = $event"
@@ -79,17 +79,10 @@
 
     //-----------------------------------API-------------------------------------//
     const openCategory = ref<string | null>(null);
-
-    const cateStore = useCateStore();
-    const dataCategories = computed<Category[]>(() => cateStore.categories);
-
-    onMounted(async () => {
-        if (!cateStore.categories.length) {
-            await cateStore.fetchCategories();
-        }
-    });
-    
-    
+    defineProps<{
+        categories: Category[]
+    }>();
+   
 </script>
 
 <style scoped>

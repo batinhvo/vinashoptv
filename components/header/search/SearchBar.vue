@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="onSearch" class="max-w-[700px] w-full">
+    <form @submit.prevent="onSearch" class="max-w-[900px] w-full">
         <div class="input-group flex px-5 relative" ref="dropdownRef">
             <input 
                 type="search" 
@@ -40,6 +40,7 @@
 </template>
 
 <script setup lang="ts">
+    import type { Category } from 'types/categoryTypes';
 
     const router = useRouter();
     const cateStore = useCateStore();

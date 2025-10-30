@@ -1,12 +1,7 @@
 import type {  ProductDetail, Product, skusProduct } from "types/productTypes";
 
 export const useProductStore = defineStore('products', () => {
-    const config = useRuntimeConfig();
-    // const apiUrl = config.public.apiBaseUrl;
-
-    const apiUrl = import.meta.browser
-    ? config.public.apiBaseUrl
-    : config.public.apiBaseServer
+    const apiUrl = useApi();
 
     const productList = ref<Product[]>([]);
     const product = ref<Product | null>(null);

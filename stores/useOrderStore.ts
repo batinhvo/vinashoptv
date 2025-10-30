@@ -10,7 +10,7 @@ export const useOrderStore = defineStore('order', {
     actions: {
         async getDataOrderHistory() {
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
                 const dataOrderResponse = await $fetch<{error: number; data: { list: OrderHistory[], count: number } }>(`${apiUrl}invoices?page=1&perPage=8&status=pending`, {
@@ -38,7 +38,7 @@ export const useOrderStore = defineStore('order', {
         async getDataFilterOrderHistory(params: any) {
 
             try {
-                const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+                const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
                 const dataOrderResponse = await $fetch<{error: number; data: { list: OrderHistory[], count: number } }>(`${apiUrl}invoices?${params}`, {
@@ -64,7 +64,7 @@ export const useOrderStore = defineStore('order', {
         },
 
         async submitOrder(payload: any) {            
-            const apiUrl = useRuntimeConfig().public.apiBaseUrl;
+            const apiUrl = useApi();
 
             try {
                 const orderResponse = await $fetch<{error: number; data: any}>(`${apiUrl}invoices`, {

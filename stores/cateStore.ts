@@ -1,13 +1,13 @@
-import { type Category } from "types/categoryTypes";
+import { type Category } from 'types/categoryTypes';
 
 export const useCateStore = defineStore('categories', () => {
 
     const apiUrl = useApi();
 
-    const categories = ref<Category[]>([]);
-    const flatCategories  = ref<Category[]>([]);
-    const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
-    const loaded = ref(false);
+  const categories = ref<Category[]>([]);
+  const flatCategories = ref<Category[]>([]);
+  const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
+  const loaded = ref(false);
 
     const buildCategoryTree = (list: Category[]): Category[] => {
         const map = new Map<number, Category & { children: Category[] }>();
@@ -18,11 +18,11 @@ export const useCateStore = defineStore('categories', () => {
             map.set(c.id, { ...c, children: [] });
         }
 
-        // Gắn con vào cha
-        for (const c of list) {
-            if (c.parentId === 0) roots.push(map.get(c.id)!)
-            else map.get(c.parentId)?.children.push(map.get(c.id)!)
-        }
+    // Gắn con vào cha
+    for (const c of list) {
+      if (c.parentId === 0) roots.push(map.get(c.id)!);
+      else map.get(c.parentId)?.children.push(map.get(c.id)!);
+    }
 
         // Hàm đệ quy sắp xếp
         const sortTree = (nodes: Category[]): Category[] =>
@@ -51,11 +51,11 @@ export const useCateStore = defineStore('categories', () => {
             loaded.value = true;
             error.value = 0;
 
-        } catch (e) {
-            error.value = 1; // Gán lỗi khi xảy ra exception
-            console.error('Exception in fetchCate:', e);
-        }
-    };
+    // } catch (e) {
+    //     error.value = 1; // Gán lỗi khi xảy ra exception
+    //     console.error('Exception in fetchCate:', e);
+    // }
+  };
 
     const getCategories = async (): Promise<Category[]> => {
         if (!loaded.value || !categories.value.length) {
@@ -68,24 +68,21 @@ export const useCateStore = defineStore('categories', () => {
     //     categories.value.filter((c) => c.parentId === 0)
     // )
 
-    return {
-        // state
-        categories,
-        flatCategories,
-        error,
-        loaded,
+  return {
+    // state
+    categories,
+    flatCategories,
+    error,
+    loaded,
 
-        // actions
-        fetchCategories,
-        getCategories,
+    // actions
+    fetchCategories,
+    getCategories,
 
-        // getters
-        //rootCategories,
-    }
-
+    // getters
+    //rootCategories,
+  };
 });
-
-
 
 // Dùng Pinia store khi bạn cần:
 // Quản lý dữ liệu global và chia sẻ dữ liệu giữa nhiều component.

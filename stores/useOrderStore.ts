@@ -110,7 +110,7 @@ export const useOrderStore = defineStore('order', {
             try {
                 const apiUrl = useApi();
 
-                const response = await $fetch<{ error: number; message: string }>(`${apiUrl}paypal?token=${token}&payerId=${payerId}`,{
+                const response = await $fetch<{ error: number; message: string }>(`${apiUrl}invoices/paypal?token=${token}&payerId=${payerId}`,{
                         method: "GET",
                         headers: {"Content-Type": "application/json"},
                     }

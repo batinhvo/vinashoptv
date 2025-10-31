@@ -93,7 +93,7 @@ export const useOrderStore = defineStore('order', {
                             time: 5000,
                         });                           
                         setTimeout(() => {
-                            //window.location.href = "/";
+                            window.location.href = "/";
                         }, 5000);               
                     }
                 }

@@ -59,7 +59,7 @@
 
                                 <InputField v-model="formData.billingInfo.zipCode" 
                                     :widthfull=true
-                                    name="postCode" label="PostCode/Zip" type="number" placeholder="9999" />
+                                    name="postCode" label="PostCode/Zip" type="number" placeholder="99999" />
 
                                 <InputField v-model="formData.billingInfo.address" 
                                     :widthfull=true 
@@ -109,7 +109,7 @@
                                     <InputField 
                                         v-model="formData.shippingInfo.zipCode" 
                                         :widthfull=true
-                                        name="postCode" label="PostCode/Zip" type="number" placeholder="9999" />
+                                        name="postCode" label="PostCode/Zip" type="number" placeholder="99999" />
 
                                     <InputField 
                                         v-model="shippingInfo.address" 
@@ -591,11 +591,11 @@
             await orderStore.submitOrder(payload);
             await cartStore.clearCart();
             cartStore.clearLocalCart();
-;           notify({
-                message: 'Order Placed Successfully. Thank you for shopping with us!',
-                type: 'success',
-                time: 5000,
-            }); 
+// ;           notify({
+//                 message: 'Order Placed Successfully. Thank you for shopping with us!',
+//                 type: 'success',
+//                 time: 5000,
+//             }); 
             
 
         } catch (error) {

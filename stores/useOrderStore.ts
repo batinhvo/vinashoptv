@@ -36,7 +36,6 @@ export const useOrderStore = defineStore('order', {
         },
 
         async getDataFilterOrderHistory(params: any) {
-
             try {
                 const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
@@ -65,7 +64,7 @@ export const useOrderStore = defineStore('order', {
 
         async submitOrder(payload: any) {            
             const apiUrl = useApi();
-
+            const notify = useNotify();
             try {
                 const orderResponse = await $fetch<{error: number; data: any}>(`${apiUrl}invoices`, {
                     method: 'POST',
@@ -81,11 +80,18 @@ export const useOrderStore = defineStore('order', {
 
                 if (orderResponse) {
                     const urlPattern = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
-                    console.log(orderResponse)
+                    
                     if (urlPattern.test(orderResponse.data)) {
-                        //window.open(orderResponse.data);
+                        
                         window.location.href = orderResponse.data;
-                    } else {                               
+
+                    } else {    
+                        //CARD
+                        notify({
+                            message: 'Order Placed Successfully. Thank you for shopping with us!',
+                            type: 'success',
+                            time: 5000,
+                        });                           
                         setTimeout(() => {
                             window.location.href = "/";
                         }, 5000);               
@@ -99,5 +105,29 @@ export const useOrderStore = defineStore('order', {
                 );
             }
         },
-    },
+
+        async handleAfterPaypalReturn(token: string, payerId: string) {
+            try {
+                const apiUrl = useApi();
+
+                const response = await $fetch<{ error: number; message: string }>(`${apiUrl}paypal?token=${token}&payerId=${payerId}`,{
+                        method: "GET",
+                        headers: {"Content-Type": "application/json"},
+                    }
+                );
+
+                return {
+                    error: response.error,
+                    message: response.message,
+                };
+
+            } catch (e: any) {
+                console.error("Error in handleAfterPaypalReturn:", e);
+                return {
+                    error: 1,
+                    message: "An error occurred while confirming PayPal payment."
+                };
+            }
+        },
+    }
 });

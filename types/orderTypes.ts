@@ -114,12 +114,12 @@ export interface Promotion {
 }
 
 export interface ProductSubmit {
-  gift: Gift[];
+  gift?: Gift[];
   media: string;
   name: string;
   price: number;
   productId: number;
-  promotion: Promotion[];
+  promotion?: Promotion[];
   quantity: number;
   salePrice: number;
   skuId: number;

@@ -83,9 +83,12 @@ export const useOrderStore = defineStore('order', {
                     const urlPattern = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
                     console.log(orderResponse)
                     if (urlPattern.test(orderResponse.data)) {
-                        window.open(orderResponse.data, "_blank");
-                    } else {
-                        window.location.href = "/";                       
+                        //window.open(orderResponse.data);
+                        window.location.href = orderResponse.data;
+                    } else {                               
+                        setTimeout(() => {
+                            window.location.href = "/";
+                        }, 5000);               
                     }
                 }
                 

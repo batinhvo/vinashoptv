@@ -42,8 +42,6 @@
     const cateStore = useCateStore();
     const dataCategories = computed<Category[]>(() => cateStore.categories);
 
-    onMounted(async () => {
-        await cateStore.getCategories()
-    });
+    await cateStore.getCategories();
 
 </script>

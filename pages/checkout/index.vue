@@ -190,7 +190,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="pl-4 xl:pl-8 py-4 content-baseline text-right">
-                                                    ${{ formatPrice(product.price * product.quantity) }}
+                                                    ${{ formatPrice((product.salePrice != 0 ? product.salePrice : product.price) * product.quantity) }}
                                                     <button @click.prevent="cartStore.removeItem(index)"
                                                         class="w-7 h-7 text-center hover:bg-gray-300 hover:border rounded-full">
                                                         <span class="text-xs">
@@ -332,7 +332,7 @@
                                     </div>
                                 </div>
 
-                                <button v-if="!isSummit"
+                                <button v-if="!isSubmit"
                                     class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6">
                                     Place order
                                 </button>
@@ -364,7 +364,7 @@
     const isConditions = ref(true);
     const isReceiveEmail = ref(false);
     const isLoading = ref(true);
-    const isSummit = ref(false);
+    const isSubmit = ref(false);
 
     const formData = ref<{
         billingInfo: any;
@@ -449,11 +449,19 @@
             const relatedGifts = giftList.value.filter(g => g.skuId === prod.skuId);
             const relatedPromotions = cartStore.dataPromotion.filter(p => p.skuIdIn === prod.skuId);
 
-            return {
+            const productData: any = {
                 ...prod,
-                gift: relatedGifts,
-                promotion: relatedPromotions   // ⬅️ thêm mảng promotion
             };
+
+            if (relatedGifts.length > 0) {
+                productData.gift = relatedGifts;
+            }
+
+            if (relatedPromotions.length > 0) {
+                productData.promotion = relatedPromotions;
+            }
+
+            return productData;
         });
 
         return {
@@ -519,14 +527,14 @@
     watchEffect(() => {
         if(cartStore.dataProductShow) {
             formData.value.productList = cartStore.dataProductShow.map(item => ({
-                gift: [],
+                //gift: [],
                 media: item.media,
                 name: item.title,
                 price: item.price,
                 productId: item.productId,
-                promotion: [],
+                //promotion: [],
                 quantity: item.quantity,
-                salePrice: item.salePrice,
+                salePrice: item.salePrice != 0 ? item.salePrice : item.price,
                 skuId: item.skuId,
                 tax: item.tax,
                 weight: item.weight,
@@ -576,7 +584,7 @@
     //----------------------------HANDLE SUBMIT-----------------------------------//
     const { handleSubmit } = useForm();
     const onSubmit = handleSubmit( async () => {
-        isSummit.value = true;
+        isSubmit.value = true;
         const payload = getFinalFormData()
         try {
             normalizeCardInfo()
@@ -586,7 +594,7 @@
 ;           notify({
                 message: 'Order Placed Successfully. Thank you for shopping with us!',
                 type: 'success',
-                time: 3000,
+                time: 5000,
             }); 
             
 
@@ -594,7 +602,7 @@
             notify({              
                 message: 'Order failed. Please check information and try again!',
                 type: 'error',
-                time: 3000,
+                time: 5000,
             });
         }
     });

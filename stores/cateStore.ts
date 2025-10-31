@@ -2,23 +2,21 @@ import { type Category } from 'types/categoryTypes';
 
 export const useCateStore = defineStore('categories', () => {
 
-    const apiUrl = useApi();
-
-    console.log(apiUrl)
+  const apiUrl = useApi();
 
   const categories = ref<Category[]>([]);
   const flatCategories = ref<Category[]>([]);
   const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
   const loaded = ref(false);
 
-    const buildCategoryTree = (list: Category[]): Category[] => {
-        const map = new Map<number, Category & { children: Category[] }>();
-        const roots: Category[] = [];
+  const buildCategoryTree = (list: Category[]): Category[] => {
+    const map = new Map<number, Category & { children: Category[] }>();
+    const roots: Category[] = [];
 
-        // Tạo map
-        for (const c of list) {
-            map.set(c.id, { ...c, children: [] });
-        }
+    // Tạo map
+    for (const c of list) {
+        map.set(c.id, { ...c, children: [] });
+    }
 
     // Gắn con vào cha
     for (const c of list) {
@@ -26,51 +24,48 @@ export const useCateStore = defineStore('categories', () => {
       else map.get(c.parentId)?.children.push(map.get(c.id)!);
     }
 
-        // Hàm đệ quy sắp xếp
-        const sortTree = (nodes: Category[]): Category[] =>
-            [...nodes]
-            .sort((a, b) => a.sort - b.sort)
-            .map((n) => ({
-            ...n,
-            children: n.children?.length ? sortTree(n.children) : [],
-        }))
+    // Hàm đệ quy sắp xếp
+    const sortTree = (nodes: Category[]): Category[] =>
+        [...nodes]
+        .sort((a, b) => a.sort - b.sort)
+        .map((n) => ({
+        ...n,
+        children: n.children?.length ? sortTree(n.children) : [],
+    }))
 
-        return sortTree(roots)
-    }
+    return sortTree(roots)
+  }
 
-    const fetchCategories =  async (force = false): Promise<void> => {
-      if (loaded.value && categories.value.length && !force) return;// nếu dữ liệu đã có thì không gọi lại
+  const fetchCategories =  async (force = false): Promise<void> => {
+    if (loaded.value && categories.value.length && !force) return;// nếu dữ liệu đã có thì không gọi lại
 
-      try {
-          const res = await $fetch<{ error: number; data: Category[]; message: string }>(`${apiUrl}categories`);
+    try {
+      const res = await $fetch<{ error: number; data: Category[]; message: string }>(`${apiUrl}categories`);
 
-          if (res.error !== 0 || !res.data) {
-              throw new Error(res.message || 'Dữ liệu trả về không hợp lệ');
-          }
-
-          flatCategories.value = res.data;
-          categories.value = buildCategoryTree(res.data);
-          loaded.value = true;
-          error.value = 0;
-
-           console.log("hahahah ",flatCategories.value)
-
-      } catch (e) {
-          error.value = 1; // Gán lỗi khi xảy ra exception
-          console.error('Exception in fetchCate:', e);
+      if (res.error !== 0 || !res.data) {
+          throw new Error(res.message || 'Dữ liệu trả về không hợp lệ');
       }
-    }
 
-    const getCategories = async (): Promise<Category[]> => {
-        if (!loaded.value || !categories.value.length) {
-            await fetchCategories();
-        }
-        return categories.value;
+      flatCategories.value = res.data;
+      categories.value = buildCategoryTree(res.data);
+      loaded.value = true;
+      error.value = 0;
+    } catch (e) {
+      error.value = 1; // Gán lỗi khi xảy ra exception
+      console.error('Exception in fetchCate:', e);
     }
-    
-    // const rootCategories = computed(() =>
-    //     categories.value.filter((c) => c.parentId === 0)
-    // )
+  }
+
+  const getCategories = async (): Promise<Category[]> => {
+    if (!loaded.value || !categories.value.length) {
+      await fetchCategories();
+    }
+    return categories.value;
+  }
+  
+  // const rootCategories = computed(() =>
+  //     categories.value.filter((c) => c.parentId === 0)
+  // )
 
   return {
     // state

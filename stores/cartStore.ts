@@ -43,7 +43,7 @@ export const useCartStore = defineStore('cart', () => {
     const cartSummary = computed(() => {
         const base = dataProductShow.value.reduce(
             (total, item) => {
-                total.subTotal += item.price * item.quantity;
+                total.subTotal += (item.salePrice != 0 ? item.salePrice : item.price) * item.quantity;
                 total.weight   += item.weight * item.quantity;
                 total.tax      += item.tax || 0;
                 return total;
@@ -207,13 +207,13 @@ export const useCartStore = defineStore('cart', () => {
                 skuId: idSku,
                 title: cached.dataProduct?.title || '',
                 type: cached.typeValue === 'default' ? '' : cached.typeValue,
-                price: Number(cached.dataSkus?.salePrice ? cached.dataSkus?.salePrice : cached.dataSkus?.price ) || 0,
+                price: Number(cached.dataSkus?.price ) || 0,
                 quantity,
                 weight: Number(cached.dataSkus?.weight) || 0,
                 tax: Number(cached.dataProduct?.tax) || 0,   
                 media: cached.dataProduct.media || '',
                 productId: cached.dataProduct.id || 0,
-                salePrice: cached.dataProduct.minPrice || 0,
+                salePrice: Number(cached.dataSkus?.salePrice) || 0,
             });
         }    
         checkQuantityGift(idSku, existing ? existing.quantity : quantity);
@@ -258,14 +258,14 @@ export const useCartStore = defineStore('cart', () => {
             buyNowItem.value = {
                 skuId: idSku,
                 title: cached.dataProduct?.title,
-                price: Number(cached.dataSkus?.salePrice ? cached.dataSkus?.salePrice : cached.dataSkus?.price ) || 0,
+                price: Number(cached.dataSkus?.price) || 0,
                 type: cached.typeValue === 'default' ? '' : cached.typeValue,
                 quantity,
                 weight: Number(cached.dataSkus?.weight) || 0,
                 tax: Number(cached.dataProduct?.tax) || 0,
                 media: cached.dataProduct.media || '',
                 productId: cached.dataProduct.id || 0,
-                salePrice: cached.dataProduct.minPrice || 0,
+                salePrice: Number(cached.dataSkus?.salePrice) || 0,
             }
         }
 
@@ -433,9 +433,17 @@ export const useCartStore = defineStore('cart', () => {
     // COUPON
     const fetchCoupon = async (code:string) => {
         try {
+            const headers: Record<string, string> = {
+                "Content-Type": "application/json",
+            };
+
+            if (code === "FIRSTORDER") {
+                headers["Authorization"] = `Bearer ${token()}`;
+            }
+
             const dataCoupon = await $fetch<{ error: number; data: Coupon; message: string }>(`${apiUrl}coupons`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: { code }
             })
 
@@ -454,7 +462,7 @@ export const useCartStore = defineStore('cart', () => {
                 successNotify('Coupon Code Applied Successfully!')
             } else {
                 couponValue.value = 0;
-                errorNotify('Invalid or expired coupon code!');
+                errorNotify(dataCoupon.message);
             }
 
             error.value = 0;

@@ -28,13 +28,22 @@
                     <h1 class="text-center text-4xl pb-5 font-bold">Payment failed!</h1>
                     <h3 class="text-center text-xl font-normal pb-10">Something went wrong. Please try again later!</h3>
                 </div>
-                <div class="pb-10" v-if="data?.error === 0">
+
+                <div class="pb-10" v-if="authStore.authenticated && data?.error === 0">
                     <NuxtLink :to="`/user/orderhistory`">
                         <button class="in-top-3 btn btn-primary bg-primary py-2 px-5 lg:px-12 rounded-lg text-base text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
                             View history orders
                         </button>
                     </NuxtLink>   
-                </div>                 
+                </div>      
+                
+                <div class="pb-10" v-else>
+                    <NuxtLink :to="`/`">
+                        <button class="in-top-3 btn btn-primary bg-primary py-2 px-5 lg:px-12 rounded-lg text-base text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
+                            Home
+                        </button>
+                    </NuxtLink>   
+                </div>      
 
             </div>
             
@@ -48,6 +57,7 @@
     const payerId = $route.query.PayerID as string;
 
     const orderStore = useOrderStore();
+    const authStore = useAuthStore();
     const { data } = await useAsyncData('paypalReturn', () =>
         orderStore.handleAfterPaypalReturn(token, payerId)
     );

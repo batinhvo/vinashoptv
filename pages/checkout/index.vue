@@ -529,7 +529,7 @@
             formData.value.productList = cartStore.dataProductShow.map(item => ({
                 //gift: [],
                 media: item.media,
-                name: item.title,
+                name: item.type ? item.title + ' - ' + item.type : item.title,
                 price: item.price,
                 productId: item.productId,
                 //promotion: [],

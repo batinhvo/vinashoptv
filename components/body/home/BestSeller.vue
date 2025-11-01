@@ -35,10 +35,13 @@
         sortBy: 'createdAt',
         special: 1,
     });
+    
+    //await productStore.fetchProducts(params);
 
-    //onMounted(async () => {
+    const { data: products } = await useAsyncData('special-products', async () => {
         await productStore.fetchProducts(params);
-    //});
-
-    const products = computed(() => productStore.productList.slice(0, 4));
+        return productStore.productList.slice(0, 4);
+    });
+    
+    //const products = computed(() => productStore.productList.slice(0, 4));
 </script>

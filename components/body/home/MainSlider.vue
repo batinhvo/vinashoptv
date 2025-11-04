@@ -54,8 +54,8 @@
             title: 'King\'s Golden Oils',
             subtitle: '',
             description: 'Made in USA',
-            price: 55,
-            sub: "95",
+            price: 59,
+            sub: "00",
             image: '/images/banner/banner-03.png',
             alt: 'king-golden-oils-promotion-image',
             link: 'kings-golden-oils-du-vng-thin-t-6-bottlesbox'

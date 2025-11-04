@@ -11,7 +11,7 @@
 
         <div v-else>
             <div>
-                <NuxtImg :src="Imgsource" class="w-full" alt="" crossorigin="anonymous" />         
+                <img :src="Imgsource" class="w-full" alt="" crossorigin="anonymous" />         
             </div>
             <div class="container mx-auto min-h-[500px]">
                 <div class="my-0 md:my-10">

@@ -604,14 +604,7 @@
             normalizeCardInfo()
             await orderStore.submitOrder(payload);
             await cartStore.clearCart();
-            cartStore.clearLocalCart();
-// ;           notify({
-//                 message: 'Order Placed Successfully. Thank you for shopping with us!',
-//                 type: 'success',
-//                 time: 5000,
-//             }); 
-            
-
+            cartStore.clearLocalCart();           
         } catch (error) {
             notify({              
                 message: 'Order failed. Please check information and try again!',
@@ -619,6 +612,9 @@
                 time: 5000,
             });
         }
+        setTimeout(() => {
+            isSubmit.value = false;
+        }, 8000);
     });
 </script>
 

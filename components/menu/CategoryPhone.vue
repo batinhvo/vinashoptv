@@ -21,7 +21,7 @@
             <ul>
                 <li>
                     <div class="flex justify-between items-center py-2">
-                        <NuxtLink to="/saleoff" class="font-bold" @click.prevent="toggleMobileMenu">Sale Off</NuxtLink>                                              
+                        <NuxtLink to="/allproducts" class="font-bold" @click.prevent="toggleMobileMenu">All Products</NuxtLink>                                              
                     </div>                   
                 </li>   
                 <MenuContentMenuPhone 

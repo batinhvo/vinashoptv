@@ -561,19 +561,19 @@
         }, 2000)
     });
 
-    watchEffect(async () => {
-        if(authStore.authenticated) {        
-            cartStore.loadCartFromStorage();   
-            await Promise.all([
-                stateStore.fetchStates(),
-                authStore.getInfoUser(),
-                cartStore.fetchDataCart(),
-            ]);
+    // watchEffect(async () => {
+    //     if(authStore.authenticated) {        
+    //         cartStore.loadCartFromStorage();   
+    //         await Promise.all([
+    //             stateStore.fetchStates(),
+    //             authStore.getInfoUser(),
+    //             cartStore.fetchDataCart(),
+    //         ]);
 
-            billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
-            shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
-        }
-    });
+    //         billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
+    //         shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
+    //     }
+    // });
 
     //----------------------------INVOICE FORM-----------------------------------//.
     const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];

@@ -46,9 +46,13 @@
 
     provide("setShowSubcribe", setShowSubcribe);
 
-    onMounted(async () => {
-        if(authStore.authenticated) {
+    let isLoading = false;
 
+    watchEffect(async () => {
+        if (authStore.authenticated && !isLoading) {
+        isLoading = true;
+        try {
+            
             cartStore.loadCartFromStorage();
 
             await Promise.all([
@@ -71,12 +75,43 @@
                 localStorage.setItem('lastVisitDate', today);
             } else {
                 showSubcribe.value = false;
-            }             
+            }  
 
-        } else {
-            showSubcribe.value = false;
+        } finally {
+            isLoading = false;
         }
-    });
+    }});
 
+    // onMounted(async () => {
+    //     if(authStore.authenticated) {
+
+    //         cartStore.loadCartFromStorage();
+
+    //         await Promise.all([
+    //             cartStore.fetchDataCart(),
+    //             authStore.getInfoUser(),
+    //             authStore.checkSubscribeEmail(),
+    //             orderStore.getDataOrderHistory(),
+    //         ]);
+            
+    //         if (authStore.infoSubscribe?.userId) {
+    //             showSubcribe.value = false;
+    //             return;
+    //         }
+
+    //         const lastVisit  = localStorage.getItem('lastVisitDate');
+    //         const today = new Date().toDateString();
+
+    //         if (lastVisit !== today) {
+    //             showSubcribe.value = true;
+    //             localStorage.setItem('lastVisitDate', today);
+    //         } else {
+    //             showSubcribe.value = false;
+    //         }             
+
+    //     } else {
+    //         showSubcribe.value = false;
+    //     }
+    // });
     
 </script>

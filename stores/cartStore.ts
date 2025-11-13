@@ -132,7 +132,7 @@ export const useCartStore = defineStore('cart', () => {
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
         if (!authStore.authenticated || !token()) return;
-
+        //console.log('đã kêu fetchcart')
         try {
             const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                 method: 'GET',
@@ -154,7 +154,7 @@ export const useCartStore = defineStore('cart', () => {
 
             // CASE 1: Server có dữ liệu
             if (serverCart.length > 0) {
-                addCartItems.value = [];
+                //addCartItems.value = [];
 
                 await Promise.all(
                     serverCart.map((item: any) =>
@@ -491,6 +491,7 @@ export const useCartStore = defineStore('cart', () => {
 
     // Khi store khởi tạo → load cart từ localStorage
     const loadCartFromStorage = () => {
+        //console.log('mới kêu nè')
         const raw = localStorage.getItem('cart_data')
         addCartItems.value = raw ? JSON.parse(raw) : [];
 
@@ -514,8 +515,8 @@ export const useCartStore = defineStore('cart', () => {
     const clearLocalCart = () => {
         addCartItems.value = []
         dataPromotions.value = []
-        localStorage.removeItem('cart_data')
-        localStorage.removeItem('dataPromotions_data')
+        //localStorage.removeItem('cart_data')
+        //localStorage.removeItem('dataPromotions_data')
     }
 
     //remove product cart

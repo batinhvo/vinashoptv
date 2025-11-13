@@ -152,8 +152,43 @@ export const useAuthStore = defineStore('auth', {
                     'Content-Type': 'application/json'
                     }
                 });
-            } catch (e: any) {
+            } catch (e) {
                 console.error('Error update profile user: ', e);
+                return Promise.reject((e as Error)?.message || 'Something went wrong')
+            }
+        },
+
+        async forgotPassword(email: string) {
+            try {
+                const apiUrl = useApi();
+                await $fetch(`${apiUrl}auth/forgot-password`, {
+                    method: 'POST',
+                    body: {email: email},
+                    headers: {
+                    'Content-Type': 'application/json'
+                    }
+                });
+            } catch (e: any) {
+                console.error('Error recover password: ', e);
+                return Promise.reject(e?.response._data?.message || 'Something went wrong')
+            }
+        },
+
+        async resetPasswordUser(infoPass: {token:string;password:string}) {
+            try {
+                const apiUrl = useApi();
+                await $fetch(`${apiUrl}auth/reset-password`, {
+                    method: 'POST',
+                    body: {
+                        password: infoPass.password,
+                        token: infoPass.token
+                    },
+                    headers: {
+                    'Content-Type': 'application/json'
+                    }
+                });
+            } catch (e: any) {
+                console.error('Error recover password: ', e);
                 return Promise.reject(e?.response._data?.message || 'Something went wrong')
             }
         },

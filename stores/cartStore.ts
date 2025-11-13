@@ -450,12 +450,24 @@ export const useCartStore = defineStore('cart', () => {
             if (dataCoupon?.data) {
                 const coupon = dataCoupon.data;
 
-                if (coupon.discountBasedOn === 'percent') {
-                    couponValue.value = (coupon.codeValue / 100) * shippingFee.value;
-                } else if (coupon.discountBasedOn === 'value') {
-                    couponValue.value = coupon.codeValue;
-                } else {
-                    couponValue.value = 0;
+                if (coupon.type === 'shipping') {
+                    if (coupon.discountBasedOn === 'percent') {
+                        couponValue.value = (coupon.codeValue / 100) * shippingFee.value;
+                    } else if (coupon.discountBasedOn === 'value') {
+                        couponValue.value = coupon.codeValue;
+                    } else {
+                        couponValue.value = 0;
+                    }
+                }
+
+                if (coupon.type === 'discount') {
+                    if (coupon.discountBasedOn === 'percent') {
+                        couponValue.value = (coupon.codeValue / 100) * subTotal.value;
+                    } else if (coupon.discountBasedOn === 'value') {
+                        couponValue.value = coupon.codeValue;
+                    } else {
+                        couponValue.value = 0;
+                    }
                 }
 
                 typeCoupon.value = coupon.type;

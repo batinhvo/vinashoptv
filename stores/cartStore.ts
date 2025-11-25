@@ -20,6 +20,7 @@ export const useCartStore = defineStore('cart', () => {
     const discountValue = ref<number>(0)
     const couponValue = ref<number>(0)
     const typeCoupon = ref<string>('') // 'shipping' | 'discount'
+    const isPutCart = ref<boolean>(false)
 
     const productStore = useProductStore()
     const authStore = useAuthStore()
@@ -132,7 +133,7 @@ export const useCartStore = defineStore('cart', () => {
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
         if (!authStore.authenticated || !token()) return;
-        //console.log('đã kêu fetchcart')
+        console.log('đã kêu fetchcart')
         try {
             const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                 method: 'GET',
@@ -141,6 +142,8 @@ export const useCartStore = defineStore('cart', () => {
                     'Content-Type': 'application/json',
                 },
             });
+
+            console.log(dataCartResponse.data)
 
             let serverCart: any[] = [];
 
@@ -155,6 +158,7 @@ export const useCartStore = defineStore('cart', () => {
             // CASE 1: Server có dữ liệu
             if (serverCart.length > 0) {
                 //addCartItems.value = [];
+                isPutCart.value = true;
 
                 await Promise.all(
                     serverCart.map((item: any) =>
@@ -275,22 +279,24 @@ export const useCartStore = defineStore('cart', () => {
     //ADD DATA PRODUCT TO SERVER
     const addDataCartToServer = () => {
         if (authStore.authenticated && token()) {
+            console.log(authStore.authenticated)
+            console.log(token())
             syncCart();
         }
     }
 
     //sync cart
     const syncCart  = async () => {
-
         const skuIdList = addCartItems.value.map(item => ({ 
             skuId: item.skuId, 
             quantity: item.quantity 
         }));
 
         try {
-            // Luôn PUT để đồng bộ trạng thái giỏ hàng hiện tại lên server (không cần quan tâm giỏ hàng rỗng hay không)
+            const method = isPutCart.value ? 'PUT' : 'POST';
+
             await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-                method: 'PUT',
+                method,
                 headers: {
                     Authorization: `Bearer ${token()}`,
                     'Content-Type': 'application/json',

@@ -42,7 +42,7 @@
                             :is-strong=false
                             name="statusOrder"
                             label="Order Status"
-                            placeholder="Nothing Selected"
+                            placeholder="Pending"
                         />                                                    
                     </div>
                     <div class="flex mb-10 px-3">
@@ -69,7 +69,7 @@
                     <div class="border border-gray-300 flex flex-wrap text-center py-3 items-center">
                     <div class="w-1/4 lg:w-1/5 border-r border-gray-200">
                         <span>#{{ order.id }}</span><br>
-                        <span>(12/30/2024 18:51)</span>
+                        <span>{{ formatTimestamp(order.createdAt) }}</span>
                     </div>
                     <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">{{ order.billingFirstName + ' ' + order.billingLastName }}</div>
                     <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">{{ order.status }}</div>
@@ -94,6 +94,14 @@
                     </div>          
                 </div>
             </div>
+
+            <BodyProductPaginationOfOrderHistory v-if="orderStore.orderCount > 8" 
+                :dataTotal="orderStore.orderCount" 
+                :updateSort="isUpdateSort" 
+                @updatePages="updatePages" 
+                @updateRange="rangeChange" 
+                @resetUpdateSort="isUpdateSort = false"
+            />
         </div>
     </div>
 </template>
@@ -101,16 +109,21 @@
 <script setup lang="ts">
 import type { OrderFilter } from 'types/orderTypes';
 
-    const notify = useNotify();
-    definePageMeta({middleware: 'auth-middle'})
-
-    const openOrderId = ref<number | null>(null);
-    const toggleDetails = (id: number) => {
-        openOrderId.value = openOrderId.value === id ? null : id;
-    };
+    definePageMeta({middleware: 'auth-middle'});
 
     const PhoneOpt = ['Shipping', 'Billing'];
     const statusOpt = ['All', 'Unable', 'Pending', 'Shipped', 'Cancelled', 'Returned'];
+
+    const authStore = useAuthStore();
+    const orderStore = useOrderStore();
+    const config = useRuntimeConfig();
+    const notify = useNotify();
+
+    const openOrderId = ref<number | null>(null);
+    const orderCount = ref(0);
+    const isUpdateSort = ref(false);
+    const fromShow = ref(1);
+    const toShow = ref(1);
 
     const formData = ref<OrderFilter>({
         phoneOf: '',
@@ -119,6 +132,39 @@ import type { OrderFilter } from 'types/orderTypes';
         orderTo: '',
         phone: '',
     });
+
+    const toggleDetails = (id: number) => {
+        openOrderId.value = openOrderId.value === id ? null : id;
+    };
+
+    const rangeChange = ({ from, to }: { from: number; to: number }) => {
+        fromShow.value = from;
+        toShow.value = to; 
+    }
+
+    const fetchDataOrderHistory = async (query: string) => {       
+        await orderStore.fetchOrders(query);
+        orderCount.value = orderStore.orderCount || 0;
+    }
+
+    const updatePages = async (page: number) => {
+        const query = new URLSearchParams();
+        query.append('page', page.toString());
+        query.append('perPage', '8');
+        await fetchDataOrderHistory(query.toString());
+    };
+
+    // Hàm chuyển timestamp mili sang string dạng (MM/DD/YYYY HH:mm)
+    function formatTimestamp(timestamp: number): string {
+        const date = new Date(timestamp);
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        const year = date.getFullYear();
+        const month = pad(date.getMonth() + 1); // tháng bắt đầu từ 0
+        const day = pad(date.getDate());
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        return `(${month}/${day}/${year} ${hours}:${minutes})`;
+    }
 
     const clearForm = () => {
         formData.value = {
@@ -145,25 +191,23 @@ import type { OrderFilter } from 'types/orderTypes';
         params.append('perPage', '8');
 
         try {
-            await orderStore.getDataFilterOrderHistory(params);
+            const query = params.toString();
+            await fetchDataOrderHistory(query);
+            if(orderStore.orderCount === 0) {
+                notify({
+                    message: 'No matching results found, please check again!',
+                    type: 'warning',
+                    time: 8000,
+                });   
+            }  
         } catch (err) {
-            console.error(err);
-            notify({
-                message: 'Order Placed Successfully. Thank you for shopping with us!',
-                type: 'success',
-                time: 3000,
-            });   
+            console.error(err);           
         }
     });
 
-    //------------------------------------------------------------------------------//
-
-    const authStore = useAuthStore();
-    const orderStore = useOrderStore();
-
-    onMounted( async () => {
+    onMounted(async () => {
         if (authStore.authenticated) {
-            await orderStore.getDataOrderHistory();
+            await fetchDataOrderHistory(config.public.paramsOrderHistory);
         }
     });
 

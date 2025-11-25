@@ -1,19 +1,18 @@
 import type { OrderHistory } from "types/orderTypes";
 
 export const useOrderStore = defineStore('order', {
-
     state: () => ({
         orderData: [] as OrderHistory[],
-        orderCount: null as number | null,
+        orderCount: 0 as number,
     }),
 
     actions: {
-        async getDataOrderHistory() {
+        async fetchOrders(query: string) {
+            const apiUrl = useApi();
+            const token = useAuthToken();
+            
             try {
-                const apiUrl = useApi();
-                const token = useCookie('tokenAccess').value;
-
-                const dataOrderResponse = await $fetch<{error: number; data: { list: OrderHistory[], count: number } }>(`${apiUrl}invoices?page=1&perPage=8&status=pending`, {
+                const dataOrderResponse = await $fetch<{error: number; data: { list: OrderHistory[], count: number }}>(`${apiUrl}invoices?${query}`, {
                     method: 'GET',
                     headers: {
                         "Content-Type" : "application/json",
@@ -22,55 +21,36 @@ export const useOrderStore = defineStore('order', {
                 });
 
                 if (dataOrderResponse.error !== 0) {
-                    console.error('Error get order history');
+                    throw new Error("Server returned an error when fetching orders.");
                 }
 
-                if (dataOrderResponse.data) {
-                    this.orderData = dataOrderResponse.data.list;
-                    this.orderCount = dataOrderResponse.data.count;
-                }
+                this.orderData = dataOrderResponse.data.list;
+                this.orderCount = dataOrderResponse.data.count;
 
             } catch (e: any) {
-                console.error('Error get order history: ', e)
-            }
-        },
-
-        async getDataFilterOrderHistory(params: any) {
-            try {
-                const apiUrl = useApi();
-                const token = useCookie('tokenAccess').value;
-
-                const dataOrderResponse = await $fetch<{error: number; data: { list: OrderHistory[], count: number } }>(`${apiUrl}invoices?${params}`, {
-                    method: 'GET',
-                    headers: {
-                        "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token || ""}`,
-                    },
-                });
-
-                if (dataOrderResponse.error !== 0) {
-                    console.error('Error get order history');
-                }
-
-                if (dataOrderResponse.data) {
-                    this.orderData = dataOrderResponse.data.list;
-                    this.orderCount = dataOrderResponse.data.count;
-                }
-
-            } catch (e: any) {
-                console.error('Error get order history: ', e)
+                console.error("Error fetching orders:", e);
+                throw new Error(e?.message || "Cannot load order history.");
             }
         },
 
         async submitOrder(payload: any) {            
             const apiUrl = useApi();
+            const token = useAuthToken();
             const notify = useNotify();
+
+            console.log(token)
             try {
+                const headers: Record<string, string> = {
+                    "Content-Type": "application/json",
+                };
+
+                if (token) {
+                    headers["Authorization"] = `Bearer ${token}`;
+                }
+
                 const orderResponse = await $fetch<{error: number; data: any}>(`${apiUrl}invoices`, {
                     method: 'POST',
-                    headers: {
-                        "Content-Type" : "application/json",                       
-                    },
+                    headers,
                     body: JSON.stringify(payload)
                 });
 

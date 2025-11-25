@@ -52,14 +52,13 @@
         if (authStore.authenticated && !isLoading) {
         isLoading = true;
         try {
-            
             cartStore.loadCartFromStorage();
 
             await Promise.all([
                 cartStore.fetchDataCart(),
                 authStore.getInfoUser(),
                 authStore.checkSubscribeEmail(),
-                orderStore.getDataOrderHistory(),
+                //orderStore.fetchOrders(),
             ]);
             
             if (authStore.infoSubscribe?.userId) {

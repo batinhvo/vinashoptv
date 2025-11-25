@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     public: {
       apiBaseServer: process.env.NUXT_API_BASE_SERVER_URL,
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
+      paramsOrderHistory: process.env.PARAMS_ORDER_HISTORY,
     },
   },
   app: {

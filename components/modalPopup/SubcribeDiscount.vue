@@ -13,6 +13,7 @@
                     rules="required|email"
                     widthfull
                     :is-strong="false"
+                    disabled
                 />         
             </form>
         </div>
@@ -43,14 +44,9 @@
     const onSubmit = handleSubmit( async () => {
         try {
             await authStore.subscribeEmail(emailSubcribe.value);
-            notify({
-                message: 'Your profile has been updated successfully!',
-                type: 'success',
-                time: 2000,
-            });
         } catch (error) {
             notify({
-                message: 'Failed to update profile. Please try again!',
+                message: 'Failed to Subscribe. Please try again!',
                 type: 'error',
                 time: 2000,
             });

@@ -51,18 +51,18 @@
                     @selected="location.stateOnSelected" 
                     :widthfull=true 
                     isSearch
-                    name="state" label="State" class="lg:w-1/2 px-1"/>
+                    name="state" label="State" rules="stateSelect" class="lg:w-1/2 px-1"/>
 
                   <InputSelective 
                     :options="location.cityOpt" 
                     :placeholder="location.cityPlaceholder.value" 
                     @selected="location.cityOnSelected" 
                     isSearch
-                    name="city" label="City" class="lg:w-1/2 px-1"/>  
+                    name="city" label="City" rules="citySelect" class="lg:w-1/2 px-1"/>  
 
                   <InputField
                     v-model="formDataSubmit.zip"
-                    name="postCode" label="PostCode/Zip" rules="required" placeholder="9999" />
+                    name="postCode" label="PostCode/Zip" type="number" rules="zipcode" placeholder="9999" />
 
                   <InputField 
                     v-model="formDataSubmit.address"

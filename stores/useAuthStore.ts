@@ -4,10 +4,15 @@ const notify = useNotify();
 export const useAuthStore = defineStore('auth', {
     
     state: () => ({
+        infoSubscribeLoaded: false,
         authenticated: false,
         user: null as string | null,
         userInfo: null as UserInfo | null,
-        infoSubscribe: null as InfoSubscribe | null,
+        //infoSubscribe: null as InfoSubscribe | null,
+        infoSubscribe: {
+            userId: undefined,
+            isApplied: undefined
+        } as { userId?: number; isApplied?: string },
     }),
 
     actions: {
@@ -255,6 +260,9 @@ export const useAuthStore = defineStore('auth', {
 
                 if (subscribeResponse.error) throw new Error(subscribeResponse.message);
 
+                this.infoSubscribe.userId = subscribeResponse.userId; 
+                this.infoSubscribeLoaded = false;              
+
                 notify({
                     message: 'Subscribed to discount emails successfully!',
                     type: 'success',
@@ -283,7 +291,10 @@ export const useAuthStore = defineStore('auth', {
                 });
 
                 if (infoSubscribeResponse.data) {
-                    this.infoSubscribe = infoSubscribeResponse.data;
+                    this.infoSubscribe = infoSubscribeResponse.data;      
+                    this.infoSubscribeLoaded = false;                         
+                } else {
+                    this.infoSubscribeLoaded = true;      
                 }
                 
             } catch (e: any) {

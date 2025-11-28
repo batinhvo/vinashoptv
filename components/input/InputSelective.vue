@@ -4,34 +4,7 @@
             {{ label }} <span v-if="isStrong" class="text-red-500">*</span>
         </label>
 
-        <!-- VeeValidate Form -->
-        <!-- <Field  :name="name" :rules="rules" v-model="selectedValue" v-slot="{field, meta}">
-            
-            <button type="button" @click="toggleDropdown" v-bind="field" :value="field.value"
-            class="w-full bg-white border border-gray-300 rounded-full px-4 py-3 text-left shadow-sm focus:outline-none"
-            :class="[!meta.valid && meta.touched ? 'border-red-500' : 'border-gray-300']">
-                {{ modelValue || placeholder }}
-                <span class="float-right">
-                    <i class="fa fa-angle-down text-[9px] text-neutral-500 pl-1.5"></i>
-                </span>
-            </button>
-
-            
-            <ul v-if="isOpen" class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                <li
-                    v-for="(option, index) in unref(options)"
-                    :key="index"
-                    @click="selectOption(option, field)"
-                    class="cursor-pointer px-4 py-2 hover:bg-gray-100"
-                >
-                    {{ option }}
-                </li>
-            </ul>
-            
-            <ErrorMessage :name="name" class="text-red-500 mt-2 text-xs pl-4"/>
-        </Field> -->
-
-        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{ field, meta }">
+        <Field :name="name" :rules="rules" v-slot="{ field, meta }">
             <!-- Nút dropdown -->
             <button
                 type="button"
@@ -41,7 +14,7 @@
                 class="w-full bg-white border border-gray-300 rounded-full px-4 py-3 text-left shadow-sm focus:outline-none"
                 :class="[!meta.valid && meta.touched ? 'border-red-500' : 'border-gray-300']"
             >
-                {{ modelValue || placeholder }}
+                {{ field.value || placeholder }}
                 <span class="float-right">
                 <i class="fa fa-angle-down text-[9px] text-neutral-500 pl-1.5"></i>
                 </span>
@@ -111,6 +84,7 @@
     const selectOption = (option: string, field: any) => {
         modelValue.value = option 
         field.value = option // Đồng bộ VeeValidate
+        fieldValue.value = option
         isOpen.value = false
         // Emit value back to parent
         emit('update:modelValue', option)
@@ -136,5 +110,6 @@
 
     // watch(modelValue, () => {
     //     meta.valid = fieldValue.value ? true : false; // This is just an example logic. 
+    //     console.log(fieldValue.value)
     // })
 </script>

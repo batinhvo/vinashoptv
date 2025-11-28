@@ -133,7 +133,7 @@ export const useCartStore = defineStore('cart', () => {
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
         if (!authStore.authenticated || !token()) return;
-        console.log('đã kêu fetchcart')
+        //console.log('đã kêu fetchcart')
         try {
             const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                 method: 'GET',
@@ -143,7 +143,7 @@ export const useCartStore = defineStore('cart', () => {
                 },
             });
 
-            console.log(dataCartResponse.data)
+            //console.log(dataCartResponse.data)
 
             let serverCart: any[] = [];
 
@@ -279,8 +279,8 @@ export const useCartStore = defineStore('cart', () => {
     //ADD DATA PRODUCT TO SERVER
     const addDataCartToServer = () => {
         if (authStore.authenticated && token()) {
-            console.log(authStore.authenticated)
-            console.log(token())
+            //console.log(authStore.authenticated)
+            //console.log(token())
             syncCart();
         }
     }

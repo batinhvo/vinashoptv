@@ -38,7 +38,7 @@ export const useOrderStore = defineStore('order', {
             const token = useAuthToken();
             const notify = useNotify();
 
-            console.log(token)
+            //console.log(token)
             try {
                 const headers: Record<string, string> = {
                     "Content-Type": "application/json",

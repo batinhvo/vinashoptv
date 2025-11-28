@@ -3,7 +3,7 @@
         <div class="container flex justify-between items-center">
             <NuxtLink to="/" class="text-gray-110 text-font-13 hover:text-black">Welcome to Vinashop</NuxtLink>
             <div class="flex items-center space-x-4">
-                <div v-if="authStore.authenticated && !authStore.infoSubscribe?.userId" class="flex items-center space-x-4">
+                <div v-if="showSubscribeButton" class="flex items-center space-x-4">
                     <button @click="onShowSubcribe" class="text-green-334 text-font-13 hover:text-black flex items-center">
                         <i class="ec ec-blog-likes text-lg mr-1"></i> Subscribe
                     </button>
@@ -68,6 +68,8 @@
 </template>
 
 <script setup lang="ts">
+    const authStore = useAuthStore();
+
     const triggerSubmitProfile = ref(false);
     const triggerSubmitChangePass = ref(false);
 
@@ -86,6 +88,13 @@
             triggerSubmitChangePass.value = false
         }, 100)
     };
+
+    const showSubscribeButton = computed(() => {
+        if (!authStore.authenticated) return false;
+        if (!authStore.infoSubscribeLoaded) return false;
+        if (authStore.infoSubscribe?.userId) return false;
+        return true;
+    });
 
     const showChangePass = ref(false);
     const openChangePass = () => { 
@@ -117,13 +126,14 @@
         setShowSubcribe?.(true); 
     };
 
-    //-----------------------------------------------------------------------//
     
-    const authStore = useAuthStore();
+
+    //-----------------------------------------------------------------------//
 
     onMounted( async () => {
         authStore.restoreUser();
     });
+
 </script>
 
 <style lang="css" scoped>

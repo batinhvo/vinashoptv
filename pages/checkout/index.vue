@@ -47,19 +47,19 @@
                                     :placeholder="billingLocation.statePlaceholder.value"
                                     @selected="billingLocation.stateOnSelected" 
                                     :widthfull=true 
-                                    isSearch
-                                    name="state" label="State" class="lg:w-1/2 px-1"/>
+                                    isSearch                                    
+                                    name="state" label="State" rules="stateSelect" class="lg:w-1/2 px-1"/>
 
                                 <InputSelective 
                                     :options="billingLocation.cityOpt" 
-                                    :placeholder="billingLocation.cityPlaceholder.value" 
+                                    :placeholder="billingLocation.cityPlaceholder.value"                                     
                                     isSearch
                                     @selected="billingLocation.cityOnSelected" 
-                                    name="city" label="City" class="lg:w-1/2 px-1"/>
+                                    name="city" label="City" rules="citySelect" class="lg:w-1/2 px-1"/>
 
                                 <InputField v-model="formData.billingInfo.zipCode" 
                                     :widthfull=true
-                                    name="postCode" label="PostCode/Zip" type="number" placeholder="99999" />
+                                    name="postCode" label="PostCode/Zip" rules="zipcode" type="number" placeholder="99999" />
 
                                 <InputField v-model="formData.billingInfo.address" 
                                     :widthfull=true 
@@ -98,31 +98,31 @@
                                         :placeholder="shippingLocation.statePlaceholder.value"
                                         @selected="shippingLocation.stateOnSelected" 
                                         :widthfull=true 
-                                        name="state" label="State" class="lg:w-1/2 px-1"/>
+                                        name="stateDif" label="State" rules="stateSelect" class="lg:w-1/2 px-1"/>
 
                                     <InputSelective  
                                         :options="shippingLocation.cityOpt" 
                                         :placeholder="shippingLocation.cityPlaceholder.value"                                     
                                         @selected="shippingLocation.cityOnSelected" 
-                                        name="city" label="City" class="lg:w-1/2 px-1"/>
+                                        name="cityDif" label="City" rules="citySelect" class="lg:w-1/2 px-1"/>
 
                                     <InputField 
                                         v-model="formData.shippingInfo.zipCode" 
                                         :widthfull=true
-                                        name="postCode" label="PostCode/Zip" type="number" placeholder="99999" />
+                                        name="postCodeDif" label="PostCode/Zip" rules="zipcode" type="number" placeholder="99999" />
 
                                     <InputField 
                                         v-model="shippingInfo.address" 
                                         :widthfull=true 
-                                        name="streetDif" label="Street Address" placeholder="enter your address" />
+                                        name="streetDif" label="Street Address" rules="required" placeholder="enter your address" />
 
                                     <InputField 
                                         v-model="shippingInfo.email" 
-                                        name="emailDif" label="Email Address" rules="email" placeholder="enter your email address" />
+                                        name="emailDif" label="Email Address" rules="email|required" placeholder="enter your email address" />
                                         
                                     <InputField 
                                         v-model="shippingInfo.phone" 
-                                        name="phoneDif" label="Phone" rules="phone" placeholder="enter your phone number" />
+                                        name="phoneDif" label="Phone" rules="phone|required"  placeholder="enter your phone number" />
                                 </div>
                             </div>
 
@@ -274,7 +274,7 @@
                                                 v-model="formData.cardInfo.cardType"
                                                 :widthfull=true
                                                 :options="creditcardOpt"                                            
-                                                name="creditCard" label="Select Your Credit Card" placeholder="Nothing Selected" />
+                                                name="creditCard" label="Select Your Credit Card" rules="selectRequired" placeholder="Nothing Selected" />
 
                                             <InputField 
                                                 v-model="formData.cardInfo.nameOnCard"
@@ -293,13 +293,13 @@
                                                 v-model="formData.cardInfo.expirationMonth"                                            
                                                 :widthfull=true                                                                                      
                                                 :options="monthOpt" 
-                                                name="monthCard" label="Month Expired" placeholder="Nothing Selected" />
+                                                name="monthCard" label="Month Expired" rules="selectRequired" placeholder="Nothing Selected" />
 
                                             <InputSelective 
                                                 v-model="formData.cardInfo.expirationYear"
                                                 :widthfull=true 
                                                 :options="yearOpt"                                            
-                                                name="yearCard" label="Year Expired" placeholder="Nothing Selected" />
+                                                name="yearCard" label="Year Expired" rules="selectRequired" placeholder="Nothing Selected" />
 
                                             <InputField 
                                                 v-model="formData.cardInfo.cvv" 

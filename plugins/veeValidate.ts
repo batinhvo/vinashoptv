@@ -79,6 +79,19 @@ export default defineNuxtPlugin(() => {
       return true;
     });
 
+    defineRule('zipcode', (value: number | undefined) => {
+      if (!value || !value.toString().length) {
+        return 'This field cannot be left empty';
+      }
+
+      const regex = /^\d{5}(-\d{4})?$/;
+      if (!regex.test(value.toString())) {
+        return 'Invalid ZIP Code format';
+      }
+
+      return true;
+    });
+
     defineRule('confirmed', (value: string | undefined, [targetValue]: [string]) => {
       if (!value || !targetValue) {
           return true;
@@ -89,21 +102,17 @@ export default defineNuxtPlugin(() => {
       return true;
     });
 
-    defineRule('stateSelect', (value: string | undefined) => {
-      if ( !value || value === 'Select State') {
-          return 'Please select a state';
-      }
-      return true;
+    defineRule('stateSelect', (value: string) => {
+      return value ? true : 'Please select a state';
     });
 
-    defineRule('citySelect', (value: string | undefined) => {
-        if ( !value || value === 'Select City') {
-            return 'Please select a city';
-        }
-        return true;
+    defineRule('citySelect', (value: string) => {
+      return value ? true : 'Please select a city';
     });
-    
 
+    defineRule('selectRequired', (value: string) => {
+      return value ? true : 'Please select an option';
+    });
 
     // defineRule('checkString', (value: string | undefined, [checkValue]: [string]) => {
     //     console.log(checkValue)

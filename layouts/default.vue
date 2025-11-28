@@ -21,7 +21,7 @@
 <script setup lang="ts">
 
     const authStore = useAuthStore();
-    const orderStore = useOrderStore();
+    //const orderStore = useOrderStore();
     const cartStore = useCartStore();
 
     const showSubcribe = ref(false);

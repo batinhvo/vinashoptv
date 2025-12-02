@@ -133,7 +133,7 @@ export const useCartStore = defineStore('cart', () => {
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
         if (!authStore.authenticated || !token()) return;
-        //console.log('đã kêu fetchcart')
+        console.log('đã kêu fetchcart')
         try {
             const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                 method: 'GET',
@@ -141,12 +141,9 @@ export const useCartStore = defineStore('cart', () => {
                     Authorization: `Bearer ${token()}`,
                     'Content-Type': 'application/json',
                 },
-            });
-
-            //console.log(dataCartResponse.data)
+            });            
 
             let serverCart: any[] = [];
-
             if (dataCartResponse?.data) {
                 try {
                     serverCart = JSON.parse(dataCartResponse.data);
@@ -155,10 +152,19 @@ export const useCartStore = defineStore('cart', () => {
                 }
             }
 
+            if(dataCartResponse?.data == null) {
+                isPutCart.value = false;
+                //console.log('đã kêu post')
+            } else {
+                //console.log('đã kêu put')
+                isPutCart.value = true;
+            }
+
             // CASE 1: Server có dữ liệu
             if (serverCart.length > 0) {
                 //addCartItems.value = [];
-                isPutCart.value = true;
+                console.log('đã kêu put')
+                //isPutCart.value = true;
 
                 await Promise.all(
                     serverCart.map((item: any) =>

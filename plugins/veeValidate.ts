@@ -81,7 +81,7 @@ export default defineNuxtPlugin(() => {
 
     defineRule('zipcode', (value: number | undefined) => {
       if (!value || !value.toString().length) {
-        return 'This field cannot be left empty';
+        return 'This field cannot be left empty';        
       }
 
       const regex = /^\d{5}(-\d{4})?$/;
@@ -110,7 +110,7 @@ export default defineNuxtPlugin(() => {
       return value ? true : 'Please select a city';
     });
 
-    defineRule('selectRequired', (value: string) => {
+    defineRule('selectRequired', (value: string | undefined) => {
       return value ? true : 'Please select an option';
     });
 

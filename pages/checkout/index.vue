@@ -46,16 +46,18 @@
                                     :options="billingLocation.stateOpt" 
                                     :placeholder="billingLocation.statePlaceholder.value"
                                     @selected="billingLocation.stateOnSelected" 
+                                    :rules="!authStore.authenticated ? 'stateSelect' : ''"
                                     :widthfull=true 
                                     isSearch                                    
-                                    name="state" label="State" rules="stateSelect" class="lg:w-1/2 px-1"/>
+                                    name="state" label="State" class="lg:w-1/2 px-1"/>
 
                                 <InputSelective 
                                     :options="billingLocation.cityOpt" 
                                     :placeholder="billingLocation.cityPlaceholder.value"                                     
                                     isSearch
                                     @selected="billingLocation.cityOnSelected" 
-                                    name="city" label="City" rules="citySelect" class="lg:w-1/2 px-1"/>
+                                    :rules="!authStore.authenticated ? 'citySelect' : ''"
+                                    name="city" label="City" class="lg:w-1/2 px-1"/>
 
                                 <InputField v-model="formData.billingInfo.zipCode" 
                                     :widthfull=true
@@ -600,25 +602,42 @@
 
     //----------------------------HANDLE SUBMIT-----------------------------------//
     const { handleSubmit } = useForm();
-    const onSubmit = handleSubmit( async () => {
-        isSubmit.value = true;
-        const payload = getFinalFormData()
-        try {
-            normalizeCardInfo()
-            await orderStore.submitOrder(payload);
-            await cartStore.clearCart();
-            cartStore.clearLocalCart();           
-        } catch (error) {
-            notify({              
-                message: 'Order failed. Please check information and try again!',
+    const onSubmit = handleSubmit(
+        async () => {
+            // VALID CASE
+            isSubmit.value = true;
+
+            const payload = getFinalFormData()
+
+            try {
+                normalizeCardInfo()
+                await orderStore.submitOrder(payload);
+                await cartStore.clearCart();
+                cartStore.clearLocalCart();           
+            } catch (error) {
+                notify({
+                    message: 'Order failed. Please check information and try again!',
+                    type: 'error',
+                    time: 5000,
+                });
+            }
+
+            setTimeout(() => {
+                isSubmit.value = false;
+            }, 8000);
+        },
+
+        // INVALID CASE 🚨
+        (errors) => {
+            notify({
+                message: 'Please check the required fields!',
                 type: 'error',
-                time: 5000,
+                time: 3000,
             });
+
+            console.warn("Validation errors:", errors);
         }
-        setTimeout(() => {
-            isSubmit.value = false;
-        }, 8000);
-    });
+    );
 </script>
 
 <style lang="css" scoped>

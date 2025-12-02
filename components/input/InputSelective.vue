@@ -4,7 +4,7 @@
             {{ label }} <span v-if="isStrong" class="text-red-500">*</span>
         </label>
 
-        <Field :name="name" :rules="rules" v-slot="{ field, meta }">
+        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{ field, meta }">
             <!-- Nút dropdown -->
             <button
                 type="button"
@@ -56,6 +56,8 @@
 </template>
   
 <script lang="ts" setup>
+import { Field } from 'vee-validate';
+
     // Props
     const props = defineProps({
         label: { type: String, default: '' },
@@ -74,24 +76,38 @@
     // States
     const isOpen = ref(false)
     const searchQuery = ref("");
-    const selectedValue = ref<string | null>(null)
+    const selectedValue = ref<string | number | null>();
     
     // Methods
     const toggleDropdown = () => {
         isOpen.value = !isOpen.value
     }
     
-    const selectOption = (option: string, field: any) => {
-        modelValue.value = option 
-        field.value = option // Đồng bộ VeeValidate
-        fieldValue.value = option
-        isOpen.value = false
-        // Emit value back to parent
-        emit('update:modelValue', option)
-        emit('selected', option)
-    }
+    // const selectOption = (option: string, field: any) => {
+    //     modelValue.value = option 
+    //     field.value = option // Đồng bộ VeeValidate
+    //     fieldValue.value = option;
+    //     isOpen.value = false
 
-    const { value: fieldValue, meta } = useField(props.name, props.rules);
+    //     // Emit value back to parent
+    //     emit('update:modelValue', option)
+    //     emit('selected', option)
+        
+    //     console.log(modelValue.value)
+    // }
+
+    const selectOption = (option: string, field: any) => {
+    //setValue(option);            // cập nhật VeeValidate
+    modelValue.value = option;   // cập nhật v-model
+    isOpen.value = false;
+    fieldValue.value = option;
+    field.value = option;
+
+    emit("update:modelValue", option);
+    emit("selected", option);
+};
+
+    const { value: fieldValue, setValue } = useField(props.name, props.rules);
     const modelValue = defineModel<string | number | null>();
 
     // lọc danh sách theo input
@@ -112,4 +128,18 @@
     //     meta.valid = fieldValue.value ? true : false; // This is just an example logic. 
     //     console.log(fieldValue.value)
     // })
+
+    // watch(
+    //     () => modelValue.value,
+    //     (val) => {
+    //         if (val !== undefined && val !== null) {
+    //         setValue(val);        // cập nhật cho Field
+    //         selectedValue.value = val; 
+    //         fieldValue.value = val;
+    //         }
+    //     },
+    //     { immediate: true }
+    // );
+
+    
 </script>

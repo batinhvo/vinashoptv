@@ -338,7 +338,7 @@
                                 </div>
 
                                 <button v-if="!isSubmit"
-                                    class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6">
+                                    class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6" :disabled="!formData.paymentMethod">
                                     Place order
                                 </button>
 

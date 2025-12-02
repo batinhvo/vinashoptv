@@ -273,8 +273,9 @@
                                             <InputSelective 
                                                 v-model="formData.cardInfo.cardType"
                                                 :widthfull=true
-                                                :options="creditcardOpt"                                            
-                                                name="creditCard" label="Select Your Credit Card" rules="selectRequired" placeholder="Nothing Selected" />
+                                                :options="creditcardOpt"       
+                                                :rules="formData.paymentMethod === 'card' ? 'selectRequired' : ''"                                     
+                                                name="creditCard" label="Select Your Credit Card" placeholder="Nothing Selected" />
 
                                             <InputField 
                                                 v-model="formData.cardInfo.nameOnCard"
@@ -293,13 +294,15 @@
                                                 v-model="formData.cardInfo.expirationMonth"                                            
                                                 :widthfull=true                                                                                      
                                                 :options="monthOpt" 
-                                                name="monthCard" label="Month Expired" rules="selectRequired" placeholder="Nothing Selected" />
+                                                :rules="formData.paymentMethod === 'card' ? 'selectRequired' : ''"
+                                                name="monthCard" label="Month Expired" placeholder="Nothing Selected" />
 
                                             <InputSelective 
                                                 v-model="formData.cardInfo.expirationYear"
                                                 :widthfull=true 
-                                                :options="yearOpt"                                            
-                                                name="yearCard" label="Year Expired" rules="selectRequired" placeholder="Nothing Selected" />
+                                                :options="yearOpt"         
+                                                :rules="formData.paymentMethod === 'card' ? 'selectRequired' : ''"                                   
+                                                name="yearCard" label="Year Expired" placeholder="Nothing Selected" />
 
                                             <InputField 
                                                 v-model="formData.cardInfo.cvv" 

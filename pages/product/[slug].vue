@@ -33,7 +33,7 @@
 
                     <div class="w-full md:w-1/2 lg:w-1/3 xl:w-4/12 px-4 mt-8 md:mt-0">
                         <div class="text-xs mb-2">{{ cateTitle }}</div>
-                        <div class="text-2xl mb-2">{{ dataDetails.title }}</div>
+                        <div class="text-2xl mb-2 font-medium">{{ dataDetails.title }}</div>
                         <div class="text-right mb-2 pr-3">Sold: {{ dataDetails.totalOutFake }}</div>                                         
                         <div class="text-justify" v-html="changeCharacter(dataDetails.summary)" ></div>                   
                     </div>

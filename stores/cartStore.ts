@@ -46,7 +46,7 @@ export const useCartStore = defineStore('cart', () => {
             (total, item) => {
                 total.subTotal += (item.salePrice != 0 ? item.salePrice : item.price) * item.quantity;
                 total.weight   += item.weight * item.quantity;
-                total.tax      += item.tax || 0;
+                total.tax      += item.tax * total.subTotal || 0;
                 return total;
             },
             { subTotal: 0, weight: 0, tax: 0 }
@@ -79,7 +79,7 @@ export const useCartStore = defineStore('cart', () => {
     const taxTotal = computed(() => {
         const couponValueType = typeCoupon.value === 'shipping' ? couponValue.value : 0;
         const shippingAfterCoupon = Math.max(shippingFee.value - couponValueType, 0);
-        return taxProductTotal.value + shippingAfterCoupon * valueTaxLocal.value;
+        return (taxProductTotal.value + shippingAfterCoupon + subTotal.value) * valueTaxLocal.value;
     });
 
     const orderTotal = computed(() => {

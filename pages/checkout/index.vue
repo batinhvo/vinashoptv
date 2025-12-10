@@ -92,21 +92,25 @@
 
                                     <InputField 
                                         v-model="shippingInfo.lastName"
-                                        name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />
+                                        name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />                   
 
-                                    <InputSelective         
-                                        v-model="shippingLocation.newStateSelect.value"              
-                                        :options="shippingLocation.stateOpt" 
-                                        :placeholder="shippingLocation.statePlaceholder.value"
-                                        @selected="shippingLocation.stateOnSelected" 
+                                    <InputSelective             
+                                        v-model="billingLocation.newStateSelect.value"               
+                                        :options="billingLocation.stateOpt" 
+                                        :placeholder="billingLocation.statePlaceholder.value"
+                                        @selected="billingLocation.stateOnSelected" 
+                                        :rules="!authStore.authenticated ? 'stateSelect' : ''"
                                         :widthfull=true 
-                                        name="stateDif" label="State" rules="stateSelect" class="lg:w-1/2 px-1"/>
+                                        isSearch                                    
+                                        name="stateDif" label="State" class="lg:w-1/2 px-1"/>
 
-                                    <InputSelective  
-                                        :options="shippingLocation.cityOpt" 
-                                        :placeholder="shippingLocation.cityPlaceholder.value"                                     
-                                        @selected="shippingLocation.cityOnSelected" 
-                                        name="cityDif" label="City" rules="citySelect" class="lg:w-1/2 px-1"/>
+                                    <InputSelective 
+                                        :options="billingLocation.cityOpt" 
+                                        :placeholder="billingLocation.cityPlaceholder.value"                                     
+                                        isSearch
+                                        @selected="billingLocation.cityOnSelected" 
+                                        :rules="!authStore.authenticated ? 'citySelect' : ''"
+                                        name="cityDif" label="City" class="lg:w-1/2 px-1"/>
 
                                     <InputField 
                                         v-model="formData.shippingInfo.zipCode" 

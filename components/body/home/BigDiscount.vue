@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto mb-8">
-        <NuxtLink to="/saleoff" class="block">
+        <NuxtLink to="https://beta.vinashoptv.com/categories/Elec" class="block">
             <div class="bg-[url('assets/images/bg-discount.jpg')] bg-cover bg-top-center mx-4">
                 <div class="px-12 py-6 lg:py-0">
                     <div class="flex flex-wrap items-center lg:p-14">

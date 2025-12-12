@@ -94,23 +94,22 @@
                                         v-model="shippingInfo.lastName"
                                         name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />                   
 
-                                    <InputSelective             
-                                        v-model="billingLocation.newStateSelect.value"               
-                                        :options="billingLocation.stateOpt" 
-                                        :placeholder="billingLocation.statePlaceholder.value"
-                                        @selected="billingLocation.stateOnSelected" 
-                                        :rules="!authStore.authenticated ? 'stateSelect' : ''"
+                                    <InputSelective         
+                                        v-model="shippingLocation.newStateSelect.value"              
+                                        :options="shippingLocation.stateOpt" 
+                                        :placeholder="shippingLocation.statePlaceholder.value"
+                                        @selected="shippingLocation.stateOnSelected" 
                                         :widthfull=true 
-                                        isSearch                                    
+                                        isSearch
                                         name="stateDif" label="State" class="lg:w-1/2 px-1"/>
 
-                                    <InputSelective 
-                                        :options="billingLocation.cityOpt" 
-                                        :placeholder="billingLocation.cityPlaceholder.value"                                     
+                                    <InputSelective  
+                                        :options="shippingLocation.cityOpt" 
+                                        :placeholder="shippingLocation.cityPlaceholder.value"                                     
+                                        @selected="shippingLocation.cityOnSelected" 
                                         isSearch
-                                        @selected="billingLocation.cityOnSelected" 
-                                        :rules="!authStore.authenticated ? 'citySelect' : ''"
                                         name="cityDif" label="City" class="lg:w-1/2 px-1"/>
+
 
                                     <InputField 
                                         v-model="formData.shippingInfo.zipCode" 
@@ -512,6 +511,11 @@
         });
     };
 
+    function setLocation() {
+        billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
+        shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
+    };
+
     watch([() => cartStore.dataProductShow, () => cartStore.dataPromotion], refreshGiftList, { deep: true });
 
     watch(() => cartStore.couponValue, (val) => { coupon.value = val ?? 0 }, { immediate: true });
@@ -562,8 +566,7 @@
             authStore.getInfoUser(),
         ]);
 
-        billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
-        shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
+        setLocation();
 
         setTimeout(() => {
             isLoading.value = false;

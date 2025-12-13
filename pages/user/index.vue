@@ -50,7 +50,8 @@
 </template>
 
 <script setup lang="ts">
-    definePageMeta({middleware: 'auth-middle'});
+    
+    definePageMeta({middleware: 'auth-middle'}); 
 
     const authStore = useAuthStore();
     const stateStore = useStateStore();

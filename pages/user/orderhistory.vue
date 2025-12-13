@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OrderFilter } from 'types/orderTypes';
+    import type { OrderFilter } from 'types/orderTypes';
 
     definePageMeta({middleware: 'auth-middle'});
 

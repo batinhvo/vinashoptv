@@ -8,7 +8,8 @@ export const useOrderStore = defineStore('order', {
 
     actions: {
         async fetchOrders(query: string) {
-            const apiUrl = useApi();
+            const apiUrl = useApi();            
+            const authStore = useAuthStore();
             const token = useAuthToken();
             
             try {
@@ -28,6 +29,10 @@ export const useOrderStore = defineStore('order', {
                 this.orderCount = dataOrderResponse.data.count;
 
             } catch (e: any) {
+                if(e?.response?.status === 401) {
+                    await authStore.refreshAccessToken();                    
+                }
+
                 console.error("Error fetching orders:", e);
                 throw new Error(e?.message || "Cannot load order history.");
             }
@@ -38,7 +43,6 @@ export const useOrderStore = defineStore('order', {
             const token = useAuthToken();
             const notify = useNotify();
 
-            //console.log(token)
             try {
                 const headers: Record<string, string> = {
                     "Content-Type": "application/json",

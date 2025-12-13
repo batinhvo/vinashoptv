@@ -6,7 +6,9 @@ export default defineNuxtConfig({
     autoImport: true,
   },
   devtools: { enabled: true },
-  plugins: ['~/plugins/veeValidate.ts'],
+  plugins: [
+    '~/plugins/veeValidate.ts',
+  ],
   components: true,
   runtimeConfig: {
     public: {

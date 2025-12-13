@@ -56,7 +56,7 @@
 </template>
   
 <script lang="ts" setup>
-import { Field } from 'vee-validate';
+    import { Field } from 'vee-validate';
 
     // Props
     const props = defineProps({

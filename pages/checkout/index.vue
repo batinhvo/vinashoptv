@@ -101,6 +101,7 @@
                                         @selected="shippingLocation.stateOnSelected" 
                                         :widthfull=true 
                                         isSearch
+                                        :rules="isShippingInfo ? 'stateSelect' : ''"
                                         name="stateDif" label="State" class="lg:w-1/2 px-1"/>
 
                                     <InputSelective  
@@ -108,6 +109,7 @@
                                         :placeholder="shippingLocation.cityPlaceholder.value"                                     
                                         @selected="shippingLocation.cityOnSelected" 
                                         isSearch
+                                        :rules="isShippingInfo ? 'citySelect' : ''"
                                         name="cityDif" label="City" class="lg:w-1/2 px-1"/>
 
 
@@ -516,36 +518,50 @@
         shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
     };
 
-    watch([() => cartStore.dataProductShow, () => cartStore.dataPromotion], refreshGiftList, { deep: true });
+    watch([() => cartStore.dataProductShow, () => cartStore.dataPromotion], refreshGiftList);
 
     watch(() => cartStore.couponValue, (val) => { coupon.value = val ?? 0 }, { immediate: true });
 
     watch(() => formData.value.billingInfo.state, (val) => { cartStore.checklocalTax(val) }, { immediate: true });
 
-    watchEffect(() => {
-        if (authStore.userInfo) {
+    watch(
+        () => authStore.userInfo,
+        (user) => {
+            if (!user) return;
+
             Object.assign(formData.value.billingInfo, {
-            firstName: authStore.userInfo.firstName || "",
-            lastName: authStore.userInfo.lastName || "",
-            email: authStore.userInfo.email || "",
-            phone: authStore.userInfo.phone || "",
-            address: authStore.userInfo.address || "",
-            state: authStore.userInfo.state || "",
-            zipCode: authStore.userInfo.zip || "",
-            city: authStore.userInfo.cityId || "",
+                firstName: user.firstName ?? "",
+                lastName: user.lastName ?? "",
+                email: user.email ?? "",
+                phone: user.phone ?? "",
+                address: user.address ?? "",
+                state: user.state ?? "",
+                zipCode: user.zip ?? "",
+                city: user.cityId ?? "",
             });  
-        }
-    });
+        },
+        { immediate: true }
+    );
+
+    watch(
+        [
+            () => formData.value.billingInfo.state,
+            () => formData.value.billingInfo.city,
+            () => formData.value.shippingInfo.state,
+            () => formData.value.shippingInfo.city,
+        ],
+        () => {
+            setLocation();
+        }       
+    );
 
     watchEffect(() => {
         if(cartStore.dataProductShow) {
             formData.value.productList = cartStore.dataProductShow.map(item => ({
-                //gift: [],
                 media: item.media,
                 name: item.type ? item.title + ' - ' + item.type : item.title,
                 price: item.price,
                 productId: item.productId,
-                //promotion: [],
                 quantity: item.quantity,
                 salePrice: item.salePrice != 0 ? item.salePrice : item.price,
                 skuId: item.skuId,
@@ -566,26 +582,10 @@
             authStore.getInfoUser(),
         ]);
 
-        setLocation();
-
         setTimeout(() => {
             isLoading.value = false;
         }, 2000)
     });
-
-    // watchEffect(async () => {
-    //     if(authStore.authenticated) {        
-    //         cartStore.loadCartFromStorage();   
-    //         await Promise.all([
-    //             stateStore.fetchStates(),
-    //             authStore.getInfoUser(),
-    //             cartStore.fetchDataCart(),
-    //         ]);
-
-    //         billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
-    //         shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
-    //     }
-    // });
 
     //----------------------------INVOICE FORM-----------------------------------//.
     const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];

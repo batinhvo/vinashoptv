@@ -62,6 +62,22 @@ export const useCartStore = defineStore('cart', () => {
         }
 
         return base;
+
+        // return dataProductShow.value.reduce(
+        //     (total, item) => {
+        //         const price = Number(item.salePrice || item.price || 0);
+        //         const qty    = Number(item.quantity || 0);
+        //         const weight = Number(item.weight || 0);
+        //         const tax    = Number(item.tax || 0);
+
+        //         total.subTotal += price * qty;
+        //         total.weight   += weight * qty;
+        //         total.tax      += tax * price * qty;
+
+        //         return total;
+        //     },
+        //     { subTotal: 0, weight: 0, tax: 0 }
+        // );
     });
 
     const subTotal = computed(() => {
@@ -133,6 +149,11 @@ export const useCartStore = defineStore('cart', () => {
     // GET DATA CART FROM SERVER
     const fetchDataCart = async () => {
         if (!authStore.authenticated || !token()) return;
+
+        if (!addCartItems.value.length) {
+            loadCartFromStorage();
+        }
+
         try {
             const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                 method: 'GET',
@@ -140,16 +161,45 @@ export const useCartStore = defineStore('cart', () => {
                     Authorization: `Bearer ${token()}`,
                     'Content-Type': 'application/json',
                 },
-            });            
+            });   
+            
+            const serverCart = dataCartResponse?.data ? JSON.parse(dataCartResponse.data) : [];
+            const localCart  = addCartItems.value.map(i => ({
+                skuId: i.skuId,
+                quantity: i.quantity
+            }));
 
-            let serverCart: any[] = [];
-            if (dataCartResponse?.data) {
-                try {
-                    serverCart = JSON.parse(dataCartResponse.data);
-                } catch {
-                    serverCart = [];
-                }
-            }
+            const mergedCart = mergeCart(localCart, serverCart);
+
+            addCartItems.value = [];
+            listGiftChecked.value = [];
+
+            await Promise.all(
+                mergedCart.map(item =>
+                    addProductToCart(item.skuId, item.quantity, true)
+                )
+            );
+
+            // sync lên server
+            await $fetch(`${apiUrl}carts`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token()}`,
+                    'Content-Type': 'application/json',
+                },
+                body: { skuIdList: JSON.stringify(mergedCart) },
+            });
+
+            localStorage.setItem('cart_data', JSON.stringify(mergedCart));
+            error.value = 0;
+            // let serverCart: any[] = [];
+            // if (dataCartResponse?.data) {
+            //     try {
+            //         serverCart = JSON.parse(dataCartResponse.data);
+            //     } catch {
+            //         serverCart = [];
+            //     }
+            // }
 
             if(dataCartResponse?.data == null) {
                 isPutCart.value = false;                
@@ -157,28 +207,47 @@ export const useCartStore = defineStore('cart', () => {
                 isPutCart.value = true;
             }
 
-            // CASE 1: Server có dữ liệu
-            if (serverCart.length > 0) {
-                await Promise.all(
-                    serverCart.map((item: any) =>
-                    addProductToCart(Number(item.skuId), Number(item.quantity), true)
-                    )
-                );
+            // // CASE 1: Server có dữ liệu
+            // if (serverCart.length > 0) {
+            //     addCartItems.value = [];
+            //     listGiftChecked.value = [];
 
-                localStorage.setItem("cart_data", JSON.stringify(serverCart));
-                await syncCart();
-            }
+            //     await Promise.all(
+            //         serverCart.map(item => addProductToCart(Number(item.skuId), Number(item.quantity), true))
+            //     );
 
-            // CASE 2: Server rỗng nhưng local có cart → đẩy local lên
-            else if (addCartItems.value.length > 0) {
-                await syncCart();
-            }
+            //     localStorage.setItem("cart_data", JSON.stringify(serverCart));
+            //     await syncCart();
+            // }
+
+            // // CASE 2: Server rỗng nhưng local có cart → đẩy local lên
+            // else if (addCartItems.value.length > 0) {
+            //     await syncCart();
+            // }
 
         } catch (err) {
             console.error("Error fetching cart:", err);
             error.value = 1;
         }
 
+    }
+
+    //MERGE CART
+    const mergeCart = (
+        localCart: { skuId: number; quantity: number }[],
+        serverCart: { skuId: number; quantity: number }[]
+    ) => {
+        const mergedCartMap = new Map<number, number>();
+
+        serverCart.forEach(item => {
+            mergedCartMap.set(item.skuId, item.quantity);
+        });
+
+        localCart.forEach(item => {
+            mergedCartMap.set(item.skuId, (mergedCartMap.get(item.skuId) || 0) + item.quantity);
+        });
+
+        return Array.from(mergedCartMap.entries()).map(([skuId, quantity]) => ({ skuId, quantity }));
     }
 
     // ADD PRODUCT TO CART
@@ -188,7 +257,7 @@ export const useCartStore = defineStore('cart', () => {
         // Kiểm tra nếu đã có trong cache thì dùng luôn tránh gọi API nhiều lần
         if (!cached) {
             try {
-                const product = await getDataProduct(idSku);
+                const product = await getDataProduct(idSku, !replace);
                 cached = {
                     dataProduct: product.dataProduct,
                     dataSkus: product.dataSkus,
@@ -220,8 +289,11 @@ export const useCartStore = defineStore('cart', () => {
             });
         }    
         checkQuantityGift(idSku, existing ? existing.quantity : quantity);
-        scheduleSaveToLocal();
-        addDataCartToServer();
+
+        if (!replace) {
+            scheduleSaveToLocal();
+            addDataCartToServer();
+        }
     }
 
     // CLICK ADD TO CART
@@ -329,7 +401,7 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     //LOAD PRODUCT
-    const getDataProduct = async (idSku : number) => {
+    const getDataProduct = async (idSku : number, fetchPromo = true) => {
         await productStore.fetchProductDetailSkus(idSku);
         const dataSkus = productStore.productDetailSkus;
 
@@ -340,7 +412,9 @@ export const useCartStore = defineStore('cart', () => {
         await fetchVariant(idSku);
         const typeValue = dataVariant.value.join(', ');
 
-        await fetchPromotion(idSku);
+        if (fetchPromo) {
+            await fetchPromotion(idSku);
+        }
 
         return { dataProduct, typeValue, dataSkus }
     }
@@ -560,7 +634,7 @@ export const useCartStore = defineStore('cart', () => {
             }
             
         }
-        scheduleSaveToLocal();
+        //scheduleSaveToLocal();
         addDataCartToServer();    
     }
 
@@ -577,7 +651,7 @@ export const useCartStore = defineStore('cart', () => {
                 checkQuantityGift(target.skuId, target.quantity);   
             }
         }
-        scheduleSaveToLocal();
+        //scheduleSaveToLocal();
         addDataCartToServer();
     }
 

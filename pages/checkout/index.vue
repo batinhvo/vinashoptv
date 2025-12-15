@@ -370,6 +370,7 @@
 
 <script setup lang="ts">
     import type { CartItem, Gift, ProductSubmit, Promotion } from 'types/orderTypes';
+
     const isShippingInfo = ref(false);
     const isConditions = ref(true);
     const isReceiveEmail = ref(false);
@@ -491,26 +492,47 @@
     };
 
     function refreshGiftList() {
-        giftList.value = [];
+        // giftList.value = [];
+        // promotionList.value = [];
+
+        // cartStore.dataProductShow.forEach(product => {
+        //     cartStore.dataPromotion.forEach(promo => {
+        //         if (checkGiftCondition(product, promo)) {
+        //             const exists = giftList.value.some(g => g.skuId === promo.skuIdOut);
+        //             if (!exists) {
+        //                 giftList.value.push({
+        //                     name: promo.name,
+        //                     quantity: product.quantity,
+        //                     skuId: promo.skuIdOut,
+        //                     weight: product.weight,
+        //                 });
+
+        //                 promotionList.value.push(promo)
+        //             }
+        //         }
+        //     });
+        // });
+
+        const giftMap = new Map<number, Gift>();
         promotionList.value = [];
 
         cartStore.dataProductShow.forEach(product => {
-            cartStore.dataPromotion.forEach(promo => {
-                if (checkGiftCondition(product, promo)) {
-                    const exists = giftList.value.some(g => g.skuId === promo.skuIdOut);
-                    if (!exists) {
-                        giftList.value.push({
-                            name: promo.name,
-                            quantity: product.quantity,
-                            skuId: promo.skuIdOut,
-                            weight: product.weight,
-                        });
-
-                        promotionList.value.push(promo)
-                    }
+            cartStore.dataPromotion
+            .filter(promo => checkGiftCondition(product, promo))
+            .forEach(promo => {
+                if (!giftMap.has(promo.skuIdOut)) {
+                giftMap.set(promo.skuIdOut, {
+                    name: promo.name,
+                    quantity: product.quantity,
+                    skuId: promo.skuIdOut,
+                    weight: product.weight,
+                });
+                promotionList.value.push(promo);
                 }
             });
         });
+
+        giftList.value = Array.from(giftMap.values());
     };
 
     function setLocation() {
@@ -544,20 +566,21 @@
     );
 
     watch(
-        [
-            () => formData.value.billingInfo.state,
-            () => formData.value.billingInfo.city,
-            () => formData.value.shippingInfo.state,
-            () => formData.value.shippingInfo.city,
-        ],
-        () => {
-            setLocation();
-        }       
+        () => ({
+            bState: formData.value.billingInfo.state,
+            bCity: formData.value.billingInfo.city,
+            sState: formData.value.shippingInfo.state,
+            sCity: formData.value.shippingInfo.city,
+        }),
+        () => setLocation(),
+        { immediate: true }
     );
 
-    watchEffect(() => {
-        if(cartStore.dataProductShow) {
-            formData.value.productList = cartStore.dataProductShow.map(item => ({
+    watch(
+        () => cartStore.dataProductShow,
+        (list) => {
+            if (!list) return;
+            formData.value.productList = list.map(item => ({
                 media: item.media,
                 name: item.type ? item.title + ' - ' + item.type : item.title,
                 price: item.price,
@@ -567,9 +590,10 @@
                 skuId: item.skuId,
                 tax: item.tax,
                 weight: item.weight,
-            }))
-        }
-    });
+            }));
+        },
+        { immediate: true }
+    );
 
     onMounted(async () => {
         cartStore.loadCartFromStorage();
@@ -581,10 +605,12 @@
             cartStore.fetchWeights(),
             authStore.getInfoUser(),
         ]);
-
+        
         setTimeout(() => {
             isLoading.value = false;
-        }, 2000)
+        }, 2000);
+        
+        
     });
 
     //----------------------------INVOICE FORM-----------------------------------//.
@@ -613,7 +639,6 @@
         async () => {
             // VALID CASE
             isSubmit.value = true;
-
             const payload = getFinalFormData()
 
             try {

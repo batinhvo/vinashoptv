@@ -21,6 +21,7 @@ export const useCartStore = defineStore('cart', () => {
     const couponValue = ref<number>(0)
     const typeCoupon = ref<string>('') // 'shipping' | 'discount'
     const isPutCart = ref<boolean>(false)
+    const CART_MERGE_KEY = 'cart_merged_after_login';
 
     const productStore = useProductStore()
     const authStore = useAuthStore()
@@ -150,9 +151,8 @@ export const useCartStore = defineStore('cart', () => {
     const fetchDataCart = async () => {
         if (!authStore.authenticated || !token()) return;
 
-        if (!addCartItems.value.length) {
-            loadCartFromStorage();
-        }
+         // ❗ Nếu đã merge rồi thì chỉ fetch cart, KHÔNG merge nữa
+        const isMerged = localStorage.getItem(CART_MERGE_KEY);
 
         try {
             const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
@@ -162,8 +162,29 @@ export const useCartStore = defineStore('cart', () => {
                     'Content-Type': 'application/json',
                 },
             });   
+
+            if(dataCartResponse?.data == null) {
+                isPutCart.value = false;                
+            } else {                
+                isPutCart.value = true;
+            }
             
             const serverCart = dataCartResponse?.data ? JSON.parse(dataCartResponse.data) : [];
+
+            if (isMerged) {
+                addCartItems.value = [];
+                await Promise.all(
+                    serverCart.map((item: any) =>
+                        addProductToCart(item.skuId, item.quantity, true)
+                    )
+                );
+                return;
+            }
+
+            if (!addCartItems.value.length) {
+                loadCartFromStorage();
+            }
+
             const localCart  = addCartItems.value.map(i => ({
                 skuId: i.skuId,
                 quantity: i.quantity
@@ -191,39 +212,9 @@ export const useCartStore = defineStore('cart', () => {
             });
 
             localStorage.setItem('cart_data', JSON.stringify(mergedCart));
-            error.value = 0;
-            // let serverCart: any[] = [];
-            // if (dataCartResponse?.data) {
-            //     try {
-            //         serverCart = JSON.parse(dataCartResponse.data);
-            //     } catch {
-            //         serverCart = [];
-            //     }
-            // }
+            localStorage.setItem(CART_MERGE_KEY, 'true');
 
-            if(dataCartResponse?.data == null) {
-                isPutCart.value = false;                
-            } else {                
-                isPutCart.value = true;
-            }
-
-            // // CASE 1: Server có dữ liệu
-            // if (serverCart.length > 0) {
-            //     addCartItems.value = [];
-            //     listGiftChecked.value = [];
-
-            //     await Promise.all(
-            //         serverCart.map(item => addProductToCart(Number(item.skuId), Number(item.quantity), true))
-            //     );
-
-            //     localStorage.setItem("cart_data", JSON.stringify(serverCart));
-            //     await syncCart();
-            // }
-
-            // // CASE 2: Server rỗng nhưng local có cart → đẩy local lên
-            // else if (addCartItems.value.length > 0) {
-            //     await syncCart();
-            // }
+            error.value = 0; 
 
         } catch (err) {
             console.error("Error fetching cart:", err);
@@ -292,7 +283,7 @@ export const useCartStore = defineStore('cart', () => {
 
         if (!replace) {
             scheduleSaveToLocal();
-            addDataCartToServer();
+            await addDataCartToServer();
         }
     }
 
@@ -348,22 +339,16 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     //ADD DATA PRODUCT TO SERVER
-    const addDataCartToServer = () => {
-        if (authStore.authenticated && token()) {
-            //console.log(authStore.authenticated)
-            //console.log(token())
-            syncCart();
-        }
-    }
+    const addDataCartToServer = async () => {
+        if (!authStore.authenticated || !token()) return;
 
-    //sync cart
-    const syncCart  = async () => {
         const skuIdList = addCartItems.value.map(item => ({ 
             skuId: item.skuId, 
             quantity: item.quantity 
         }));
 
         try {
+            console.log(isPutCart.value)
             const method = isPutCart.value ? 'PUT' : 'POST';
 
             await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
@@ -379,7 +364,7 @@ export const useCartStore = defineStore('cart', () => {
         } catch (err) {
             console.error("Error posting cart:", err)
             error.value = 1;
-        }
+        }        
     }
 
     //Clear Cart

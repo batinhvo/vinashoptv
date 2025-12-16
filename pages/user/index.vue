@@ -1,5 +1,14 @@
 <template>
-    <div class="container">
+    <div v-if="isLoading" class="fixed inset-0 bg-white/80 flex flex-col items-center justify-center z-50"> 
+        <div class="flex space-x-2">
+            <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+            <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+            <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce"></span>
+        </div>
+        <p class="mt-4 text-gray-700 font-medium text-lg">Loading</p>
+    </div>
+
+    <div v-else class="container">
         <div class="mt-0 md:mt-10">
           <ul class="flex items-center bg-zinc-100 md:bg-white pl-2 xl:pl-0">
             <li class="px-3 py-2 hover:bg-zinc-100 rounded hover:border hover:border-gray-200"><NuxtLink to="/">Home</NuxtLink></li>
@@ -53,27 +62,78 @@
     
     definePageMeta({middleware: 'auth-middle'}); 
 
+    const isLoading = ref(true);
+
     const authStore = useAuthStore();
     const stateStore = useStateStore();
 
-    const cityName = ref(''); 
-    const stateName = ref('');
-
+    /* ---------- FETCH DATA ---------- */
     onMounted(async () => {
-        try {
-            await authStore.getInfoUser();
-            await stateStore.fetchStates();
+        await Promise.all([
+            authStore.getInfoUser(),
+            stateStore.fetchStates()
+        ]);
 
-            stateName.value = stateStore.states.find(state => state.code === authStore.userInfo?.state)?.name || '';
+        setTimeout(() => {
+            isLoading.value = false;
+        }, 600);
+    })
 
-            if (authStore.userInfo?.state) {
-                await stateStore.fetchCities(authStore.userInfo?.state);
+    /* ---------- FETCH CITIES WHEN STATE CHANGES ---------- */
+    watch(
+        () => authStore.userInfo?.state,
+        async (stateCode) => {
+            if (stateCode) {
+            await stateStore.fetchCities(stateCode)
             }
+        },
+        { immediate: true }
+    )
 
-            cityName.value = stateStore.cities.find(city => city.id === authStore.userInfo?.cityId)?.name || '';
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    });
+    /* ---------- COMPUTED DISPLAY ---------- */
+    const stateName = computed(() => {
+        const stateCode = authStore.userInfo?.state
+        return stateStore.states.find(s => s.code === stateCode)?.name || ''
+    })
+
+    const cityName = computed(() => {
+        const cityId = authStore.userInfo?.cityId
+        return stateStore.cities.find(c => c.id === cityId)?.name || ''
+    })
 </script>
+
+<style lang="css" scoped>
+    .title.border-b::after {
+        content: ' ';
+        height: 2px;
+        width: 114px;
+        display: block;
+        background-color: #20d600;
+        position: relative;
+        bottom: -1px;
+        left: 0;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+        /* Ẩn trên Firefox */
+        appearance: none;
+    }
+
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 1s ease-in-out;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+        opacity: 0;
+    }
+</style>
 

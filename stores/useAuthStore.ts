@@ -42,7 +42,7 @@ export const useAuthStore = defineStore('auth', {
                     
                     this.user = userResponse.data.name;
                     this.authenticated = true;
-                    window.location.reload();
+                    //window.location.reload();
                     //refreshNuxtData();
                     
                 }
@@ -53,18 +53,27 @@ export const useAuthStore = defineStore('auth', {
         },
 
         logOut() {
+            const route = useRoute();
+
             useCookie('tokenAccess').value = null;
             useCookie('tokenRefresh').value = null; 
-            
+
+            localStorage.removeItem('cart_merged_after_login');
+            localStorage.removeItem('cart_data');
             localStorage.removeItem('user');
 
             this.authenticated = false; 
+            this.userInfo = null;
             this.user = null;
-            window.location.reload();
+            //window.location.reload();
 
             const cartStore = useCartStore();
             cartStore.clearLocalCart();
             //navigateTo('/');
+
+            if (route.path === '/user') {
+                navigateTo('/')
+            }
         },
 
         restoreUser() {

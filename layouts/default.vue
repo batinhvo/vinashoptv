@@ -46,51 +46,59 @@
 
     provide("setShowSubcribe", setShowSubcribe);
 
-    let isLoading = false;
+    const isLoading = ref(false);
 
-    watchEffect(async () => {
-        if (authStore.authenticated && !isLoading) {
-        isLoading = true;
-        try {
+    watch(
+        () => authStore.authenticated,
+        async (isAuth) => {
+            if (!isAuth || isLoading.value) return;
+
+            isLoading.value = true;
+
+            try {
             cartStore.loadCartFromStorage();
 
             await Promise.all([
                 cartStore.fetchDataCart(),
                 authStore.getInfoUser(),
                 authStore.checkSubscribeEmail(),
-                //orderStore.fetchOrders(),
             ]);
-            
+
+            // 🔥 CHECK SAU KHI API XONG
             if (authStore.infoSubscribe?.userId) {
                 showSubcribe.value = false;
                 return;
             }
 
-            const lastVisit  = localStorage.getItem('lastVisitDate');
             const today = new Date().toDateString();
+            const lastVisit = localStorage.getItem('lastVisitDate');
 
-            if (lastVisit !== today) {
-                showSubcribe.value = true;
+            showSubcribe.value = lastVisit !== today;
+
+            if (showSubcribe.value) {
                 localStorage.setItem('lastVisitDate', today);
-            } else {
-                showSubcribe.value = false;
-            }  
+            }
 
-        } finally {
-            isLoading = false;
-        }
-    }});
+            } finally {
+            isLoading.value = false;
+            }
+        },
+        { immediate: true }
+    );
 
-    // onMounted(async () => {
-    //     if(authStore.authenticated) {
+    
 
+    // watchEffect(async () => {
+    //     if (authStore.authenticated && !isLoading) {
+    //     isLoading = true;
+    //     try {
     //         cartStore.loadCartFromStorage();
 
     //         await Promise.all([
     //             cartStore.fetchDataCart(),
     //             authStore.getInfoUser(),
     //             authStore.checkSubscribeEmail(),
-    //             orderStore.getDataOrderHistory(),
+    //             //orderStore.fetchOrders(),
     //         ]);
             
     //         if (authStore.infoSubscribe?.userId) {
@@ -106,11 +114,13 @@
     //             localStorage.setItem('lastVisitDate', today);
     //         } else {
     //             showSubcribe.value = false;
-    //         }             
+    //         }  
 
-    //     } else {
-    //         showSubcribe.value = false;
+    //     } finally {
+    //         isLoading = false;
     //     }
-    // });
+    // }});
+
+    
     
 </script>

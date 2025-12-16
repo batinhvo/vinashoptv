@@ -546,6 +546,8 @@
 
     watch(() => formData.value.billingInfo.state, (val) => { cartStore.checklocalTax(val) }, { immediate: true });
 
+    watch(() => formData.value.shippingInfo.state, (val) => { cartStore.checklocalTax(val) }, { immediate: true });
+
     watch(
         () => authStore.userInfo,
         (user) => {
@@ -673,36 +675,36 @@
 </script>
 
 <style lang="css" scoped>
-.title.border-b::after {
-    content: ' ';
-    height: 2px;
-    width: 114px;
-    display: block;
-    background-color: #20d600;
-    position: relative;
-    bottom: -1px;
-    left: 0;
-}
+    .title.border-b::after {
+        content: ' ';
+        height: 2px;
+        width: 114px;
+        display: block;
+        background-color: #20d600;
+        position: relative;
+        bottom: -1px;
+        left: 0;
+    }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 
-input[type="number"] {
-    -moz-appearance: textfield;
-    /* Ẩn trên Firefox */
-    appearance: none;
-}
+    input[type="number"] {
+        -moz-appearance: textfield;
+        /* Ẩn trên Firefox */
+        appearance: none;
+    }
 
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 1s ease-in-out;
-}
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 1s ease-in-out;
+    }
 
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
+    .fade-enter-from,
+    .fade-leave-to {
+        opacity: 0;
+    }
 </style>

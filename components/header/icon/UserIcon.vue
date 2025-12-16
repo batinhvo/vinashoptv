@@ -13,9 +13,9 @@
         <div class="bg-white border border-gray-200 shadow-xl py-3">                               
             <NuxtLink to="/user" @click.prevent="toggleOpenChoice" class="block py-1.5 px-5 hover:bg-zinc-200">Profile</NuxtLink>                                    
             <button @click.prevent="openEditProfile(); isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Edit Profile</button>
-            <button @click.prevent="openChangePass(); isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Change Password</button>
+            <button @click.prevent="openChangePass(); isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Change Password</button>           
             <NuxtLink to="/user/orderhistory" @click.prevent="toggleOpenChoice" class="block py-1.5 px-5 hover:bg-zinc-200">Your Orders</NuxtLink>
-            <button @click="authStore.logOut; isOpenChoice = false" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
+            <button @click.prevent="handleLogout()" class="block py-1 w-full text-left px-5 hover:bg-gray-200">Log out</button>
         </div>
     </div>
 
@@ -51,8 +51,9 @@
 </template>
 
 <script setup lang="ts">
+    const authStore = useAuthStore();
 
-const triggerSubmitProfile = ref(false);
+    const triggerSubmitProfile = ref(false);
     const triggerSubmitChangePass = ref(false);
 
     const handleUpdateProfile = () => {
@@ -100,8 +101,13 @@ const triggerSubmitProfile = ref(false);
         }
     }
 
+    const handleLogout = () => {
+        authStore.logOut()
+        isOpenChoice.value = false
+    }
+
     //------------------------------------------------------------------------------------//
-    const authStore = useAuthStore();
+    
 
     onMounted( async () => {
         authStore.restoreUser();       

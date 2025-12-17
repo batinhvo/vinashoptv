@@ -42,7 +42,7 @@ export const useAuthStore = defineStore('auth', {
                     
                     this.user = userResponse.data.name;
                     this.authenticated = true;
-                    //window.location.reload();
+                    window.location.reload();
                     //refreshNuxtData();
                     
                 }

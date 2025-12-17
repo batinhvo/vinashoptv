@@ -82,30 +82,16 @@
     const toggleDropdown = () => {
         isOpen.value = !isOpen.value
     }
-    
-    // const selectOption = (option: string, field: any) => {
-    //     modelValue.value = option 
-    //     field.value = option // Đồng bộ VeeValidate
-    //     fieldValue.value = option;
-    //     isOpen.value = false
-
-    //     // Emit value back to parent
-    //     emit('update:modelValue', option)
-    //     emit('selected', option)
-        
-    //     console.log(modelValue.value)
-    // }
 
     const selectOption = (option: string, field: any) => {
-    //setValue(option);            // cập nhật VeeValidate
-    modelValue.value = option;   // cập nhật v-model
-    isOpen.value = false;
-    fieldValue.value = option;
-    field.value = option;
+        modelValue.value = option;   // cập nhật v-model
+        isOpen.value = false;
+        fieldValue.value = option;
+        field.value = option;
 
-    emit("update:modelValue", option);
-    emit("selected", option);
-};
+        emit("update:modelValue", option);
+        emit("selected", option);
+    };
 
     const { value: fieldValue, setValue } = useField(props.name, props.rules);
     const modelValue = defineModel<string | number | null>();
@@ -123,11 +109,6 @@
             searchQuery.value = ''; // Xóa ô search khi dropdown đóng
         }
     });
-
-    // watch(modelValue, () => {
-    //     meta.valid = fieldValue.value ? true : false; // This is just an example logic. 
-    //     console.log(fieldValue.value)
-    // })
 
     // watch(
     //     () => modelValue.value,

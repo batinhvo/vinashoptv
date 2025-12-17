@@ -117,6 +117,7 @@ export const useAuthStore = defineStore('auth', {
 
                 if(e?.response?.status === 401) {
                     await this.refreshAccessToken();
+                    await this.getInfoUser();
                 }
 
             }

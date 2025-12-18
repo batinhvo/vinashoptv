@@ -8,7 +8,7 @@ export const useAuthStore = defineStore('auth', {
         authenticated: false,
         user: null as string | null,
         userInfo: null as UserInfo | null,
-        //infoSubscribe: null as InfoSubscribe | null,
+        refreshPromise: null as Promise<void> | null,
         infoSubscribe: {
             userId: undefined,
             isApplied: undefined
@@ -126,37 +126,57 @@ export const useAuthStore = defineStore('auth', {
         },
 
         async refreshAccessToken() {
-            const apiUrl = useApi();       
-            const tokenRefresh = useCookie('tokenRefresh');
-            
-            try {
+            if (this.refreshPromise) {
+                return this.refreshPromise; // ⛔ chặn gọi trùng
+            }
 
-                const data  = await $fetch<{error: number; data: DataRefresh; message: string;}>(`${apiUrl}auth/refresh-token`, {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type" : "application/json",
-                    },
-                    body: JSON.stringify({ refreshToken: tokenRefresh.value })
-                });
-    
-                if (data.error) throw new Error(data.message);
+            this.refreshPromise = (async () => {
+                const apiUrl = useApi();       
+                const tokenRefresh = useCookie<string>('tokenRefresh');
 
-                useCookie('tokenAccess').value = data.data.accessToken;
-                useCookie('tokenRefresh').value = data.data.refreshToken;
-                this.authenticated = true;
-                    
-            } catch (e :any) {
-                console.error("Token refresh failed:", e);
-                if (e?.response?.status === 500 || e?.response?.status === 400) {
+                if (!tokenRefresh.value) {
+                    this.logOut();
+                    throw new Error('No refresh token');
+                }
+
+                try {
+                    const data = await $fetch<{
+                        error: number;
+                        data: DataRefresh;
+                        message: string;
+                    }>(`${apiUrl}auth/refresh-token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ refreshToken: tokenRefresh.value })
+                    });
+
+                    if (data.error) throw new Error(data.message);
+
+                    useCookie('tokenAccess').value = data.data.accessToken;
+                    useCookie('tokenRefresh').value = data.data.refreshToken;
+
+                    this.authenticated = true;
+                } catch (e: any) {
+                    console.error('Token refresh failed:', e);
+
                     this.authenticated = false;
+
                     notify({
                         message: 'Your session has expired, please log in again!',
                         type: 'error',
                         time: 3000,
                     });
-                    this.logOut();                   
+
+                    this.logOut();
+                    throw e;
+                } finally {
+                    this.refreshPromise = null;
                 }
-            }
+            })();
+
+            return this.refreshPromise;
         },
 
         async registerUser(profileData: any) {

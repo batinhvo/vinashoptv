@@ -113,6 +113,8 @@ export const useAuthStore = defineStore('auth', {
                 if (infoUserResponse.data) {
                     this.userInfo = infoUserResponse.data;
                 }
+
+                console.log('có kêu nè')
             } catch (e: any) {
 
                 if(e?.response?.status === 401) {
@@ -308,6 +310,12 @@ export const useAuthStore = defineStore('auth', {
                 }
                 
             } catch (e: any) {
+
+                if(e?.response?.status === 401) {
+                    await this.refreshAccessToken();
+                    await this.checkSubscribeEmail();
+                }
+
                 console.error('Error subscribe email: ', e);
                 return Promise.reject(e?.response._data?.message || 'Something went wrong')
             }

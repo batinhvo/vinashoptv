@@ -51,17 +51,18 @@
     watch(
         () => authStore.authenticated,
         async (isAuth) => {
-            if (!isAuth || isLoading.value) return;
+            if (!isAuth) return;
+            if (isLoading.value) return;
 
             isLoading.value = true;
 
             try {
             cartStore.loadCartFromStorage();
 
-            await Promise.all([
-                cartStore.fetchDataCart(),
+            await Promise.all([              
                 authStore.getInfoUser(),
                 authStore.checkSubscribeEmail(),
+                cartStore.fetchDataCart(),
             ]);
 
             // 🔥 CHECK SAU KHI API XONG
@@ -73,14 +74,15 @@
             const today = new Date().toDateString();
             const lastVisit = localStorage.getItem('lastVisitDate');
 
-            showSubcribe.value = lastVisit !== today;
-
-            if (showSubcribe.value) {
+            if (lastVisit !== today) {
+                showSubcribe.value = true;
                 localStorage.setItem('lastVisitDate', today);
-            }
+            } else {
+                showSubcribe.value = false;
+            }  
 
             } finally {
-            isLoading.value = false;
+                isLoading.value = false;
             }
         },
         { immediate: true }

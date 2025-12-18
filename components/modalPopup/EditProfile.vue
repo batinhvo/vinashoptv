@@ -24,28 +24,30 @@
                 :widthfull=false 
                 :is-strong=false
                 rules="required|phone" name="phone" label="Phone Number" />
-                
+
             <InputSelective             
-                v-model="location.newStateSelect.value"               
-                :options="location.stateOpt" 
-                :placeholder="location.statePlaceholder.value"
-                @selected="location.stateOnSelected" 
+                v-model="locationUser.newStateSelect.value"               
+                :options="locationUser.stateOpt" 
+                :placeholder="locationUser.statePlaceholder.value"
+                @selected="locationUser.stateOnSelected" 
+                rules="stateSelect"
                 :widthfull=true 
-                isSearch
+                isSearch                                    
                 name="state" label="State" class="lg:w-1/2 px-1"/>
 
             <InputSelective 
-                :options="location.cityOpt" 
-                :placeholder="location.cityPlaceholder.value" 
-                @selected="location.cityOnSelected"
-                isSearch 
-                name="city" label="City" class="lg:w-1/2 px-1"/>  
+                :options="locationUser.cityOpt" 
+                :placeholder="locationUser.cityPlaceholder.value"                                     
+                isSearch
+                @selected="locationUser.cityOnSelected" 
+                rules="citySelect"
+                name="city" label="City" class="lg:w-1/2 px-1"/>
 
             <InputField 
                 v-model="formData.zip" 
                 :widthfull=false 
                 :is-strong=false
-                name="zip" type="number" label="Postcode/Zip"/>
+                name="zip" type="number" rules="zipcode" label="Postcode/Zip"/>
 
             <InputField 
                 v-model="formData.address" 
@@ -65,7 +67,7 @@
     }>();
 
     const formData = ref({
-        location: { state: '', city: 0 },
+        locaUser: { state: '', city: 0 },
         address: '',
         country: 'US',
         firstName: '',
@@ -79,38 +81,37 @@
     const stateStore = useStateStore();
     const authStore = useAuthStore();
 
-    watchEffect(() => {
-        if (authStore.userInfo) {
+    const locationUser = useLocationSelect(formData, 'locaUser');
+
+    watch(
+        () => authStore.userInfo,
+        async (user) => {
+            if (!user) return;
+
+            await stateStore.fetchStates();
+
             Object.assign(formData.value, {
-                firstName: authStore.userInfo.firstName || "",
-                lastName: authStore.userInfo.lastName || "",
-                email: authStore.userInfo.email || "",
-                phone: authStore.userInfo.phone || "",
-                address: authStore.userInfo.address || "",
-                zip: authStore.userInfo.zip || "",
+                firstName: user.firstName ?? '',
+                lastName: user.lastName ?? '',
+                email: user.email ?? '',
+                phone: user.phone ?? '',
+                address: user.address ?? '',
+                zip: user.zip ?? '',
             });
 
-            formData.value.location = {
-                state: authStore.userInfo.state || "",
-                city: authStore.userInfo.cityId || 0,
-            };
-        }
-    });
+            formData.value.locaUser.state = user.state ?? '';
+            formData.value.locaUser.city = Number(user.cityId ?? 0);
 
-    const location = useLocationSelect(formData, 'location');
+            locationUser.setStateAndCity(formData.value.locaUser.state, Number(formData.value.locaUser.city));
+        },
+        { immediate: true }
+    );
 
     onMounted(async () => {
         await Promise.all([
             stateStore.fetchStates(),
             authStore.getInfoUser(),
         ]);
-       
-        if (formData.value.location.state && formData.value.location.city) {
-            location.setStateAndCity(
-                formData.value.location.state,
-                Number(formData.value.location.city)
-            );
-        }
     });
 
     //----------------------------------------------------------------------
@@ -122,8 +123,8 @@
         try {          
            const profileData = computed(() => ({
             ...formData.value,
-            state: formData.value.location.state,
-            cityId: Number(formData.value.location.city),
+            state: formData.value.locaUser.state,
+            cityId: Number(formData.value.locaUser.city),
             }));
 
             // onSubmit

@@ -112,15 +112,18 @@ export const useAuthStore = defineStore('auth', {
 
                 if (infoUserResponse.data) {
                     this.userInfo = infoUserResponse.data;
+                    this.authenticated = true;
                 }
 
-                console.log('có kêu nè')
             } catch (e: any) {
 
-                if(e?.response?.status === 401) {
+                if (e?.response?.status === 401) {
                     await this.refreshAccessToken();
                     await this.getInfoUser();
                 }
+
+                // this.authenticated = false;
+                // this.logOut();
 
             }
         },
@@ -324,9 +327,9 @@ export const useAuthStore = defineStore('auth', {
 
                 if (infoSubscribeResponse.data) {
                     this.infoSubscribe = infoSubscribeResponse.data;      
-                    this.infoSubscribeLoaded = false;                         
+                    this.infoSubscribeLoaded = true;                         
                 } else {
-                    this.infoSubscribeLoaded = true;      
+                    this.infoSubscribeLoaded = false;      
                 }
                 
             } catch (e: any) {

@@ -1,14 +1,46 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
+export default defineNuxtRouteMiddleware(async (to) => {
 
     const authStore = useAuthStore();
 
-    let userData = null;
-    if (import.meta.client) {
-        userData = localStorage.getItem('user');
+    const accessToken = useCookie('tokenAccess').value;
+    const refreshToken = useCookie('tokenRefresh').value;
+
+    // Không có token nào → chưa login
+    if (!accessToken && !refreshToken) {
+        authStore.authenticated = false;
+
+        if (to.path !== '/') {
+            return navigateTo('/');
+        }
+
+        return;
     }
 
-    if (!userData) {
-        authStore.authenticated = false;
-        return navigateTo('/');
+     // Có access token → OK
+    if (accessToken) {
+        authStore.authenticated = true;
+        return;
     }
+
+    // Không có access token nhưng có refresh token → refresh
+    if (!accessToken && refreshToken) {
+        try {
+            await authStore.refreshAccessToken();
+            authStore.authenticated = true;
+            return;
+        } catch (err) {
+            authStore.logOut();
+            return navigateTo('/');
+        }
+    }
+
+    // let userData = null;
+    // if (import.meta.client) {
+    //     userData = localStorage.getItem('user');
+    // }
+
+    // if (!userData) {
+    //     authStore.authenticated = false;
+    //     return navigateTo('/');
+    // }
 });

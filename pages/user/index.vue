@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
     
-    definePageMeta({middleware: 'auth-middle'}); 
+    definePageMeta({middleware: ['auth-middle']});
 
     const isLoading = ref(true);
 

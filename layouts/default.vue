@@ -57,29 +57,30 @@
             isLoading.value = true;
 
             try {
-            cartStore.loadCartFromStorage();
+                cartStore.loadCartFromStorage();
 
-            await Promise.all([              
-                authStore.getInfoUser(),
-                authStore.checkSubscribeEmail(),
-                cartStore.fetchDataCart(),
-            ]);
+                await Promise.all([              
+                    authStore.getInfoUser(),
+                    authStore.checkSubscribeEmail(),
+                    cartStore.fetchDataCart(),
+                ]);
 
-            // 🔥 CHECK SAU KHI API XONG
-            if (authStore.infoSubscribe?.userId) {
-                showSubcribe.value = false;
-                return;
-            }
+                // 🔥 CHECK SAU KHI API XONG
+                if (authStore.infoSubscribe?.userId) {
+                    showSubcribe.value = false;
+                    return;
+                }
 
-            const today = new Date().toDateString();
-            const lastVisit = localStorage.getItem('lastVisitDate');
-
-            if (lastVisit !== today) {
-                showSubcribe.value = true;
-                localStorage.setItem('lastVisitDate', today);
-            } else {
-                showSubcribe.value = false;
-            }  
+                const today = new Date().toDateString();
+                const lastVisit = localStorage.getItem('lastVisitDate');
+                
+                if (lastVisit !== today && authStore.infoSubscribeLoaded == true) {
+                    console.log(!authStore.infoSubscribeLoaded)
+                    showSubcribe.value = true;
+                    localStorage.setItem('lastVisitDate', today);
+                } else {
+                    showSubcribe.value = false;
+                }  
 
             } finally {
                 isLoading.value = false;

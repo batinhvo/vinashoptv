@@ -21,7 +21,6 @@
 <script setup lang="ts">
 
     const authStore = useAuthStore();
-    //const orderStore = useOrderStore();
     const cartStore = useCartStore();
 
     const showSubcribe = ref(false);
@@ -60,7 +59,7 @@
                 cartStore.loadCartFromStorage();
 
                 await Promise.all([              
-                    authStore.getInfoUser(),
+                    //authStore.getInfoUser(),
                     authStore.checkSubscribeEmail(),
                     cartStore.fetchDataCart(),
                 ]);
@@ -74,8 +73,7 @@
                 const today = new Date().toDateString();
                 const lastVisit = localStorage.getItem('lastVisitDate');
                 
-                if (lastVisit !== today && authStore.infoSubscribeLoaded == true) {
-                    console.log(!authStore.infoSubscribeLoaded)
+                if (lastVisit !== today && authStore.infoSubscribeLoaded == false) {                 
                     showSubcribe.value = true;
                     localStorage.setItem('lastVisitDate', today);
                 } else {
@@ -89,41 +87,4 @@
         { immediate: true }
     );
 
-    
-
-    // watchEffect(async () => {
-    //     if (authStore.authenticated && !isLoading) {
-    //     isLoading = true;
-    //     try {
-    //         cartStore.loadCartFromStorage();
-
-    //         await Promise.all([
-    //             cartStore.fetchDataCart(),
-    //             authStore.getInfoUser(),
-    //             authStore.checkSubscribeEmail(),
-    //             //orderStore.fetchOrders(),
-    //         ]);
-            
-    //         if (authStore.infoSubscribe?.userId) {
-    //             showSubcribe.value = false;
-    //             return;
-    //         }
-
-    //         const lastVisit  = localStorage.getItem('lastVisitDate');
-    //         const today = new Date().toDateString();
-
-    //         if (lastVisit !== today) {
-    //             showSubcribe.value = true;
-    //             localStorage.setItem('lastVisitDate', today);
-    //         } else {
-    //             showSubcribe.value = false;
-    //         }  
-
-    //     } finally {
-    //         isLoading = false;
-    //     }
-    // }});
-
-    
-    
 </script>

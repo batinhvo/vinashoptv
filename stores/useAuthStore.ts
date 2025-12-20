@@ -4,11 +4,12 @@ const notify = useNotify();
 export const useAuthStore = defineStore('auth', {
     
     state: () => ({
-        infoSubscribeLoaded: false,
         authenticated: false,
         user: null as string | null,
         userInfo: null as UserInfo | null,
         refreshPromise: null as Promise<void> | null,
+
+        infoSubscribeLoaded: false,
         infoSubscribe: {
             userId: undefined,
             isApplied: undefined
@@ -16,332 +17,253 @@ export const useAuthStore = defineStore('auth', {
     }),
 
     actions: {
+        /* ---------------- LOGIN ---------------- */
         async authenticateUser({email, password}: InputDataLogin) {
+            const apiUrl = useApi();
+
             try {
-                const apiUrl = useApi();
+               
                 const userResponse = await $fetch<{ error: number; data: DataUser; message: string }>(`${apiUrl}auth/login`, {
                     method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: {
-                        email, password,
-                    }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: { email, password, },
                 });
 
-                if (userResponse.error) return Promise.reject(userResponse.message);
+                if (userResponse.error) throw new Error(userResponse.message);
 
-                if (userResponse.data) {
-                    const tokenAccess = useCookie('tokenAccess');
-                    const tokenRefresh = useCookie('tokenRefresh');
+                const access = useCookie('tokenAccess', { sameSite: 'lax' });
+                const refresh = useCookie('tokenRefresh', { sameSite: 'lax' });
 
-                    tokenAccess.value = userResponse.data.accessToken;
-                    tokenRefresh.value = userResponse.data.refreshToken;
-                    
-                    localStorage.setItem('user', JSON.stringify(userResponse.data.name));
-                    
-                    this.user = userResponse.data.name;
-                    this.authenticated = true;
-                    window.location.reload();
-                    //refreshNuxtData();
-                    
-                }
+                access.value = userResponse.data.accessToken;
+                refresh.value = userResponse.data.refreshToken;
+                
+                this.user = userResponse.data.name;
+                this.authenticated = true;
+
+                await this.getInfoUser();
+
             } catch (e: any) {
-                console.error("Login failed: ", e);
-                return Promise.reject(e?.response._data?.message || 'Something went wrong')
+                throw new Error(e?.message || 'Login failed');
             }; 
         },
 
+         /* ---------------- LOGOUT ---------------- */
         logOut() {
             const route = useRoute();
 
             useCookie('tokenAccess').value = null;
-            useCookie('tokenRefresh').value = null; 
+            useCookie('tokenRefresh').value = null;
 
-            localStorage.removeItem('cart_merged_after_login');
-            localStorage.removeItem('cart_data');
-            localStorage.removeItem('user');
-
-            this.authenticated = false; 
-            this.userInfo = null;
-            this.user = null;
-            //window.location.reload();
+            localStorage.clear();
+            this.$reset();
 
             const cartStore = useCartStore();
             cartStore.clearLocalCart();
-            //navigateTo('/');
 
             if (route.path === '/user') {
                 navigateTo('/')
-            }
+            }  
         },
 
-        restoreUser() {
-            const token = useCookie('tokenAccess');
-            const userData = localStorage.getItem('user');
+        /* ---------------- RESTORE ---------------- */
+        async restoreUser() {
+            const token = useCookie('tokenAccess').value;
+            if (!token) return;
 
-            if (token && userData) {
-                try {
-                    this.user = JSON.parse(userData);
-                    this.authenticated = true;
-                } catch (error) {
-                    console.error('Error parsing user data:', error);
-                    this.authenticated = false;
-                    this.user = null;
-                }
-            } else {
-                this.authenticated = false;
-                this.user = null;
-            }
+            this.authenticated = true;
+            await this.getInfoUser();
         }, 
 
+        /* ---------------- USER INFO ---------------- */
         async getInfoUser() {
-            if (!this.authenticated || !useCookie('tokenAccess').value) return;
-
-            try {
+            return this.safeRequest(async () => {
                 const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
-                const infoUserResponse = await $fetch<{error: number; data: UserInfo; message: string }>(`${apiUrl}user/info`, {
-                    method: 'GET',
+                const infoUserResponse = await $fetch<{ data: UserInfo }>(`${apiUrl}user/info`, {
                     headers: {
-                        "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token || ""}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
-                if (infoUserResponse.data) {
-                    this.userInfo = infoUserResponse.data;
-                    this.authenticated = true;
-                }
-
-            } catch (e: any) {
-
-                if (e?.response?.status === 401) {
-                    await this.refreshAccessToken();
-                    await this.getInfoUser();
-                }
-
-                // this.authenticated = false;
-                // this.logOut();
-
-            }
+                this.userInfo = infoUserResponse.data;
+                this.user = infoUserResponse.data.firstName + ' ' + infoUserResponse.data.lastName ;
+                this.authenticated = true;
+            });
         },
 
+        /* ---------------- REFRESH TOKEN ---------------- */
         async refreshAccessToken() {
-            if (this.refreshPromise) {
-                return this.refreshPromise; // ⛔ chặn gọi trùng
-            }
+            if (this.refreshPromise) return this.refreshPromise;         
 
             this.refreshPromise = (async () => {
                 const apiUrl = useApi();       
-                const tokenRefresh = useCookie<string>('tokenRefresh');
+                const refresh = useCookie('tokenRefresh').value;
 
-                if (!tokenRefresh.value) {
-                    this.logOut();
-                    throw new Error('No refresh token');
-                }
+                if (!refresh) throw new Error('No refresh token');
 
-                try {
-                    const data = await $fetch<{
-                        error: number;
-                        data: DataRefresh;
-                        message: string;
-                    }>(`${apiUrl}auth/refresh-token`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ refreshToken: tokenRefresh.value })
-                    });
+                const data = await $fetch<{ error: number; data: DataRefresh; message: string; }>(`${apiUrl}auth/refresh-token`, {
+                    method: 'POST',
+                    body: { refreshToken: refresh }
+                });
 
-                    if (data.error) throw new Error(data.message);
+                useCookie('tokenAccess').value = data.data.accessToken;
+                useCookie('tokenRefresh').value = data.data.refreshToken;
 
-                    useCookie('tokenAccess').value = data.data.accessToken;
-                    useCookie('tokenRefresh').value = data.data.refreshToken;
-
-                    this.authenticated = true;
-                } catch (e: any) {
-                    console.error('Token refresh failed:', e);
-
-                    this.authenticated = false;
-
-                    notify({
-                        message: 'Your session has expired, please log in again!',
-                        type: 'error',
-                        time: 3000,
-                    });
-
-                    this.logOut();
-                    throw e;
-                } finally {
-                    this.refreshPromise = null;
-                }
             })();
 
-            return this.refreshPromise;
+            try {
+                await this.refreshPromise;
+            } catch {
+                this.logOut();
+            } finally {
+                this.refreshPromise = null;
+            }
         },
 
+        /* ---------------- SAFE REQUEST ---------------- */
+        async safeRequest(callback: () => Promise<void>) {
+            try {
+                await callback();
+            } catch (e: any) {
+                if (e?.response?.status === 401) {
+                    await this.refreshAccessToken();
+                    await callback();
+                } else {
+                    throw e;
+                }
+            }
+        },
+
+        /* ---------------- CHECK-EMAIL-SUBSCRIBE ---------------- */
+        async checkSubscribeEmail() {
+            return this.safeRequest(async () => {
+                const apiUrl = useApi();
+                const token = useCookie('tokenAccess').value;
+
+                const res = await $fetch<{ data: InfoSubscribe }>(`${apiUrl}subscribes`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                this.infoSubscribe = res.data;
+                this.infoSubscribeLoaded = true;
+            });
+        },
+
+        /* ---------------- REGISTER ---------------- */
         async registerUser(profileData: any) {
             try {
                 const apiUrl = useApi();
+
                 await $fetch(`${apiUrl}auth/register`, {
                     method: 'POST',
-                    body: profileData.value,
-                    headers: {
-                    'Content-Type': 'application/json'
-                    }
+                    body: profileData.value,                 
                 });
-            } catch (e) {
-                console.error('Error update profile user: ', e);
-                return Promise.reject((e as Error)?.message || 'Something went wrong')
+
+            } catch (e: any) {
+                console.error('Register user error: ', e);
+                throw new Error(e?.response?._data?.message || 'Register failed');
             }
         },
 
+        /* ---------------- FORGOT-PASSWORD ---------------- */
         async forgotPassword(email: string) {
             try {
                 const apiUrl = useApi();
+
                 await $fetch(`${apiUrl}auth/forgot-password`, {
                     method: 'POST',
-                    body: {email: email},
-                    headers: {
-                    'Content-Type': 'application/json'
-                    }
+                    body: {email: email},                   
                 });
             } catch (e: any) {
                 console.error('Error recover password: ', e);
-                return Promise.reject(e?.response._data?.message || 'Something went wrong')
+                throw new Error(e?.response?._data?.message || 'Request failed');
             }
         },
 
-        async resetPasswordUser(infoPass: {token:string;password:string}) {
+        /* ---------------- RESET-PASSWORD ---------------- */
+        async resetPasswordUser({ token, password }: { token: string; password: string }) {
             try {
                 const apiUrl = useApi();
+
                 await $fetch(`${apiUrl}auth/reset-password`, {
                     method: 'POST',
-                    body: {
-                        password: infoPass.password,
-                        token: infoPass.token
-                    },
-                    headers: {
-                    'Content-Type': 'application/json'
-                    }
+                    body: { token, password },            
                 });
             } catch (e: any) {
-                console.error('Error recover password: ', e);
-                return Promise.reject(e?.response._data?.message || 'Something went wrong')
+                console.error('Reset password error:', e);
+                throw new Error(e?.response?._data?.message || 'Reset password failed');
             }
         },
 
-        async updateProfileUser({address, cityId, country, firstName, lastName, phone, state, zip}: DataProfileUser) {
-            try {
+        /* ---------------- UPDATE-PROFILE-USER ---------------- */
+        async updateProfileUser(payload: DataProfileUser) {
+
+            return this.safeRequest(async () => {
                 const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
-                if (!token) throw new Error("No token available");
+                if (!token) throw new Error('Unauthorized');
 
-                await $fetch<{error: number; message: string}>(`${apiUrl}auth`, {
+                await $fetch(`${apiUrl}auth`, {
                     method: 'PATCH',
                     headers: {
-                        "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token || ""}`,
+                        Authorization: `Bearer ${token}`,
                     },
-                    body: { address, cityId, country, firstName, lastName, phone, state, zip },
+                    body: payload,
                 });
-                
-            } catch (e: any) {
-                console.error('Error update profile user: ', e);
-                return Promise.reject(e?.response._data?.message || 'Something went wrong')
-            }
+            });
         },
 
+        /* ---------------- CHANGE-PASSWORD ---------------- */
         async updatePasswordUser({currentPassword, newPassword}: PassUser) {
-            try {
+
+            return this.safeRequest(async () => {
                 const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
-                if (!token) throw new Error("No token available");
+                if (!token) throw new Error('Unauthorized');
 
-                const changePassResponse = await $fetch<{error: number; message: string}>(`${apiUrl}auth/change-password`, {
+                await $fetch(`${apiUrl}auth/change-password`, {
                     method: 'PATCH',
                     headers: {
-                        "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token || ""}`,
+                        Authorization: `Bearer ${token}`,
                     },
                     body: { currentPassword, newPassword },
                 });
-  
-                if (changePassResponse.error) throw new Error(changePassResponse.message);
-            } catch (e: any) {
-                console.error('Error updating password: ', e);
-            }
+            });
+
         },
 
+        /* ---------------- SUBSCRIBE-EMAIL ---------------- */
         async subscribeEmail(email: string) {
-            try {
+            return this.safeRequest(async () => {
                 const apiUrl = useApi();
                 const token = useCookie('tokenAccess').value;
 
-                if (!token) throw new Error("No token available");
+                if (!token) throw new Error('Unauthorized');
 
-                const subscribeResponse = await $fetch<{error: number; message: string; userId: number}>(`${apiUrl}subscribes`, {
+                const res = await $fetch<{ userId: number }>(`${apiUrl}subscribes`, {
                     method: 'POST',
                     headers: {
-                        "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token || ""}`,
+                        Authorization: `Bearer ${token}`,
                     },
                     body: { email },
                 });
 
-                if (subscribeResponse.error) throw new Error(subscribeResponse.message);
-
-                this.infoSubscribe.userId = subscribeResponse.userId; 
-                this.infoSubscribeLoaded = false;              
+                this.infoSubscribe.userId = res.userId;
+                this.infoSubscribeLoaded = false;
 
                 notify({
                     message: 'Subscribed to discount emails successfully!',
                     type: 'success',
                     time: 3000,
                 });
+            });
 
-            } catch (e: any) {
-                console.error('Error subscribe email: ', e);
-                return Promise.reject(e?.response._data?.message || 'Something went wrong')
-            }
         },
 
-        async checkSubscribeEmail() {
-            if (!this.authenticated || !useCookie('tokenAccess').value) return;
-
-            try {
-                const apiUrl = useApi();
-                const token = useCookie('tokenAccess').value;
-
-                const infoSubscribeResponse = await $fetch<{error: number; data: InfoSubscribe; message: string }>(`${apiUrl}subscribes`, {
-                    method: 'GET',
-                    headers: {
-                        "Content-Type" : "application/json",
-                        "Authorization" : `Bearer ${token || ""}`,
-                    },
-                });
-
-                if (infoSubscribeResponse.data) {
-                    this.infoSubscribe = infoSubscribeResponse.data;      
-                    this.infoSubscribeLoaded = true;                         
-                } else {
-                    this.infoSubscribeLoaded = false;      
-                }
-                
-            } catch (e: any) {
-
-                if(e?.response?.status === 401) {
-                    await this.refreshAccessToken();
-                    await this.checkSubscribeEmail();
-                }
-
-                console.error('Error subscribe email: ', e);
-                return Promise.reject(e?.response._data?.message || 'Something went wrong')
-            }
-        },
     },
 });

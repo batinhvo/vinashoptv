@@ -8,51 +8,67 @@ interface City {
     name: string;
 }
 
+interface ApiResponse<T> {
+  error: number
+  data: T
+  message: string
+}
+
 export const useStateStore = defineStore('states', () => {
     const apiUrl = useApi();
 
-    // Dữ liệu state
-    const states = ref<State[]>([]);  
-    const cities = ref<City[]>([]);
-
-    const error = ref<number>(0); // Lưu trạng thái lỗi, 0 là không có lỗi.
-    const message = ref<string>(''); 
+    // state
+    const states = ref<State[]>([])
+    const cities = ref<City[]>([])
+    const error = ref(0)
+    const message = ref('')
     
-    const fetchStates =  async () => {
+    // helper fetch chung
+    const fetchApi = async <T>(url: string): Promise<T> => {
         try {
-            const data = await $fetch<{ error: number; data: State[]; message: string }>(`${apiUrl}states`);
-            if (data) {
-                states.value = data.data || [];
-                message.value = data.message || 'Không có thông báo';
-            }
-        } catch (err) {
-            error.value = 1;
-            message.value = 'Lỗi khi tải dữ liệu state.';
+            const res = await $fetch<ApiResponse<T>>(`${apiUrl}${url}`)
+            message.value = res.message || ''
+            error.value = res.error || 0
+            return res.data
+        } catch {
+            error.value = 1
+            throw new Error('Fetch failed')
         }
-    };
+    }
 
-    const fetchCities = async (stateCode: string): Promise<{id:number; name:string}[]> => {
+    const fetchStates = async () => {
         try {
-            cities.value = [];
-            const data = await $fetch<{ error: number; data: City[]; message: string }>(`${apiUrl}cities?state=${stateCode}`);
-            if (data.data) {
-                cities.value = data.data || [];
-                message.value = data.message || 'Không có thông báo';
-                return cities.value;
-            }
-            return [];
-        } catch (err) {
-            error.value = 1;
-            message.value = 'Lỗi khi tải dữ liệu city.';
-            return [];
+            states.value = await fetchApi<State[]>('states')
+        } catch {
+            message.value = 'Lỗi khi tải dữ liệu state.'
+            states.value = []
         }
-    };
+    }
+
+    const fetchCities = async (stateCode: string) => {
+        try {
+            cities.value = await fetchApi<City[]>(`cities?state=${stateCode}`)
+            return cities.value
+        } catch {
+            message.value = 'Lỗi khi tải dữ liệu city.'
+            cities.value = []
+            return []
+        }
+    }
 
     const resetCities = () => {
         cities.value = [];
     };
     
-    return { states, cities, fetchStates, fetchCities, resetCities };
+    return {
+        states,
+        cities,
+        error,
+        message,
+        fetchStates,
+        fetchCities,
+        resetCities,
+    }
 });
 
 

@@ -1,4 +1,5 @@
 import type { CartItem, Coupon, Discount, Promotion, QuantityGift, Weight } from "types/orderTypes";
+import { number } from "yup";
 const notify = useNotify();
 
 export const useCartStore = defineStore('cart', () => {
@@ -151,70 +152,68 @@ export const useCartStore = defineStore('cart', () => {
     const fetchDataCart = async () => {
         if (!authStore.authenticated || !token()) return;
 
-         // ❗ Nếu đã merge rồi thì chỉ fetch cart, KHÔNG merge nữa
+        // Nếu đã merge rồi thì chỉ fetch cart, KHÔNG merge nữa
         const isMerged = localStorage.getItem(CART_MERGE_KEY);
 
         try {
-            const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token()}`,
-                    'Content-Type': 'application/json',
-                },
-            });   
+            await authStore.safeRequest( async () => {
+                const dataCartResponse = await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+                    headers: {Authorization: `Bearer ${token()}`},
+                }); 
 
-            if(dataCartResponse?.data == null) {
-                isPutCart.value = false;                
-            } else {                
-                isPutCart.value = true;
-            }
-            
-            const serverCart = dataCartResponse?.data ? JSON.parse(dataCartResponse.data) : [];
+                if(dataCartResponse?.data == null) {
+                    isPutCart.value = false;                
+                } else {                
+                    isPutCart.value = true;
+                }
+                
+                const serverCart = dataCartResponse?.data ? JSON.parse(dataCartResponse.data) : [];
 
-            if (isMerged) {
+                if (isMerged) {
+                    addCartItems.value = [];
+                    await Promise.all(
+                        serverCart.map((item: any) =>
+                            addProductToCart(item.skuId, item.quantity, true)
+                        )
+                    );
+                    return;
+                }
+
+                if (!addCartItems.value.length) {
+                    loadCartFromStorage();
+                }
+
+                const localCart  = addCartItems.value.map(i => ({
+                    skuId: i.skuId,
+                    quantity: i.quantity
+                }));
+
+                const mergedCart = mergeCart(localCart, serverCart);
+
                 addCartItems.value = [];
+                listGiftChecked.value = [];
+
                 await Promise.all(
-                    serverCart.map((item: any) =>
+                    mergedCart.map(item =>
                         addProductToCart(item.skuId, item.quantity, true)
                     )
                 );
-                return;
-            }
 
-            if (!addCartItems.value.length) {
-                loadCartFromStorage();
-            }
+                // sync lên server
+                await $fetch(`${apiUrl}carts`, {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `Bearer ${token()}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: { skuIdList: JSON.stringify(mergedCart) },
+                });
 
-            const localCart  = addCartItems.value.map(i => ({
-                skuId: i.skuId,
-                quantity: i.quantity
-            }));
+                localStorage.setItem('cart_data', JSON.stringify(mergedCart));
+                localStorage.setItem(CART_MERGE_KEY, 'true');
 
-            const mergedCart = mergeCart(localCart, serverCart);
-
-            addCartItems.value = [];
-            listGiftChecked.value = [];
-
-            await Promise.all(
-                mergedCart.map(item =>
-                    addProductToCart(item.skuId, item.quantity, true)
-                )
-            );
-
-            // sync lên server
-            await $fetch(`${apiUrl}carts`, {
-                method: 'PUT',
-                headers: {
-                    Authorization: `Bearer ${token()}`,
-                    'Content-Type': 'application/json',
-                },
-                body: { skuIdList: JSON.stringify(mergedCart) },
+                error.value = 0; 
             });
-
-            localStorage.setItem('cart_data', JSON.stringify(mergedCart));
-            localStorage.setItem(CART_MERGE_KEY, 'true');
-
-            error.value = 0; 
 
         } catch (err) {
             console.error("Error fetching cart:", err);
@@ -348,19 +347,17 @@ export const useCartStore = defineStore('cart', () => {
         }));
 
         try {
-            console.log(isPutCart.value)
-            const method = isPutCart.value ? 'PUT' : 'POST';
+            await authStore.safeRequest(async () => {
+                const method = isPutCart.value ? 'PUT' : 'POST';
 
-            await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-                method,
-                headers: {
-                    Authorization: `Bearer ${token()}`,
-                    'Content-Type': 'application/json',
-                },
-                body: { skuIdList: JSON.stringify(skuIdList) },
-            });
+                await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
+                    method,
+                    headers: { Authorization: `Bearer ${token()}`, },
+                    body: { skuIdList },
+                });
 
-            error.value = 0;
+                error.value = 0;
+            });            
         } catch (err) {
             console.error("Error posting cart:", err)
             error.value = 1;
@@ -370,17 +367,23 @@ export const useCartStore = defineStore('cart', () => {
     //Clear Cart
     const clearCart = async () => {
         try {
-            await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
-                method: 'PUT',
-                headers: {
-                    Authorization: `Bearer ${token()}`,
-                    'Content-Type': 'application/json',
-                },
-                body: { skuIdList: JSON.stringify([]) },
+            await authStore.safeRequest(async () => {
+                await $fetch(`${apiUrl}carts`, {
+                    method: 'PUT',
+                    headers: { Authorization: `Bearer ${token()}`, },
+                    body: { skuIdList: [] },
+                });
+
+                // 🔥 Clear local cart
+                addCartItems.value = [];
+                listGiftChecked.value = [];
+                localStorage.removeItem('cart_data');
+                localStorage.removeItem(CART_MERGE_KEY);
+
+                error.value = 0;
             });
-            error.value = 0;
         } catch (err) {
-            console.error("Error posting cart:", err)
+            console.error("Error clearing cart:", err)
             error.value = 1;
         }
     }
@@ -410,8 +413,7 @@ export const useCartStore = defineStore('cart', () => {
     const fetchDiscount = async (subtotal : number) => {
         try {
             const dataDis = await $fetch<{ error: number; data: Discount; message: string }>(`${apiUrl}discounts`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST',               
                 body: { subtotal }
             })
 
@@ -448,9 +450,8 @@ export const useCartStore = defineStore('cart', () => {
                 
         try {
             const promotionRes = await $fetch<{ error: number; data: Promotion ; message: string }>(`${apiUrl}promotions`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: { skuId : skuId }
+                method: 'POST',                
+                body: { skuId }
             })
 
             if (promotionRes?.data) {
@@ -495,14 +496,12 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     // COUPON
-    const fetchCoupon = async (code:string) => {
+    const fetchCoupon = async (code:string):Promise<number> => {
         try {
-            const headers: Record<string, string> = {
-                "Content-Type": "application/json",
-            };
+            const headers: Record<string, string> = {};
 
-            if (code === "FIRSTORDER") {
-                headers["Authorization"] = `Bearer ${token()}`;
+            if (code === process.env.AUTH_REDIRECT_COUPONS && token()) {
+                headers.Authorization = `Bearer ${token()}`;
             }
 
             const dataCoupon = await $fetch<{ error: number; data: Coupon; message: string }>(`${apiUrl}coupons`, {
@@ -511,36 +510,39 @@ export const useCartStore = defineStore('cart', () => {
                 body: { code }
             })
 
-            if (dataCoupon?.data) {
-                const coupon = dataCoupon.data;
+            const coupon = dataCoupon.data;
 
-                if (coupon.type === 'shipping') {
-                    if (coupon.discountBasedOn === 'percent') {
-                        couponValue.value = (coupon.codeValue / 100) * shippingFee.value;
-                    } else if (coupon.discountBasedOn === 'value') {
-                        couponValue.value = coupon.codeValue;
-                    } else {
-                        couponValue.value = 0;
-                    }
-                }
-
-                if (coupon.type === 'discount') {
-                    if (coupon.discountBasedOn === 'percent') {
-                        couponValue.value = (coupon.codeValue / 100) * subTotal.value;
-                    } else if (coupon.discountBasedOn === 'value') {
-                        couponValue.value = coupon.codeValue;
-                    } else {
-                        couponValue.value = 0;
-                    }
-                }
-
-                typeCoupon.value = coupon.type;
-                successNotify('Coupon Code Applied Successfully!')
-            } else {
+            if (!coupon) {
                 couponValue.value = 0;
-                errorNotify(dataCoupon.message);
+                errorNotify(dataCoupon.message || 'Invalid Coupon Code');
+                return couponValue.value;
             }
 
+            const baseAmount = coupon.type === 'shipping' ? shippingFee.value : subTotal.value;
+
+           
+            if (coupon.discountBasedOn === 'percent') {
+                couponValue.value = (coupon.codeValue / 100) * baseAmount;
+            } else if (coupon.discountBasedOn === 'value') {
+                couponValue.value = coupon.codeValue;
+            } else {
+                couponValue.value = 0;
+            }
+            
+
+            // if (coupon.type === 'discount') {
+            //     if (coupon.discountBasedOn === 'percent') {
+            //         couponValue.value = (coupon.codeValue / 100) * subTotal.value;
+            //     } else if (coupon.discountBasedOn === 'value') {
+            //         couponValue.value = coupon.codeValue;
+            //     } else {
+            //         couponValue.value = 0;
+            //     }
+            // }
+
+            typeCoupon.value = coupon.type;
+            successNotify('Coupon Code Applied Successfully!')
+            
             error.value = 0;
             return couponValue.value;
 

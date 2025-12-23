@@ -353,7 +353,7 @@ export const useCartStore = defineStore('cart', () => {
                 await $fetch<{ error: number; data: string }>(`${apiUrl}carts`, {
                     method,
                     headers: { Authorization: `Bearer ${token()}`, },
-                    body: { skuIdList },
+                    body: { skuIdList: JSON.stringify(skuIdList) },
                 });
 
                 error.value = 0;

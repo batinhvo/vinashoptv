@@ -40,7 +40,7 @@ export const useAuthStore = defineStore('auth', {
                 this.user = userResponse.data.name;
                 this.authenticated = true;
 
-                await this.getInfoUser();
+                //await this.getInfoUser();
 
             } catch (e: any) {
                 throw new Error(e?.message || 'Login failed');
@@ -71,7 +71,7 @@ export const useAuthStore = defineStore('auth', {
             if (!token) return;
 
             this.authenticated = true;
-            await this.getInfoUser();
+            //await this.getInfoUser();
         }, 
 
         /* ---------------- USER INFO ---------------- */

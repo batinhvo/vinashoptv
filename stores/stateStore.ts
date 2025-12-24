@@ -40,7 +40,7 @@ export const useStateStore = defineStore('states', () => {
         try {
             states.value = await fetchApi<State[]>('states')
         } catch {
-            message.value = 'Lỗi khi tải dữ liệu state.'
+            message.value = 'Error loading state location data'
             states.value = []
         }
     }
@@ -50,7 +50,7 @@ export const useStateStore = defineStore('states', () => {
             cities.value = await fetchApi<City[]>(`cities?state=${stateCode}`)
             return cities.value
         } catch {
-            message.value = 'Lỗi khi tải dữ liệu city.'
+            message.value = 'Error loading city location data'
             cities.value = []
             return []
         }

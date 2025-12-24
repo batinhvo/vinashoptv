@@ -59,6 +59,7 @@
                 cartStore.loadCartFromStorage();
 
                 await Promise.all([              
+                    authStore.getInfoUser(),
                     authStore.checkSubscribeEmail(),
                     cartStore.fetchDataCart(),
                 ]);

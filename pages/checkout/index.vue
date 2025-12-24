@@ -614,7 +614,7 @@
 
     //----------------------------INVOICE FORM-----------------------------------//.
     const creditcardOpt = ['MasterCard', 'VISA', 'Discover', 'American Express', 'Amex', 'JCB', 'AstroPayCart', 'Diners Club International'];
-    const monthOpt = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    const monthOpt = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
     const yearOpt: string[] = Array.from({ length: 30 }, (_, i) => (2025 + i).toString());
 
     const maxInput = (e: Event) => {

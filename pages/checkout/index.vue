@@ -605,14 +605,11 @@
         await Promise.all([
             stateStore.fetchStates(),
             cartStore.fetchWeights(),
-            authStore.getInfoUser(),
         ]);
         
         setTimeout(() => {
             isLoading.value = false;
         }, 2000);
-        
-        
     });
 
     //----------------------------INVOICE FORM-----------------------------------//.

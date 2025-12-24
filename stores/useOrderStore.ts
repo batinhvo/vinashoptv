@@ -68,41 +68,20 @@ export const useOrderStore = defineStore('order', {
             try {
                 const apiUrl = useApi();
 
-                return await $fetch<{ error: number; message: string }>(`${apiUrl}invoices/paypal`, {
-                    query: { token, payerId },
-                });
+                const response = await $fetch<{ error: number; message: string }>(`${apiUrl}invoices/paypal?token=${token}&payerId=${payerId}`);
+
+                return {
+                    error: response.error,
+                    message: response.message,
+                };
 
             } catch (e: any) {
-                console.error('Paypal confirm error:', e);
+                console.error("Error in handleAfterPaypalReturn:", e);
                 return {
                     error: 1,
-                    message: 'Paypal confirmation failed',
+                    message: "An error occurred while confirming PayPal payment."
                 };
             }
         },
-
-        // async handleAfterPaypalReturn(token: string, payerId: string) {
-        //     try {
-        //         const apiUrl = useApi();
-
-        //         const response = await $fetch<{ error: number; message: string }>(`${apiUrl}invoices/paypal?token=${token}&payerId=${payerId}`,{
-        //                 method: "GET",
-        //                 headers: {"Content-Type": "application/json"},
-        //             }
-        //         );
-
-        //         return {
-        //             error: response.error,
-        //             message: response.message,
-        //         };
-
-        //     } catch (e: any) {
-        //         console.error("Error in handleAfterPaypalReturn:", e);
-        //         return {
-        //             error: 1,
-        //             message: "An error occurred while confirming PayPal payment."
-        //         };
-        //     }
-        // },
     }
 });

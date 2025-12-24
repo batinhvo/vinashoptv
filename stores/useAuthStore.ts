@@ -122,16 +122,21 @@ export const useAuthStore = defineStore('auth', {
         },
 
         /* ---------------- SAFE REQUEST ---------------- */
-        async safeRequest(callback: () => Promise<void>) {
+        async safeRequest<T>(
+            callback: () => Promise<T>,
+            timeout = 10000,
+            retried = false
+        ): Promise<T> {
             try {
-                await callback();
+               return await callback();
+
             } catch (e: any) {
-                if (e?.response?.status === 401) {
-                    await this.refreshAccessToken();
-                    await callback();
-                } else {
-                    throw e;
-                }
+
+                if (e?.status === 401 && !retried) {
+                await this.refreshAccessToken();
+                return this.safeRequest(callback, timeout, true);
+            }
+                throw e;
             }
         },
 

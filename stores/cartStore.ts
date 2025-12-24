@@ -1,5 +1,4 @@
 import type { CartItem, Coupon, Discount, Promotion, QuantityGift, Weight } from "types/orderTypes";
-import { number } from "yup";
 const notify = useNotify();
 
 export const useCartStore = defineStore('cart', () => {
@@ -161,11 +160,7 @@ export const useCartStore = defineStore('cart', () => {
                     headers: {Authorization: `Bearer ${token()}`},
                 }); 
 
-                if(dataCartResponse?.data == null) {
-                    isPutCart.value = false;                
-                } else {                
-                    isPutCart.value = true;
-                }
+                isPutCart.value = !!dataCartResponse?.data;
                 
                 const serverCart = dataCartResponse?.data ? JSON.parse(dataCartResponse.data) : [];
 
@@ -364,30 +359,6 @@ export const useCartStore = defineStore('cart', () => {
         }        
     }
 
-    //Clear Cart
-    const clearCart = async () => {
-        try {
-            await authStore.safeRequest(async () => {
-                await $fetch(`${apiUrl}carts`, {
-                    method: 'PUT',
-                    headers: { Authorization: `Bearer ${token()}`, },
-                    body: { skuIdList: [] },
-                });
-
-                // 🔥 Clear local cart
-                addCartItems.value = [];
-                listGiftChecked.value = [];
-                localStorage.removeItem('cart_data');
-                localStorage.removeItem(CART_MERGE_KEY);
-
-                error.value = 0;
-            });
-        } catch (err) {
-            console.error("Error clearing cart:", err)
-            error.value = 1;
-        }
-    }
-
     //LOAD PRODUCT
     const getDataProduct = async (idSku : number, fetchPromo = true) => {
         await productStore.fetchProductDetailSkus(idSku);
@@ -577,12 +548,31 @@ export const useCartStore = defineStore('cart', () => {
         sessionStorage.removeItem('checkout_data')
     }
 
+    //Clear Cart
+    const clearCart = async () => {
+        if (!authStore.authenticated || !token()) return;
+
+        try {
+            await authStore.safeRequest(async () => {
+                await $fetch(`${apiUrl}carts`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token()}` },
+                });
+            });
+            error.value = 0;
+        } catch (err) {
+            console.error("Error clearing cart:", err)
+            error.value = 1;
+        }
+    }
+
     // clear data -> logout
     const clearLocalCart = () => {
         addCartItems.value = []
         dataPromotions.value = []
-        //localStorage.removeItem('cart_data')
-        //localStorage.removeItem('dataPromotions_data')
+        listGiftChecked.value = [];
+        localStorage.removeItem('cart_data');
+        localStorage.removeItem(CART_MERGE_KEY);
     }
 
     //remove product cart

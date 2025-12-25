@@ -52,12 +52,13 @@
         async (isAuth) => {
             if (!isAuth) return;
             if (isLoading.value) return;
+            if (!process.client) return;
 
             isLoading.value = true;
 
             try {
                 cartStore.loadCartFromStorage();
-
+                
                 await Promise.all([              
                     authStore.getInfoUser(),
                     authStore.checkSubscribeEmail(),

@@ -641,8 +641,14 @@
             const payload = getFinalFormData()
 
             try {
-                normalizeCardInfo()
-                await orderStore.submitOrder(payload);
+                normalizeCardInfo();
+
+                if ( authStore.authenticated ) {
+                    await orderStore.submitOrder(payload);
+                } else {
+                    orderStore.submitOrderToPassersby(payload);
+                }
+                
                 await cartStore.clearCart();
                 cartStore.clearLocalCart();           
             } catch (error) {

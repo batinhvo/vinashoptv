@@ -26,10 +26,9 @@ export async function useApiFetch<T>(
     } catch (err: any) {
         // ⛔ token hết hạn
         if (err?.response?.status === 401 && token.value) {
-            // 1️⃣ xin token mới (atomic: chỉ gọi 1 lần)
+            
             await authStore.refreshAccessToken();
 
-        // 2️⃣ retry lại request
         return await $fetch<T>(`${apiUrl}${url}`, {
                 ...options,
                 headers: {

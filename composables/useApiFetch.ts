@@ -13,7 +13,6 @@ export async function useApiFetch<T>(
         ...(options.headers as HeadersInit),
     };
 
-    // Auto add Content-Type only when sending body
     if (options.body && !(headers as Record<string, unknown>)['Content-Type']) {
         (headers as Record<string, string>)['Content-Type'] = 'application/json';
     }
@@ -23,17 +22,19 @@ export async function useApiFetch<T>(
             ...options,
             headers,
         });
-    } catch (err: any) {
-        // ⛔ token hết hạn
-        if (err?.response?.status === 401 && token.value) {
-            
-            await authStore.refreshAccessToken();
 
-        return await $fetch<T>(`${apiUrl}${url}`, {
+    } catch (err: any) {
+        //token hết hạn
+        if (err?.response?.status === 401 || err?.response?.message === 'jwt expired' && token.value) {
+                        
+            await authStore.refreshAccessToken();
+            const newToken = useCookie('tokenAccess');
+
+            return await $fetch<T>(`${apiUrl}${url}`, {
                 ...options,
                 headers: {
-                ...(token.value ? { Authorization: `Bearer ${token.value}` } : {}),
-                ...(options.headers as HeadersInit),
+                    ...(newToken.value ? { Authorization: `Bearer ${newToken.value}` } : {}),
+                    ...(options.headers as HeadersInit),
                 },
             });
         }

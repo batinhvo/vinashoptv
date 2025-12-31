@@ -32,18 +32,13 @@ export const useOrderStore = defineStore('order', {
         },
 
         async submitOrder(payload: any) {            
-            const apiUrl = useApi();
             const notify = useNotify();
             const authStore = useAuthStore();
 
             return authStore.safeRequest(async () => {
-                const token = useCookie('tokenAccess').value;
 
-                const res = await $fetch<{ data: string }>(`${apiUrl}invoices`, {
+                const res = await useApiFetch<{ data: string; }>(`invoices`, {
                     method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
                     body: payload,
                 });
 

@@ -131,8 +131,11 @@ export const useAuthStore = defineStore('auth', {
                return await callback();
 
             } catch (e: any) {
+                const status = e?.response?.status || e?.statusCode;
+                const msg = e?.response?._data?.message || e?.data?.message || e?.message;
 
-                if (e?.status === 401 && !retried) {
+                const isTokenExpired = status === 401 || msg === 'jwt expired';
+                if (isTokenExpired && !retried) {
                 await this.refreshAccessToken();
                 return this.safeRequest(callback, timeout, true);
             }

@@ -605,6 +605,7 @@
         await Promise.all([
             stateStore.fetchStates(),
             cartStore.fetchWeights(),
+            cartStore.fetchDataCart(),
         ]);
         
         setTimeout(() => {

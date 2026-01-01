@@ -110,17 +110,25 @@
         }
     });
 
-    // watch(
-    //     () => modelValue.value,
-    //     (val) => {
-    //         if (val !== undefined && val !== null) {
-    //         setValue(val);        // cập nhật cho Field
-    //         selectedValue.value = val; 
-    //         fieldValue.value = val;
-    //         }
-    //     },
-    //     { immediate: true }
-    // );
+    
+
+    watch(
+        () => modelValue.value,
+        (val) => {
+            if (val !== undefined && val !== null) {
+            setValue(val);        // cập nhật cho Field
+            selectedValue.value = val; 
+            fieldValue.value = val;
+
+            //console.log('InputSelective mounted', fieldValue.value);
+            }
+        },
+        { immediate: true }
+
+        
+    );
+
+    
 
     
 </script>

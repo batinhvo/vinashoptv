@@ -116,6 +116,8 @@
   const authStore = useAuthStore();
   const { handleSubmit, resetForm } = useForm();
 
+  location.newStateSelect.value = 'Select State';
+
   const onSubmit = handleSubmit( async () => {
     try {
       const profileData = computed(() => ({

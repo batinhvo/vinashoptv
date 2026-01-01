@@ -34,13 +34,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
         }
     }
 
-    // let userData = null;
-    // if (import.meta.client) {
-    //     userData = localStorage.getItem('user');
-    // }
-
-    // if (!userData) {
-    //     authStore.authenticated = false;
-    //     return navigateTo('/');
-    // }
+    if (authStore.authenticated && !authStore.userInfo) {
+        await authStore.getInfoUser();
+    }
 });

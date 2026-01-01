@@ -70,7 +70,7 @@
     /* ---------- FETCH DATA ---------- */
     onMounted(async () => {
         await Promise.all([
-            authStore.getInfoUser(),
+            //authStore.getInfoUser(),
             stateStore.fetchStates()
         ]);
 

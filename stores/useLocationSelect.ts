@@ -7,6 +7,7 @@ export function useLocationSelect(formData: any, keyPath: string) {
     const cityOpt  = computed(() => cities.value.map(c => c.name));
 
     const newStateSelect   = ref('');
+    const newCitySelect   = ref('');
     const statePlaceholder = ref('Select State');
     const cityPlaceholder  = ref('Select City');
 
@@ -31,6 +32,9 @@ export function useLocationSelect(formData: any, keyPath: string) {
 
         statePlaceholder.value = stateStore.states.find(s => s.code === stateCode)?.name || 'Select State';
         cityPlaceholder.value = cities.value.find(c => c.id === cityId)?.name || 'Select City';
+    
+        newStateSelect.value = statePlaceholder.value;
+        newCitySelect.value  = cityPlaceholder.value;
     };
     
     return {
@@ -41,7 +45,8 @@ export function useLocationSelect(formData: any, keyPath: string) {
         stateOnSelected,
         cityOnSelected,
         setStateAndCity,
-        newStateSelect
+        newStateSelect,
+        newCitySelect,
     }
 
 }

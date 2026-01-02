@@ -2,9 +2,13 @@ export function useLocationSelect(formData: any, keyPath: string) {
     const stateStore = useStateStore();
 
     const stateOpt = computed(() => stateStore.states.map(s => s.name));
-    const cities = ref<{ id: number; name: string }[]>([]);
 
-    const cityOpt  = computed(() => cities.value.map(c => c.name));
+    const cityOpt = computed(() => {
+        const stateCode = formData.value[keyPath].state
+        return stateCode
+        ? (stateStore.cities[stateCode] || []).map(c => c.name)
+        : []
+    })
 
     const newStateSelect   = ref('');
     const newCitySelect   = ref('');
@@ -12,29 +16,44 @@ export function useLocationSelect(formData: any, keyPath: string) {
     const cityPlaceholder  = ref('Select City');
 
     const stateOnSelected = async (value: string) => {
-        const code = stateStore.states.find(s => s.name === value)?.code || '';
+        const code = stateStore.states.find(s => s.name === value)?.code;
+        if (!code) return;
+
+        if (formData.value[keyPath].state === code) return;
+
         formData.value[keyPath].state = code;
+        formData.value[keyPath].city  = '';
+
+        newCitySelect.value = '';
         cityPlaceholder.value = 'Select City';
 
-        cities.value = code ? (await stateStore.fetchCities(code)) ?? [] : [];
-    };
+        await stateStore.fetchCities(code);
+    }
 
     const cityOnSelected = (value: string) => {
-        formData.value[keyPath].city =
-        String(cities.value.find(c => c.name === value)?.id || 0);
-    };
+        const stateCode = formData.value[keyPath].state;
+        const cities = stateStore.cities[stateCode] || [];
+
+        formData.value[keyPath].city = String(cities.find(c => c.name === value)?.id || 0);
+    }
 
 
     const setStateAndCity = async (stateCode: string, cityId: number) => {
-        if (stateCode) cities.value = (await stateStore.fetchCities(stateCode)) ?? [];
+        if (!stateCode) return
+
+        const cityList = await stateStore.fetchCities(stateCode);
+
         formData.value[keyPath].state = stateCode;
         formData.value[keyPath].city  = String(cityId);
 
-        statePlaceholder.value = stateStore.states.find(s => s.code === stateCode)?.name || 'Select State';
-        cityPlaceholder.value = cities.value.find(c => c.id === cityId)?.name || 'Select City';
-    
-        newStateSelect.value = statePlaceholder.value;
-        newCitySelect.value  = cityPlaceholder.value;
+        const stateName = stateStore.states.find(s => s.code === stateCode)?.name || 'Select State';
+        const cityName = cityList.find(c => c.id === cityId)?.name || 'Select City';
+
+        statePlaceholder.value = stateName;
+        cityPlaceholder.value  = cityName;
+
+        newStateSelect.value = stateName;
+        newCitySelect.value  = cityName;
     };
     
     return {
@@ -42,11 +61,11 @@ export function useLocationSelect(formData: any, keyPath: string) {
         cityOpt,
         statePlaceholder,
         cityPlaceholder,
+        newStateSelect,
+        newCitySelect,
         stateOnSelected,
         cityOnSelected,
         setStateAndCity,
-        newStateSelect,
-        newCitySelect,
     }
 
 }

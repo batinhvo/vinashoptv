@@ -59,47 +59,52 @@
 </template>
 
 <script setup lang="ts">
-    
-    definePageMeta({middleware: ['auth-middle']});
+    definePageMeta({ middleware: ['auth-middle'] })
 
-    const isLoading = ref(true);
+    interface City {
+        id: number
+        name: string
+    }
 
-    const authStore = useAuthStore();
-    const stateStore = useStateStore();
+    const isLoading = ref(true)
 
-    /* ---------- FETCH DATA ---------- */
+    const authStore = useAuthStore()
+    const stateStore = useStateStore()
+
     onMounted(async () => {
-        await Promise.all([
-            //authStore.getInfoUser(),
-            stateStore.fetchStates()
-        ]);
-
-        setTimeout(() => {
-            isLoading.value = false;
-        }, 600);
+        await stateStore.fetchStates()
     })
 
-    /* ---------- FETCH CITIES WHEN STATE CHANGES ---------- */
     watch(
-        () => authStore.userInfo?.state,
-        async (stateCode) => {
-            if (stateCode) {
-            await stateStore.fetchCities(stateCode)
-            }
+        () => authStore.userInfo,
+        (user) => {
+            if (user) isLoading.value = false
         },
         { immediate: true }
     )
 
-    /* ---------- COMPUTED DISPLAY ---------- */
     const stateName = computed(() => {
         const stateCode = authStore.userInfo?.state
         return stateStore.states.find(s => s.code === stateCode)?.name || ''
     })
 
+    const currentCities = ref<City[]>([])
+
+    watch(
+        () => authStore.userInfo?.state,
+        async (stateCode) => {
+            currentCities.value = stateCode
+            ? await stateStore.fetchCities(stateCode)
+            : []
+        },
+        { immediate: true }
+    )
+
     const cityName = computed(() => {
         const cityId = authStore.userInfo?.cityId
-        return stateStore.cities.find(c => c.id === cityId)?.name || ''
+        return currentCities.value.find(c => c.id === cityId)?.name || ''
     })
+    
 </script>
 
 <style lang="css" scoped>

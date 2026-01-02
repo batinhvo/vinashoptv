@@ -43,6 +43,7 @@
                     @selected="locationUser.stateOnSelected" 
                     rules="stateSelect"
                     :widthfull=true 
+                    :is-strong="false"
                     isSearch                                    
                     name="state" label="State" class="lg:w-1/2 px-1"/>
 
@@ -51,6 +52,7 @@
                     :options="locationUser.cityOpt" 
                     :placeholder="locationUser.cityPlaceholder.value"                                     
                     isSearch
+                    :is-strong="false"
                     @selected="locationUser.cityOnSelected" 
                     rules="citySelect"
                     name="city" label="City" class="lg:w-1/2 px-1"/>

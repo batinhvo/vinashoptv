@@ -4,13 +4,11 @@
             {{ label }} <span v-if="isStrong" class="text-red-500">*</span>
         </label>
 
-        <Field :name="name" :rules="rules" v-model="selectedValue" v-slot="{ field, meta }">
+        <Field :name="name" :rules="rules" v-slot="{ field, meta }">
             <!-- Nút dropdown -->
             <button
                 type="button"
                 @click="toggleDropdown"
-                v-bind="field"
-                :value="field.value"
                 class="w-full bg-white border border-gray-300 rounded-full px-4 py-3 text-left shadow-sm focus:outline-none"
                 :class="[!meta.valid && meta.touched ? 'border-red-500' : 'border-gray-300']"
             >
@@ -58,6 +56,7 @@
 <script lang="ts" setup>
     import { Field } from 'vee-validate';
 
+    const authStore = useAuthStore();
     // Props
     const props = defineProps({
         label: { type: String, default: '' },
@@ -71,38 +70,33 @@
     });
     
     // Emit for parent
-    const emit = defineEmits(['update:modelValue', 'selected'])
+    const emit = defineEmits(['update:modelValue', 'selected']);
+    const modelValue = defineModel<string | null>();
     
     // States
     const isOpen = ref(false)
     const searchQuery = ref("");
-    const selectedValue = ref<string | number | null>();
+    const { value: fieldValue, setValue } = useField(props.name, props.rules);
     
     // Methods
     const toggleDropdown = () => {
-        isOpen.value = !isOpen.value
+        isOpen.value = !isOpen.value;
     }
 
     const selectOption = (option: string, field: any) => {
-        modelValue.value = option;   // cập nhật v-model
+        field.value = option;         
+        modelValue.value = option;
+        emit('selected', option);
         isOpen.value = false;
         fieldValue.value = option;
-        field.value = option;
-
-        emit("update:modelValue", option);
-        emit("selected", option);
     };
 
-    const { value: fieldValue, setValue } = useField(props.name, props.rules);
-    const modelValue = defineModel<string | number | null>();
-
-    // lọc danh sách theo input
     const filteredOptions = computed(() => {
-        const list = unref(props.options);
-        return list.filter((opt: string) =>
+        const list = unref(props.options)
+        return list.filter(opt =>
             opt.toLowerCase().includes(searchQuery.value.toLowerCase())
-        );
-    });
+        )
+    })
 
     watch(isOpen, (val) => {
         if (!val) {
@@ -110,25 +104,17 @@
         }
     });
 
-    
-
     watch(
-        () => modelValue.value,
-        (val) => {
-            if (val !== undefined && val !== null) {
-            setValue(val);        // cập nhật cho Field
-            selectedValue.value = val; 
-            fieldValue.value = val;
+        () => [authStore.authenticated, modelValue.value],
+        ([isAuth, val]) => {
+            if (!isAuth) return
 
-            //console.log('InputSelective mounted', fieldValue.value);
+            if (val !== undefined && val !== null) {
+            setValue(val)
+            } else {
+            setValue('')
             }
         },
         { immediate: true }
-
-        
-    );
-
-    
-
-    
+    )       
 </script>

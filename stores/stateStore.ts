@@ -19,7 +19,8 @@ export const useStateStore = defineStore('states', () => {
 
     // state
     const states = ref<State[]>([])
-    const cities = ref<City[]>([])
+    //const cities = ref<City[]>([])
+    const cities = ref<Record<string, City[]>>({})
     const error = ref(0)
     const message = ref('')
     
@@ -37,6 +38,8 @@ export const useStateStore = defineStore('states', () => {
     }
 
     const fetchStates = async () => {
+        if (states.value.length) return;
+
         try {
             states.value = await fetchApi<State[]>('states')
         } catch {
@@ -46,19 +49,30 @@ export const useStateStore = defineStore('states', () => {
     }
 
     const fetchCities = async (stateCode: string) => {
+        if (!stateCode) return [];
+
+        if (cities.value[stateCode]) {
+            return cities.value[stateCode]
+        }
+
         try {
-            cities.value = await fetchApi<City[]>(`cities?state=${stateCode}`)
-            return cities.value
+            const data = await fetchApi<City[]>(`cities?state=${stateCode}`)
+            cities.value[stateCode] = data
+            return data
         } catch {
             message.value = 'Error loading city location data'
-            cities.value = []
+            //cities.value = []
             return []
         }
     }
 
-    const resetCities = () => {
-        cities.value = [];
-    };
+    const resetCities = (stateCode?: string) => {
+        if (stateCode) {
+            delete cities.value[stateCode]
+        } else {
+            cities.value = {}
+        }
+    }
     
     return {
         states,

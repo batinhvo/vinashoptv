@@ -25,7 +25,7 @@ export function useLocationSelect(formData: any, keyPath: string) {
         formData.value[keyPath].city  = '';
 
         newCitySelect.value = '';
-        cityPlaceholder.value = 'Select City';
+        cityPlaceholder.value = '';
 
         await stateStore.fetchCities(code);
     }

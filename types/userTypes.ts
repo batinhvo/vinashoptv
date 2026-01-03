@@ -18,7 +18,7 @@ export interface DataProfileUser {
     email: string,
     phone: string,
     state: string,
-    zip: number | string,
+    zip: string,
 }
 
 export interface PassUser {

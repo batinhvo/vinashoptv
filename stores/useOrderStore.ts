@@ -87,7 +87,6 @@ export const useOrderStore = defineStore('order', {
         async handleAfterPaypalReturn(token: string, payerId: string) {
             try {
                 const apiUrl = useApi();
-
                 const response = await $fetch<{ error: number; message: string }>(`${apiUrl}invoices/paypal?token=${token}&payerId=${payerId}`);
 
                 return {

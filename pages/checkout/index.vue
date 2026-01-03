@@ -61,7 +61,7 @@
 
                                 <InputField v-model="formData.billingInfo.zipCode" 
                                     :widthfull=true
-                                    name="postCode" label="PostCode/Zip" rules="zipcode" type="number" placeholder="99999" />
+                                    name="postCode" label="PostCode/Zip" rules="zipcode" placeholder="99999" />
 
                                 <InputField v-model="formData.billingInfo.address" 
                                     :widthfull=true 
@@ -116,7 +116,7 @@
                                     <InputField 
                                         v-model="formData.shippingInfo.zipCode" 
                                         :widthfull=true
-                                        name="postCodeDif" label="PostCode/Zip" rules="zipcode" type="number" placeholder="99999" />
+                                        name="postCodeDif" label="PostCode/Zip" rules="zipcode" placeholder="99999" />
 
                                     <InputField 
                                         v-model="shippingInfo.address" 

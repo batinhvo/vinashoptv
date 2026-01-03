@@ -352,6 +352,7 @@ export const useCartStore = defineStore('cart', () => {
                 });
 
                 error.value = 0;
+                isPutCart.value = true;
             });            
         } catch (err) {
             console.error("Error posting cart:", err)
@@ -499,17 +500,6 @@ export const useCartStore = defineStore('cart', () => {
             } else {
                 couponValue.value = 0;
             }
-            
-
-            // if (coupon.type === 'discount') {
-            //     if (coupon.discountBasedOn === 'percent') {
-            //         couponValue.value = (coupon.codeValue / 100) * subTotal.value;
-            //     } else if (coupon.discountBasedOn === 'value') {
-            //         couponValue.value = coupon.codeValue;
-            //     } else {
-            //         couponValue.value = 0;
-            //     }
-            // }
 
             typeCoupon.value = coupon.type;
             successNotify('Coupon Code Applied Successfully!')

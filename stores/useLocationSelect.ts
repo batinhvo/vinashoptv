@@ -41,6 +41,10 @@ export function useLocationSelect(formData: any, keyPath: string) {
     const setStateAndCity = async (stateCode: string, cityId: number) => {
         if (!stateCode) return
 
+        if (!stateStore.states.length) {
+            await stateStore.fetchStates()
+        }
+
         const cityList = await stateStore.fetchCities(stateCode);
 
         formData.value[keyPath].state = stateCode;

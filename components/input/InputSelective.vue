@@ -71,7 +71,7 @@
     
     // Emit for parent
     const emit = defineEmits(['update:modelValue', 'selected']);
-    const modelValue = defineModel<string | null>();
+    const modelValue = defineModel<string | number | null>();
     
     // States
     const isOpen = ref(false)

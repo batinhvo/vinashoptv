@@ -59,31 +59,6 @@ export const useOrderStore = defineStore('order', {
             });
         },
 
-        async submitOrderToPassersby(payload: any) {            
-            const apiUrl = useApi();
-            const notify = useNotify();
-
-            const res = await $fetch<{ data: string }>(`${apiUrl}invoices`, {
-                method: 'POST',
-                body: payload,
-            });
-
-            const isUrl = /^https?:\/\//i.test(res.data);
-
-            if (isUrl) {
-                window.location.href = res.data;
-                return;
-            }
-
-            notify({
-                message: 'Order placed successfully!',
-                type: 'success',
-                time: 4000,
-            });
-
-            setTimeout(() => navigateTo('/'), 4000);
-        },
-
         async handleAfterPaypalReturn(token: string, payerId: string) {
             try {
                 const apiUrl = useApi();

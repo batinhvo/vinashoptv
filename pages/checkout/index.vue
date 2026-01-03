@@ -644,14 +644,10 @@
             try {
                 normalizeCardInfo();
 
-                if ( authStore.authenticated ) {
-                    await orderStore.submitOrder(payload);
-                } else {
-                    orderStore.submitOrderToPassersby(payload);
-                }
-                
+                await orderStore.submitOrder(payload);                
                 await cartStore.clearCart();
                 cartStore.clearLocalCart();           
+                
             } catch (error) {
                 notify({
                     message: 'Order failed. Please check information and try again!',

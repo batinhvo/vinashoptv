@@ -61,7 +61,7 @@
                     v-model="formData.zip" 
                     :widthfull=false 
                     :is-strong=false
-                    name="zip" type="number" rules="zipcode" label="Postcode/Zip"/>
+                    name="zip" rules="zipcode" label="Postcode/Zip"/>
 
                 <InputField 
                     v-model="formData.address" 

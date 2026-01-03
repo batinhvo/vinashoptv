@@ -62,7 +62,7 @@
 
                   <InputField
                     v-model="formDataSubmit.zip"
-                    name="postCode" label="PostCode/Zip" type="number" rules="zipcode" placeholder="9999" />
+                    name="postCode" label="PostCode/Zip" rules="zipcode" placeholder="9999" />
 
                   <InputField 
                     v-model="formDataSubmit.address"

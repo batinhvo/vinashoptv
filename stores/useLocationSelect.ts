@@ -59,6 +59,28 @@ export function useLocationSelect(formData: any, keyPath: string) {
         newStateSelect.value = stateName;
         newCitySelect.value  = cityName;
     };
+
+    const setStateAndCityValueName = async (stateCode: string, cityId?: number) => {
+        if (!stateCode || !cityId) return;
+
+        if (!stateStore.states.length) {
+            await stateStore.fetchStates();
+        }
+
+        const cityList = await stateStore.fetchCities(stateCode);
+
+        const cityName = cityList.find(c => c.id === cityId)?.name || 'Select City';
+        const stateName = stateStore.states.find(s => s.code === stateCode)?.name || 'Select State';
+
+        formData.value[keyPath].state = stateCode;
+        formData.value[keyPath].city = cityName;
+
+        statePlaceholder.value = stateName;
+        cityPlaceholder.value  = cityName;
+
+        newStateSelect.value = stateName;
+        newCitySelect.value  = cityName;    
+    };
     
     return {
         stateOpt,
@@ -70,6 +92,7 @@ export function useLocationSelect(formData: any, keyPath: string) {
         stateOnSelected,
         cityOnSelected,
         setStateAndCity,
+        setStateAndCityValueName,
     }
 
 }

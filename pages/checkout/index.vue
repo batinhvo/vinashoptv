@@ -536,8 +536,8 @@
     };
 
     function setLocation() {
-        billingLocation.setStateAndCity(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
-        shippingLocation.setStateAndCity(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
+        billingLocation.setStateAndCityValueName(formData.value.billingInfo.state, Number(formData.value.billingInfo.city));
+        shippingLocation.setStateAndCityValueName(formData.value.shippingInfo.state, Number(formData.value.shippingInfo.city));
     };
 
     watch([() => cartStore.dataProductShow, () => cartStore.dataPromotion], refreshGiftList);

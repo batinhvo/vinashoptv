@@ -161,6 +161,7 @@ export const useCartStore = defineStore('cart', () => {
                 }); 
 
                 isPutCart.value = !!dataCartResponse?.data;
+                //console.log(!!dataCartResponse?.data)
                 
                 const serverCart = dataCartResponse?.data ? JSON.parse(dataCartResponse.data) : [];
 
@@ -195,15 +196,22 @@ export const useCartStore = defineStore('cart', () => {
                 );
 
                 // sync lên server
-                await $fetch(`${apiUrl}carts`, {
-                    method: 'PUT',
-                    headers: {
-                        Authorization: `Bearer ${token()}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: { skuIdList: JSON.stringify(mergedCart) },
-                });
-
+                try {
+                    await $fetch(`${apiUrl}carts`, {
+                        method: isPutCart.value ? 'PUT' : 'POST',
+                        headers: {
+                            Authorization: `Bearer ${token()}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: { skuIdList: JSON.stringify(mergedCart) },
+                    });     
+                    isPutCart.value = true;
+                    error.value = 0;
+                } catch (err) {
+                    console.error("Error posting cart:", err)
+                    error.value = 1;
+                }
+                
                 localStorage.setItem('cart_data', JSON.stringify(mergedCart));
                 localStorage.setItem(CART_MERGE_KEY, 'true');
 
@@ -550,6 +558,7 @@ export const useCartStore = defineStore('cart', () => {
                 });
             });
             error.value = 0;
+
         } catch (err) {
             console.error("Error clearing cart:", err)
             error.value = 1;

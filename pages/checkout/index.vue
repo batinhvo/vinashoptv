@@ -52,6 +52,7 @@
                                     name="state" label="State" class="lg:w-1/2 px-1"/>
 
                                 <InputSelective 
+                                    v-model="billingLocation.newCitySelect.value"
                                     :options="billingLocation.cityOpt" 
                                     :placeholder="billingLocation.cityPlaceholder.value"                                     
                                     isSearch
@@ -105,6 +106,7 @@
                                         name="stateDif" label="State" class="lg:w-1/2 px-1"/>
 
                                     <InputSelective  
+                                        v-model="shippingLocation.newCitySelect.value"
                                         :options="shippingLocation.cityOpt" 
                                         :placeholder="shippingLocation.cityPlaceholder.value"                                     
                                         @selected="shippingLocation.cityOnSelected" 

@@ -146,15 +146,7 @@ export const useAuthStore = defineStore('auth', {
         /* ---------------- CHECK-EMAIL-SUBSCRIBE ---------------- */
         async checkSubscribeEmail() {
             return this.safeRequest(async () => {
-                const apiUrl = useApi();
-                const token = useCookie('tokenAccess').value;
-
-                const res = await $fetch<{ data: InfoSubscribe }>(`${apiUrl}subscribes`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
+                const res = await useApiFetch<{ data: InfoSubscribe }>(`subscribes`);
                 this.infoSubscribe = res.data;
                 this.infoSubscribeLoaded = true;
             });
@@ -164,7 +156,6 @@ export const useAuthStore = defineStore('auth', {
         async registerUser(profileData: any) {
             try {
                 const apiUrl = useApi();
-
                 await $fetch(`${apiUrl}auth/register`, {
                     method: 'POST',
                     body: profileData.value,                 
@@ -179,9 +170,7 @@ export const useAuthStore = defineStore('auth', {
         /* ---------------- FORGOT-PASSWORD ---------------- */
         async forgotPassword(email: string) {
             try {
-                const apiUrl = useApi();
-
-                await $fetch(`${apiUrl}auth/forgot-password`, {
+                await useApiFetch(`auth/forgot-password`, {
                     method: 'POST',
                     body: {email: email},                   
                 });
@@ -194,9 +183,7 @@ export const useAuthStore = defineStore('auth', {
         /* ---------------- RESET-PASSWORD ---------------- */
         async resetPasswordUser({ token, password }: { token: string; password: string }) {
             try {
-                const apiUrl = useApi();
-
-                await $fetch(`${apiUrl}auth/reset-password`, {
+                await useApiFetch(`auth/reset-password`, {
                     method: 'POST',
                     body: { token, password },            
                 });
@@ -209,36 +196,22 @@ export const useAuthStore = defineStore('auth', {
         /* ---------------- UPDATE-PROFILE-USER ---------------- */
         async updateProfileUser(payload: DataProfileUser) {
 
-            return this.safeRequest(async () => {
-                const apiUrl = useApi();
-                const token = useCookie('tokenAccess').value;
-
-                if (!token) throw new Error('Unauthorized');
-
-                await $fetch(`${apiUrl}auth`, {
+            await this.safeRequest(async () => {
+                await useApiFetch(`auth`, {
                     method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
                     body: payload,
                 });
             });
+
+            await this.getInfoUser();
         },
 
         /* ---------------- CHANGE-PASSWORD ---------------- */
         async updatePasswordUser({currentPassword, newPassword}: PassUser) {
 
             return this.safeRequest(async () => {
-                const apiUrl = useApi();
-                const token = useCookie('tokenAccess').value;
-
-                if (!token) throw new Error('Unauthorized');
-
-                await $fetch(`${apiUrl}auth/change-password`, {
-                    method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                await useApiFetch(`auth/change-password`, {
+                    method: 'PATCH',                  
                     body: { currentPassword, newPassword },
                 });
             });
@@ -248,16 +221,8 @@ export const useAuthStore = defineStore('auth', {
         /* ---------------- SUBSCRIBE-EMAIL ---------------- */
         async subscribeEmail(email: string) {
             return this.safeRequest(async () => {
-                const apiUrl = useApi();
-                const token = useCookie('tokenAccess').value;
-
-                if (!token) throw new Error('Unauthorized');
-
-                const res = await $fetch<{ userId: number }>(`${apiUrl}subscribes`, {
+                const res = await useApiFetch<{ userId: number }>(`subscribes`, {
                     method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
                     body: { email },
                 });
 

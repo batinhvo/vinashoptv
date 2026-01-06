@@ -47,41 +47,40 @@
 
     const isLoading = ref(false);
 
+    const handleAfterLogin = async () => {
+        cartStore.loadCartFromStorage();
+
+        await Promise.all([
+            authStore.getInfoUser(),
+            authStore.checkSubscribeEmail(),
+            cartStore.fetchDataCart(),
+        ]);
+
+        if (authStore.infoSubscribe?.userId) {
+            showSubcribe.value = false;
+            return;
+        }
+
+        const today = new Date().toDateString();
+        const lastVisit = localStorage.getItem('lastVisitDate');
+
+        if (lastVisit !== today && !authStore.infoSubscribeLoaded) {
+            showSubcribe.value = true;
+            localStorage.setItem('lastVisitDate', today);
+        } else {
+            showSubcribe.value = false;
+        }
+    };
+
     watch(
         () => authStore.authenticated,
         async (isAuth) => {
-            if (!isAuth) return;
-            if (isLoading.value) return;
-
+            if (!process.client || !isAuth || isLoading.value) return;
             isLoading.value = true;
-
             try {
-                cartStore.loadCartFromStorage();
-                
-                await Promise.all([              
-                    authStore.getInfoUser(),
-                    authStore.checkSubscribeEmail(),
-                    cartStore.fetchDataCart(),
-                ]);
-
-                // 🔥 CHECK SAU KHI API XONG
-                if (authStore.infoSubscribe?.userId) {
-                    showSubcribe.value = false;
-                    return;
-                }
-
-                const today = new Date().toDateString();
-                const lastVisit = localStorage.getItem('lastVisitDate');
-                
-                if (lastVisit !== today && authStore.infoSubscribeLoaded == false) {                 
-                    showSubcribe.value = true;
-                    localStorage.setItem('lastVisitDate', today);
-                } else {
-                    showSubcribe.value = false;
-                }  
-
+            await handleAfterLogin();
             } finally {
-                isLoading.value = false;
+            isLoading.value = false;
             }
         },
         { immediate: true }

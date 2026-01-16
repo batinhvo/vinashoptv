@@ -595,8 +595,9 @@
                 tax: item.tax,
                 weight: item.weight,
             }));
+            console.log('productData: ', formData.value.productList);
         },
-        { immediate: true }
+        { deep: true }
     );
 
     onMounted(async () => {

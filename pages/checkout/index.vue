@@ -234,9 +234,15 @@
                                                 <th class="text-left py-3">Tax</th>
                                                 <td class="text-right py-3">${{ formatPrice(cartStore.taxTotal) }}</td>
                                             </tr>
+                                            <tr v-show="formData.paymentMethod === 'paypal'" class="border-t border-gray-300">
+                                                <th class="text-left py-3">Paypal Fee (5%)</th>
+                                                <td class="text-right py-3">${{ formatPrice(cartStore.orderTotal * 0.05) }}</td>
+                                            </tr>
                                             <tr class="border-t border-gray-300">
                                                 <th class="text-left py-3">Total</th>
-                                                <th class="text-right py-3">${{ formatPrice(cartStore.orderTotal) }}</th>
+                                                <th class="text-right py-3">
+                                                    ${{formatPrice(formData.paymentMethod === 'paypal' ? cartStore.orderTotal * 1.05 : cartStore.orderTotal)}}
+                                                </th>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -260,9 +266,12 @@
                                             </label>
                                         </div>
                                         <div v-show="formData.paymentMethod === 'paypal'"
-                                            class="p-6 bg-gray-100 border-b border-gray-300">
-                                            <span>Pay via PayPal; you can pay with your credit card if you don’t have a
-                                                PayPal account.</span>
+                                            class="p-5 bg-gray-100 border-b border-gray-300">
+                                            <!-- <span>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal account.</span> -->
+                                            <span style="font-size: 13px">
+                                                Pay via PayPal - You can securely pay using your credit card even without a PayPal account.<br>
+                                                A 5% convenience fee will be applied to all PayPal payments.
+                                            </span>
                                         </div>
                                     </div>
                                     <div>

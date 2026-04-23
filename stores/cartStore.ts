@@ -37,6 +37,7 @@ export const useCartStore = defineStore('cart', () => {
     //****************************** GET ******************************//
 
     const cartCount = computed(() => addCartItems.value.length);
+    const round2 = (num: number) => Math.round(num * 100) / 100;
 
     const dataProductShow = computed<CartItem[]>(() => {
         return buyNowItem.value ? [buyNowItem.value] : addCartItems.value
@@ -45,9 +46,14 @@ export const useCartStore = defineStore('cart', () => {
     const cartSummary = computed(() => {
         const base = dataProductShow.value.reduce(
             (total, item) => {
-                total.subTotal += (item.salePrice != 0 ? item.salePrice : item.price) * item.quantity;
-                total.weight   += item.weight * item.quantity;
-                total.tax      += item.tax * total.subTotal || 0;
+                const price = item.salePrice != 0 ? item.salePrice : item.price;
+                const itemSubTotal = round2(price * item.quantity);
+                const itemWeight = round2(item.weight * item.quantity);
+                const itemTax = round2(item.tax * itemSubTotal);
+
+                total.subTotal = round2(total.subTotal + itemSubTotal);;
+                total.weight   = round2(total.weight + itemWeight);
+                total.tax      = round2(total.tax + itemTax);
                 return total;
             },
             { subTotal: 0, weight: 0, tax: 0 }
@@ -93,16 +99,31 @@ export const useCartStore = defineStore('cart', () => {
         return cartSummary.value.tax;
     });
 
+    // const taxTotal = computed(() => {
+    //     const couponValueType = typeCoupon.value === 'shipping' ? couponValue.value : 0;
+    //     const shippingAfterCoupon = round2(Math.max(shippingFee.value - couponValueType, 0));
+    //     return (taxProductTotal.value + shippingAfterCoupon + subTotal.value) * valueTaxLocal.value;
+    // });
+
+    // const orderTotal = computed(() => {
+    //     const shippingAfterCoupon = Math.max(shippingFee.value - (typeCoupon.value === 'shipping' ? couponValue.value : 0), 0)
+    //     const total = subTotal.value + shippingAfterCoupon + taxTotal.value - discountValue.value - (typeCoupon.value === 'discount' ? couponValue.value : 0);
+    //     return total;
+    // });
+
     const taxTotal = computed(() => {
         const couponValueType = typeCoupon.value === 'shipping' ? couponValue.value : 0;
-        const shippingAfterCoupon = Math.max(shippingFee.value - couponValueType, 0);
-        return (taxProductTotal.value + shippingAfterCoupon + subTotal.value) * valueTaxLocal.value;
+        const shippingAfterCoupon = round2(Math.max(shippingFee.value - couponValueType, 0));
+        const shippingTax = round2(shippingAfterCoupon * valueTaxLocal.value);
+        return round2((taxProductTotal.value + shippingAfterCoupon + subTotal.value) * valueTaxLocal.value);
     });
 
     const orderTotal = computed(() => {
-        const shippingAfterCoupon = Math.max(shippingFee.value - (typeCoupon.value === 'shipping' ? couponValue.value : 0), 0)
-        const total = subTotal.value + shippingAfterCoupon + taxTotal.value - discountValue.value - (typeCoupon.value === 'discount' ? couponValue.value : 0);
-        return total;
+        const shippingCoupon = typeCoupon.value === 'shipping' ? couponValue.value : 0;
+        const discountCoupon = typeCoupon.value === 'discount' ? couponValue.value : 0;
+        const shippingAfterCoupon = round2(Math.max(shippingFee.value - shippingCoupon, 0));
+        const total = subTotal.value + shippingAfterCoupon + taxTotal.value - discountValue.value - discountCoupon;
+        return round2(total);
     });
 
     const shippingFee = computed(() => {

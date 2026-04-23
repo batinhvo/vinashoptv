@@ -96,7 +96,7 @@
             return null;
         }
     },{
-        server: false
+        server: false,
     });
 
     onMounted(async () => {
@@ -140,7 +140,6 @@
             }
 
             isLoading.value = false;
-
         }
 
     });

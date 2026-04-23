@@ -236,12 +236,12 @@
                                             </tr>
                                             <tr v-show="formData.paymentMethod === 'paypal'" class="border-t border-gray-300">
                                                 <th class="text-left py-3">Paypal Fee (5%)</th>
-                                                <td class="text-right py-3">${{ formatPrice(cartStore.orderTotal * 0.05) }}</td>
+                                                <td class="text-right py-3">${{ formatPrice(round2(cartStore.orderTotal * 0.05)) }}</td>
                                             </tr>
                                             <tr class="border-t border-gray-300">
                                                 <th class="text-left py-3">Total</th>
                                                 <th class="text-right py-3">
-                                                    ${{formatPrice(formData.paymentMethod === 'paypal' ? cartStore.orderTotal * 1.05 : cartStore.orderTotal)}}
+                                                    ${{formData.paymentMethod === 'paypal' ? formatPrice(round2(cartStore.orderTotal * 1.05)) : formatPrice(cartStore.orderTotal)}}
                                                 </th>
                                             </tr>
                                         </tfoot>
@@ -618,6 +618,8 @@
             target.value = target.value.slice(0, 16); // Cắt bớt nếu vượt quá
         }
     };
+
+    const round2 = (num: number) => Math.round(num * 100) / 100;
 
     // handle price total
     const formatPrice = (value: number) => {

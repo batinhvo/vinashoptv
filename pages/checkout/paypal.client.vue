@@ -75,7 +75,7 @@
     const cartStore = useCartStore();
     const orderStore = useOrderStore();
     const authStore = useAuthStore();
-    const { data, error } = await useAsyncData('paypalReturn', async () => {
+    const { data, error } = useAsyncData('paypalReturn', async () => {
 
         if (!token || !payerId) {
             notify({
@@ -99,7 +99,8 @@
         server: false,
     });
 
-    onMounted(async () => {
+    watch(
+        [data, error], async () => {
 
         if (error.value) {
 
@@ -141,8 +142,7 @@
 
             isLoading.value = false;
         }
-
-    });
+    },{ immediate: true });
 </script>
 
 <style lang="css" scoped>

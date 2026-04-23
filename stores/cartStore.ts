@@ -69,22 +69,6 @@ export const useCartStore = defineStore('cart', () => {
         }
 
         return base;
-
-        // return dataProductShow.value.reduce(
-        //     (total, item) => {
-        //         const price = Number(item.salePrice || item.price || 0);
-        //         const qty    = Number(item.quantity || 0);
-        //         const weight = Number(item.weight || 0);
-        //         const tax    = Number(item.tax || 0);
-
-        //         total.subTotal += price * qty;
-        //         total.weight   += weight * qty;
-        //         total.tax      += tax * price * qty;
-
-        //         return total;
-        //     },
-        //     { subTotal: 0, weight: 0, tax: 0 }
-        // );
     });
 
     const subTotal = computed(() => {
@@ -99,22 +83,9 @@ export const useCartStore = defineStore('cart', () => {
         return cartSummary.value.tax;
     });
 
-    // const taxTotal = computed(() => {
-    //     const couponValueType = typeCoupon.value === 'shipping' ? couponValue.value : 0;
-    //     const shippingAfterCoupon = round2(Math.max(shippingFee.value - couponValueType, 0));
-    //     return (taxProductTotal.value + shippingAfterCoupon + subTotal.value) * valueTaxLocal.value;
-    // });
-
-    // const orderTotal = computed(() => {
-    //     const shippingAfterCoupon = Math.max(shippingFee.value - (typeCoupon.value === 'shipping' ? couponValue.value : 0), 0)
-    //     const total = subTotal.value + shippingAfterCoupon + taxTotal.value - discountValue.value - (typeCoupon.value === 'discount' ? couponValue.value : 0);
-    //     return total;
-    // });
-
     const taxTotal = computed(() => {
         const couponValueType = typeCoupon.value === 'shipping' ? couponValue.value : 0;
         const shippingAfterCoupon = round2(Math.max(shippingFee.value - couponValueType, 0));
-        const shippingTax = round2(shippingAfterCoupon * valueTaxLocal.value);
         return round2((taxProductTotal.value + shippingAfterCoupon + subTotal.value) * valueTaxLocal.value);
     });
 

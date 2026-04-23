@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
     const isLoading = ref(true);
+
     const $route = useRoute();
     const token = $route.query.token as string;
     const payerId = $route.query.PayerID as string;
@@ -72,34 +73,45 @@
     const cartStore = useCartStore();
     const orderStore = useOrderStore();
     const authStore = useAuthStore();
-    const { data } = await useAsyncData('paypalReturn',
-        async () => {
+    const { data, error } = await useAsyncData('paypalReturn', async () => {
+
+        try {
             const res = await orderStore.handleAfterPaypalReturn(token,payerId);
-        
-            if (res.error === 0) {
-                await cartStore.clearCart();
-                cartStore.clearLocalCart();
-
-                notify({
-                    message: res.message,
-                    type: 'success',
-                    time: 4000,
-                });
-
-            } else {
-
-                notify({
-                    message: res.message,
-                    type: 'error',
-                    time: 5000,
-                });
-            }
-
-            isLoading.value = false;
             return res;
-        }
-    );
 
+        } catch (err) {
+            notify({message: 'Payment failed.',type: 'error',time: 5000,});
+            return null;
+        }
+    },{
+        server: false
+    });
+
+    if (error.value) {
+        notify({
+            message: 'Unexpected error occurred.',
+            type: 'error',
+            time: 5000,
+        });
+        isLoading.value = false;
+    } else if (data.value) {
+
+        const res = data.value;
+        if (res.error === 0) {
+
+            await cartStore.clearCart();
+            cartStore.clearLocalCart();
+
+            notify({message: res.message,type: 'success',time: 4000,});
+
+        } else {
+
+            notify({message: res.message,type: 'error',time: 5000,});
+        }
+
+        isLoading.value = false;
+
+    }
 </script>
 
 <style lang="css" scoped>

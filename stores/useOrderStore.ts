@@ -44,18 +44,26 @@ export const useOrderStore = defineStore('order', {
 
                 const isUrl = /^https?:\/\//i.test(res.data);
 
+                // CASE: PayPal → redirect
                 if (isUrl) {
+
                     window.location.href = res.data;
-                    return;
+                    return {
+                        type: 'paypal'
+                    };
+
                 }
 
+                // CASE: Card → success
                 notify({
                     message: 'Order placed successfully!',
                     type: 'success',
                     time: 4000,
                 });
 
-                setTimeout(() => navigateTo('/'), 4000);
+                return {
+                    type: 'card'
+                };
             });
         },
 

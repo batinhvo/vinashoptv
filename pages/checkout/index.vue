@@ -353,15 +353,19 @@
                                     </div>
                                 </div>
 
-                                <button v-if="!isSubmit"
-                                    class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6" :disabled="!formData.paymentMethod">
-                                    Place order
+                                <button
+                                class="btn p-4 bg-primary w-full text-xl font-bold rounded-full mb-6
+                                        hover:bg-gray-700 hover:text-white
+                                        disabled:cursor-not-allowed
+                                        disabled:hover:bg-primary
+                                        disabled:hover:text-white"
+                                :disabled="!formData.paymentMethod || isSubmit">
+                                    <span class="flex items-center justify-center gap-2">
+                                        <span v-if="isSubmit" class="spinner"></span>
+                                        {{ isSubmit ? 'Loading...' : 'Place order' }}
+                                    </span>
                                 </button>
 
-                                <button v-else
-                                    class="btn p-4 bg-primary w-full text-xl font-bold rounded-full hover:bg-gray-700 hover:text-white mb-6" disabled>
-                                    Loading...
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -370,7 +374,6 @@
 
             <div v-else class="container my-10 text-center">
                 <!-- <i class="text-[200px] fa-solid fa-basket-shopping"></i> -->
-
                 <div class="text-5xl pb-5 font-bold text-[#00890c]">(-_-!)</div>
                 <div class="text-2xl font-bold">~ YOUR CART IS EMPTY ~</div>
 
@@ -503,27 +506,6 @@
     };
 
     function refreshGiftList() {
-        // giftList.value = [];
-        // promotionList.value = [];
-
-        // cartStore.dataProductShow.forEach(product => {
-        //     cartStore.dataPromotion.forEach(promo => {
-        //         if (checkGiftCondition(product, promo)) {
-        //             const exists = giftList.value.some(g => g.skuId === promo.skuIdOut);
-        //             if (!exists) {
-        //                 giftList.value.push({
-        //                     name: promo.name,
-        //                     quantity: product.quantity,
-        //                     skuId: promo.skuIdOut,
-        //                     weight: product.weight,
-        //                 });
-
-        //                 promotionList.value.push(promo)
-        //             }
-        //         }
-        //     });
-        // });
-
         const giftMap = new Map<number, Gift>();
         promotionList.value = [];
 
@@ -604,7 +586,7 @@
                 tax: item.tax,
                 weight: item.weight,
             }));
-            console.log('productData: ', formData.value.productList);
+            //console.log('productData: ', formData.value.productList);
         },
         { deep: true }
     );
@@ -655,11 +637,19 @@
 
             try {
                 normalizeCardInfo();
+                const res = await orderStore.submitOrder(payload); 
+                // CARD payment → clear
+                if (res?.type === 'card') {
 
-                await orderStore.submitOrder(payload);                
-                await cartStore.clearCart();
-                cartStore.clearLocalCart();           
-                
+                    await cartStore.clearCart();
+                    cartStore.clearLocalCart();
+
+                    setTimeout(() => {
+                        navigateTo('/');
+                    }, 4000);
+
+                }          
+
             } catch (error) {
                 notify({
                     message: 'Order failed. Please check information and try again!',
@@ -668,12 +658,11 @@
                 });
             }
 
-            setTimeout(() => {
+            finally {
                 isSubmit.value = false;
-            }, 8000);
+            }
         },
 
-        // INVALID CASE 🚨
         (errors) => {
             notify({
                 message: 'Please check the required fields!',
@@ -718,5 +707,20 @@
     .fade-enter-from,
     .fade-leave-to {
         opacity: 0;
+    }
+
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid black;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>

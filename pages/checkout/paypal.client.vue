@@ -67,14 +67,42 @@
     const $route = useRoute();
     const token = $route.query.token as string;
     const payerId = $route.query.PayerID as string;
-
+    
+    const notify = useNotify();
+    const cartStore = useCartStore();
     const orderStore = useOrderStore();
     const authStore = useAuthStore();
-    const { data } = await useAsyncData('paypalReturn', () =>
-        orderStore.handleAfterPaypalReturn(token, payerId)
-    );
-    isLoading.value = false;
+    const { data } = await useAsyncData('paypalReturn',
+        async () => {
+            const res = await orderStore.handleAfterPaypalReturn(token,payerId);
+        
+            if (res.error === 0) {
+                await cartStore.clearCart();
+                cartStore.clearLocalCart();
 
+                notify({
+                    message: res.message,
+                    type: 'success',
+                    time: 4000,
+                });
+
+                setTimeout(() => {
+                    navigateTo('/');
+                }, 4000);
+
+            } else {
+
+                notify({
+                    message: res.message,
+                    type: 'error',
+                    time: 5000,
+                });
+            }
+
+            return res;
+        });
+
+    isLoading.value = false;
 
 </script>
 

@@ -60,11 +60,17 @@
 
         <!-- button -->
         <div class="mt-2" v-if="isShowButton">
-        
-            <button type="button" class="btn bg-primary text-white py-2.5 w-full mt-4 rounded-full font-bold shadow-sm hover:bg-gray-700 hover:shadow-xl hover:-translate-y-1 duration-300"          
+
+            <button
+            type="button"
+            class="btn bg-primary text-white py-3 w-full mt-4 rounded-full font-bold shadow-sm hover:bg-gray-700 hover:shadow-xl hover:-translate-y-1 duration-300"
+            :disabled="loading"
             @click="handleAddTocartButton">
-                <span class="text-xl"><i class="ec ec-add-to-cart mr-2"></i></span>                              
-                Add to Cart
+                <span class="flex items-center justify-center gap-2">
+                    <span v-if="loading" class="spinner"></span>
+                    <i v-else class="text-xl ec ec-add-to-cart mr-2"></i>
+                    {{ loading ? 'Adding...' : 'Add to Cart' }}
+                </span>
             </button>
             
             <button type="button" class="btn bg-gray-700 text-white py-3 w-full mt-4 rounded-full font-bold shadow-sm hover:shadow-xl hover:-translate-y-1 duration-300"
@@ -91,6 +97,7 @@
     const emit = defineEmits(['updateSlideImages']);
 
     // --- Ref --- //
+    const loading = ref(false);
     const isShowButton = ref(false);
     const isOutOfStock = ref(false);
     const stockData = ref(0);
@@ -145,8 +152,18 @@
         router.push('/checkout');
     }
 
-    const handleAddTocartButton = () => {
-        cartStore.getDataAddCart(idSkus.value, quantity.value);      
+    const handleAddTocartButton = async () => {
+        if (loading.value) return;
+
+        try {
+            loading.value = true;
+            await cartStore.getDataAddCart(idSkus.value, quantity.value);   
+
+        } catch (error) {
+            console.error(error)
+        } finally {
+            loading.value = false;
+        }
     }
 
     // --- Watcherd --- //
@@ -179,5 +196,24 @@
     input[type="number"] {
         -moz-appearance: textfield; /* Ẩn trên Firefox */
         appearance: none;
+    }
+
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid white;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+
+    .text-xl {
+        font-size: 1.25rem;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
     }
 </style>

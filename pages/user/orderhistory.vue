@@ -73,7 +73,7 @@
                     </div>
                     <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">{{ order.billingFirstName + ' ' + order.billingLastName }}</div>
                     <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">{{ order.status }}</div>
-                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">${{ order.grandTotal }}</div>
+                    <div class="w-1/4 lg:w-1/5 py-3 border-r border-gray-200">${{ formatPrice(order.grandTotal) }}</div>
                         <div class="lg:w-1/5 lg:block hidden">
                             <button @click.prevent="toggleDetails(order.id)" class="btn btn-primary bg-primary py-1.5 px-3 rounded-full text-xs text-gray-22 font-normal hover:shadow-[0_4px_11px_0_rgba(254,215,0,0.35)]">
                                 More Details
@@ -165,6 +165,14 @@
         const minutes = pad(date.getMinutes());
         return `(${month}/${day}/${year} ${hours}:${minutes})`;
     }
+
+    // handle price total
+    const formatPrice = (value: number) => {
+        return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(value);
+    };
 
     const clearForm = () => {
         formData.value = {

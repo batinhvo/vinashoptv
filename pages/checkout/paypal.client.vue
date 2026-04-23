@@ -6,7 +6,9 @@
                 <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                 <span class="w-3 h-3 bg-green-600 rounded-full animate-bounce"></span>
             </div>
-            <p class="mt-4 text-gray-700 font-medium text-lg">Loading</p>
+            <p class="mt-4 text-gray-700 font-medium text-lg">
+                Processing your payment...
+            </p>
         </div>
 
         <div v-else>
@@ -75,6 +77,16 @@
     const authStore = useAuthStore();
     const { data, error } = await useAsyncData('paypalReturn', async () => {
 
+        if (!token || !payerId) {
+            notify({
+                message: 'Missing payment information.',
+                type: 'error',
+                time: 5000,
+            });
+            isLoading.value = false;
+            return null;
+        }
+
         try {
             const res = await orderStore.handleAfterPaypalReturn(token,payerId);
             return res;
@@ -87,31 +99,51 @@
         server: false
     });
 
-    if (error.value) {
-        notify({
+    onMounted(async () => {
+
+        if (error.value) {
+
+            notify({
             message: 'Unexpected error occurred.',
             type: 'error',
             time: 5000,
-        });
-        isLoading.value = false;
-    } else if (data.value) {
+            });
 
-        const res = data.value;
-        if (res.error === 0) {
+            isLoading.value = false;
+
+            return;
+        }
+
+        if (data.value) {
+
+            const res = data.value;
+
+            if (res.error === 0) {
 
             await cartStore.clearCart();
             cartStore.clearLocalCart();
 
-            notify({message: res.message,type: 'success',time: 4000,});
+            notify({
+                message: res.message,
+                type: 'success',
+                time: 4000,
+            });
 
-        } else {
+            } else {
 
-            notify({message: res.message,type: 'error',time: 5000,});
+            notify({
+                message: res.message,
+                type: 'error',
+                time: 5000,
+            });
+
+            }
+
+            isLoading.value = false;
+
         }
 
-        isLoading.value = false;
-
-    }
+    });
 </script>
 
 <style lang="css" scoped>

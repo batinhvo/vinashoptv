@@ -86,10 +86,6 @@
                     time: 4000,
                 });
 
-                setTimeout(() => {
-                    navigateTo('/');
-                }, 4000);
-
             } else {
 
                 notify({
@@ -99,10 +95,10 @@
                 });
             }
 
+            isLoading.value = false;
             return res;
-        });
-
-    isLoading.value = false;
+        }
+    );
 
 </script>
 

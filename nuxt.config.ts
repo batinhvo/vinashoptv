@@ -30,6 +30,7 @@ export default defineNuxtConfig({
       // Thêm tên miền của bạn vào danh sách cho phép
       allowedHosts: [
         'beta.vinashoptv.com',
+        'vinashoptv.com',
         // Bạn có thể thêm các tên miền khác nếu cần (ví dụ: 'localhost', '127.0.0.1')
       ],
     },

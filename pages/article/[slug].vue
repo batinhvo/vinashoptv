@@ -10,12 +10,12 @@
       <div class="my-10 px-5 text-justify xl:px-0">
         <div v-if="articleContent.loading" class="text-center"><i class="fa fa-spinner" aria-hidden="true"></i> Loading...</div>
         <div v-html="content"></div>
-      </div> 
+      </div>
     </div>
 </template>
 
 <script setup lang="ts">
-    definePageMeta({middleware: ['auth-middle']});
+    // definePageMeta({middleware: ['auth-middle']});
 
     const route = useRoute();
     const articleContent = useContentStore();

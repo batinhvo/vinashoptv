@@ -59,7 +59,7 @@
         </div>
 
         <!-- button -->
-        <div class="mt-2" v-if="isShowButton">
+        <div class="mt-2" v-if="isShowButton && !isOutOfStock">
 
             <button
             type="button"
@@ -156,7 +156,7 @@
         dataSkusfilter.value = foundSku;
 
         if (foundSku) {
-            isShowButton.value = true;
+            isShowButton.value = foundSku.stock > 0;
             isOutOfStock.value = foundSku.stock <= 0;
             stockData.value = foundSku.stock;
 
@@ -208,6 +208,15 @@
         if (!data.dataPro?.skus?.length) return;
 
         dataSkus.value = data.dataPro.skus;
+        
+        const totalStock = dataSkus.value.reduce(
+            (total, sku) => total + sku.stock,
+            0
+        );
+
+        stockData.value = totalStock;
+        isOutOfStock.value = totalStock <= 0;
+        isShowButton.value = totalStock > 0;
 
         // Nếu chỉ có 1 SKU => auto chọn
         if (data.dataPro.skus.length === 1) {

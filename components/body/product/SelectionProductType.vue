@@ -4,7 +4,7 @@
         <div class="border-b border-gray-300 pb-2">
             <span>Availability: </span>
             <span v-if="isOutOfStock" class="text-gray-500 font-bold">Out of stock</span>
-            <span v-else class="text-[#5cb85c] font-bold">{{ stockData == 0 ? data.dataPro.stock : stockData }} in stock</span>
+            <span v-else class="text-[#5cb85c] font-bold">{{ stockData }} in stock</span>
         </div>
 
         <!-- Price -->
@@ -94,7 +94,7 @@
         dataVariant?: Variant[];
     }>();
 
-    const emit = defineEmits(['updateSlideImages']);
+    const emit = defineEmits(["updateSlideImages"]);
 
     // --- Ref --- //
     const loading = ref(false);
@@ -108,84 +108,144 @@
     const dataSkusfilter = ref<Skus | null>(null);
 
     const selectedOptions = ref<Record<string, { val: string; id: number }>>({});
-    const choiceList = ref<string>('');
-    
-    // --- Computeds --- //
-    // const isOverStock = computed(() => quantity.value > stockData.value);
-    // const isAllVariantsSelected = computed(() => {
-    //     return Object.keys(selectedOptions.value).length === (data.dataVariant?.length || 0);
-    // });
+    const choiceList = ref<string>("");
 
     // --- Methods --- //
-    const increment = () => { quantity.value++ };
-    const decrement = () => { if (quantity.value > 1) quantity.value-- };
+    const increment = () => {
+        quantity.value++;
+    };
+
+    const decrement = () => {
+        if (quantity.value > 1) quantity.value--;
+    };
 
     const formatPrice = (price: number): string => {
         return price % 1 === 0 ? `${price}.00` : price.toFixed(2);
     };
 
     const selectOption = (key: string, val: string, id: number) => {
-        selectedOptions.value = { ...selectedOptions.value, [key]: {val, id} };
-        choiceList.value = Object.values(selectedOptions.value).map((val) => val.id).join(',');
+        selectedOptions.value = {
+            ...selectedOptions.value,
+            [key]: { val, id }
+        };
+
+        choiceList.value = Object.values(selectedOptions.value)
+            .map((v) => v.id)
+            .sort((a, b) => a - b)
+            .join(",");
     };
 
     const updateSelectedSku = (variantOptionIds: string) => {
-        const foundSku = dataSkus.value.find((sku) => sku.variantOptionIds === variantOptionIds) || null;
+        const sortedIds = variantOptionIds
+            .split(",")
+            .map(Number)
+            .sort((a, b) => a - b)
+            .join(",");
+
+        const foundSku =
+            dataSkus.value.find((sku) => {
+                const skuIds = sku.variantOptionIds
+                    .split(",")
+                    .map(Number)
+                    .sort((a, b) => a - b)
+                    .join(",");
+
+                return skuIds === sortedIds;
+            }) || null;
+
         dataSkusfilter.value = foundSku;
 
         if (foundSku) {
             isShowButton.value = true;
-            isOutOfStock.value = false;
+            isOutOfStock.value = foundSku.stock <= 0;
             stockData.value = foundSku.stock;
-            emit('updateSlideImages', foundSku.variantOptionIds);
-            idSkus.value = Number(dataSkusfilter.value?.id);
+
+            emit("updateSlideImages", foundSku.variantOptionIds);
+
+            idSkus.value = Number(foundSku.id);
         } else {
             isShowButton.value = false;
             isOutOfStock.value = true;
+            stockData.value = 0;
+            idSkus.value = 0;
         }
-
-        return idSkus
     };
 
+    // --- Actions --- //
     const handleBuyNowButton = () => {
+        if (!idSkus.value) return;
+
         cartStore.getDataBuyNow(idSkus.value, quantity.value);
-        router.push('/checkout');
-    }
+        router.push("/checkout");
+    };
 
     const handleAddTocartButton = async () => {
-        if (loading.value) return;
+        if (loading.value || !idSkus.value) return;
 
         try {
             loading.value = true;
-            await cartStore.getDataAddCart(idSkus.value, quantity.value);   
 
+            await cartStore.getDataAddCart(
+                idSkus.value,
+                quantity.value
+            );
         } catch (error) {
-            console.error(error)
+            console.error(error);
         } finally {
             loading.value = false;
         }
-    }
+    };
 
-    // --- Watcherd --- //
-    watchEffect(() => {
-        if (data.dataVariant?.some(vari => vari.options.length == 1)) {
-            isShowButton.value = true;
-            dataSkusfilter.value = dataSkus.value[0];        
-            idSkus.value = Number(data.dataPro?.skus.map(k => k.id))
-        }       
-    });
-
+    // --- Watch --- //
     watch(choiceList, (newVal) => {
+        if (!newVal) return;
+
         updateSelectedSku(newVal);
     });
 
-    // --- Init SKUS --- //
+    // --- Init --- //
     onMounted(() => {
-        if (data.dataPro?.skus) {
-            dataSkus.value = data.dataPro.skus;
+        if (!data.dataPro?.skus?.length) return;
+
+        dataSkus.value = data.dataPro.skus;
+
+        // Nếu chỉ có 1 SKU => auto chọn
+        if (data.dataPro.skus.length === 1) {
+            const sku = data.dataPro.skus[0];
+
+            dataSkusfilter.value = sku;
+
+            idSkus.value = Number(sku.id);
+            stockData.value = sku.stock;
+
+            isOutOfStock.value = sku.stock <= 0;
+            isShowButton.value = true;
+
+            emit("updateSlideImages", sku.variantOptionIds);
+
+            return;
+        }
+
+        // Nếu product không cần chọn variant
+        const hasRealVariants = data.dataVariant?.some(
+            (vari) => vari.options.length > 1
+        );
+
+        if (!hasRealVariants) {
+            const firstSku = data.dataPro.skus[0];
+
+            dataSkusfilter.value = firstSku;
+
+            idSkus.value = Number(firstSku.id);
+            stockData.value = firstSku.stock;
+
+            isOutOfStock.value = firstSku.stock <= 0;
+            isShowButton.value = true;
+
+            emit("updateSlideImages", firstSku.variantOptionIds);
         }
     });
-</script> 
+</script>
 
 <style lang="css" scoped>
     input[type="number"]::-webkit-inner-spin-button, 

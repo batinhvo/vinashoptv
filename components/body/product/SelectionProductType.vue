@@ -41,7 +41,7 @@
         </div>
 
         <!-- Quantity -->
-        <div class="mt-6 flex flex-wrap" v-if="isShowButton">
+        <div class="mt-6 flex flex-wrap" v-if="isShowButton && !isOutOfStock">
             <div class="font-bold w-1/3">Quantity</div>
             <div class="flex w-2/3">
                 <button  @click.prevent="decrement" class="w-10 h-7 text-center hover:bg-gray-300 bg-gray-100 border border-zinc-300 rounded-l-full">
@@ -156,9 +156,9 @@
         dataSkusfilter.value = foundSku;
 
         if (foundSku) {
-            isShowButton.value = foundSku.stock > 0;
-            isOutOfStock.value = foundSku.stock <= 0;
-            stockData.value = foundSku.stock;
+            isShowButton.value = (foundSku.total - foundSku.totalOut) > 0;
+            isOutOfStock.value = (foundSku.total - foundSku.totalOut) <= 0;
+            stockData.value = (foundSku.total - foundSku.totalOut);
 
             emit("updateSlideImages", foundSku.variantOptionIds);
 
@@ -225,9 +225,9 @@
             dataSkusfilter.value = sku;
 
             idSkus.value = Number(sku.id);
-            stockData.value = sku.stock;
+            stockData.value = sku.total - sku.totalOut;
 
-            isOutOfStock.value = sku.stock <= 0;
+            isOutOfStock.value = stockData.value <= 0;
             isShowButton.value = true;
 
             emit("updateSlideImages", sku.variantOptionIds);
@@ -246,9 +246,9 @@
             dataSkusfilter.value = firstSku;
 
             idSkus.value = Number(firstSku.id);
-            stockData.value = firstSku.stock;
+            stockData.value = firstSku.total - firstSku.totalOut;
 
-            isOutOfStock.value = firstSku.stock <= 0;
+            isOutOfStock.value = (firstSku.total - firstSku.totalOut) <= 0;
             isShowButton.value = true;
 
             emit("updateSlideImages", firstSku.variantOptionIds);

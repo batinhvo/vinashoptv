@@ -25,7 +25,7 @@
                         @updateRange="rangeChange" 
                         @resetUpdateSort="isUpdateSort = false"
                     />
-                </div>
+                </div> 
             </div>
         </div>
     </div>

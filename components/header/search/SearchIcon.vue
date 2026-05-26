@@ -62,17 +62,10 @@
         }
     }
 
-    onMounted(() => {
-        document.addEventListener('click', handleClickOutside)
-    });
-
-    onBeforeUnmount(() => {
-        document.removeEventListener('click', handleClickOutside)
-    });
-
     //---------------------------API------------------------------//
 
     const router = useRouter();
+    const route = useRoute();
 
     //trạng thái lưu trữ
     const queryProducts = ref(""); 
@@ -91,6 +84,26 @@
             },
         });
     };
+
+    watch(
+        () => route.fullPath,
+        () => {
+            if (route.path === "/search") {
+                queryProducts.value = String(route.query.keyword || "");
+            } else {
+                queryProducts.value = "";
+            }
+        },
+        { immediate: true }
+    );
+
+    onMounted(() => {
+        document.addEventListener("click", handleClickOutside);
+    });
+
+    onBeforeUnmount(() => {
+        document.removeEventListener('click', handleClickOutside)
+    });
 
 </script>
 

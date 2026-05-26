@@ -9,8 +9,6 @@
                 required
             />
 
-            <!-- <input type="hidden" v-model="selectedCategory"/> -->
-
             <button 
                 type="button" 
                 @click.prevent="toggleOpenCategories" 
@@ -43,6 +41,7 @@
     import type { Category } from 'types/categoryTypes';
 
     const router = useRouter();
+    const route = useRoute();
     const cateStore = useCateStore();
 
     //trạng thái lưu trữ
@@ -75,7 +74,40 @@
         }
     };
 
+    watch(
+        () => route.fullPath,
+        () => {
+            if (route.path === "/search") {
+                queryProducts.value = String(route.query.keyword || "");
+
+                if (route.query.category) {
+                    const cate = cateStore.categories.find(
+                        (c: Category) => c.slug === route.query.category
+                    );
+
+                    selectedCategory.value = cate
+                        ? cate.name
+                        : "All categories";
+                }
+            } else {
+                queryProducts.value = "";
+                selectedCategory.value = "All categories";
+            }
+        },
+        { immediate: true }
+    );
+
     onMounted(() => {
+        if (route.query.category) {
+            const cate = cateStore.categories.find(
+                (c: Category) => c.slug === route.query.category
+            );
+
+            if (cate) {
+                selectedCategory.value = cate.name;
+            }
+        }
+
         document.addEventListener("click", handleClickOutside);
     });
 

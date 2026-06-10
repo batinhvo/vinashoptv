@@ -15,11 +15,21 @@ export default defineNuxtConfig({
       apiBaseServer: process.env.NUXT_API_BASE_SERVER_URL,
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL,
       paramsOrderHistory: process.env.PARAMS_ORDER_HISTORY,
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY
     },
   },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
-    layoutTransition: { name: 'layout', mode: 'out-in' }
+    layoutTransition: { name: 'layout', mode: 'out-in' },
+    head: {
+      script: [
+        {
+          src: `https://www.google.com/recaptcha/api.js?render=${process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY}`,
+          async: true,
+          defer: true
+        }
+      ]
+    },
   },
   nitro: {
     port: process.env.PORT || 3002,

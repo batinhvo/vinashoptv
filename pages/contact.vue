@@ -81,13 +81,19 @@
   const apiUrl = config.public.apiBaseUrl;
   const notify = useNotify();
   const { handleSubmit, resetForm  } = useForm();
+  const { execute } = useRecaptcha()
 
   const onSubmit = handleSubmit( async () => {
     
     try {
-        await $fetch(`${apiUrl}comments/contact`, {
+      const recaptchaToken = await execute('contact_form')
+
+      await $fetch(`${apiUrl}comments/contact`, {
         method: 'POST',
-        body: formDataContact.value,
+        body: {
+          ...formDataContact.value,
+          recaptchaToken
+        },
         headers: { 'Content-Type': 'application/json' }
       });
 

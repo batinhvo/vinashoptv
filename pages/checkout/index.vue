@@ -93,7 +93,12 @@
 
                                     <InputField 
                                         v-model="shippingInfo.lastName"
-                                        name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />                   
+                                        name="lastNameDif" label="Last Name" rules="required" placeholder="enter your last name" />   
+                                        
+                                    <InputField 
+                                        v-model="shippingInfo.address" 
+                                        :widthfull=true 
+                                        name="streetDif" label="Street Address" rules="required" placeholder="enter your address" />
 
                                     <InputSelective         
                                         v-model="shippingLocation.newStateSelect.value"              
@@ -118,20 +123,16 @@
                                     <InputField 
                                         v-model="formData.shippingInfo.zipCode" 
                                         :widthfull=true
-                                        name="postCodeDif" label="PostCode/Zip" rules="zipcode" placeholder="99999" />
-
+                                        name="postCodeDif" label="PostCode/Zip" rules="zipcode" placeholder="99999" />        
+                                    
                                     <InputField 
-                                        v-model="shippingInfo.address" 
-                                        :widthfull=true 
-                                        name="streetDif" label="Street Address" rules="required" placeholder="enter your address" />
+                                        v-model="shippingInfo.phone" 
+                                        name="phoneDif" label="Phone" rules="phone|required"  placeholder="enter your phone number" />
 
                                     <InputField 
                                         v-model="shippingInfo.email" 
                                         name="emailDif" label="Email Address" rules="email|required" placeholder="enter your email address" />
-                                        
-                                    <InputField 
-                                        v-model="shippingInfo.phone" 
-                                        name="phoneDif" label="Phone" rules="phone|required"  placeholder="enter your phone number" />
+                                                                          
                                 </div>
                             </div>
 

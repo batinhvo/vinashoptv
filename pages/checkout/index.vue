@@ -41,6 +41,10 @@
                                 <InputField v-model="formData.billingInfo.lastName" 
                                     name="lastName" label="Last Name" rules="required" placeholder="enter your last name" />
 
+                                <InputField v-model="formData.billingInfo.address" 
+                                    :widthfull=true 
+                                    placeholder="enter your address" name="street" label="Street Address" rules="required"/>
+
                                 <InputSelective             
                                     v-model="billingLocation.newStateSelect.value"               
                                     :options="billingLocation.stateOpt" 
@@ -64,15 +68,11 @@
                                     :widthfull=true
                                     name="postCode" label="PostCode/Zip" rules="zipcode" placeholder="99999" />
 
-                                <InputField v-model="formData.billingInfo.address" 
-                                    :widthfull=true 
-                                    placeholder="enter your address" name="street" label="Street Address" rules="required"/>
-
-                                <InputField v-model="formData.billingInfo.email"
-                                    name="email" label="Email Address" rules="required|email" placeholder="enter your email address"/>
-
                                 <InputField v-model="formData.billingInfo.phone"
                                     name="phone" label="Phone" rules="required|phone" placeholder="enter your phone number" />
+
+                                <InputField v-model="formData.billingInfo.email"
+                                    name="email" label="Email Address" rules="required|email" placeholder="enter your email address"/>                               
                             </div>
 
                             <div class="title border-b border-gray-300 mb-10">

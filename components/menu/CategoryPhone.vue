@@ -17,7 +17,7 @@
                 <i class="ec ec-close-remove"></i>
             </button>
         </div>
-        <div class="h-full w-full relative inline-block left-0 top-0 px-8">            
+        <div class="z-50 max-h-[80%] overflow-y-auto w-full relative inline-block left-0 top-0 px-8">            
             <ul>
                 <li>
                     <div class="flex justify-between items-center py-2">

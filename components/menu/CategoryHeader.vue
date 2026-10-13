@@ -61,6 +61,8 @@
 </script>
 
 <style lang="css" scoped>
+
+
     button {
         outline: none;
     }
